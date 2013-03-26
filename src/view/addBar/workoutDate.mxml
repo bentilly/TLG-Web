@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 
+		 useHandCursor="true"
+		 buttonMode="true"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			
+			[Bindable] public var day:String;
+			[Bindable] public var date:String;
+			[Bindable] public var month:String;
+			public var myDate:Date;//passed in when created
+			
+			public var selected:Boolean = false;
+			
+			
+			public function selectMe():void{
+				dayTitle.setStyle('color', 0x2a8796);
+				dateTitle.setStyle('color', 0x2a8796);
+				monthTitle.setStyle('color', 0x2a8796);
+				selected = true;
+				this.alpha = 1;
+			}
+			public function deselectMe():void{
+				dayTitle.setStyle('color', 0xffffff);
+				dateTitle.setStyle('color', 0xffffff);
+				monthTitle.setStyle('color', 0xffffff);
+				selected = false;
+				this.alpha = .5;
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup horizontalAlign="center" gap="0" mouseEnabled="false">
+		<s:Label id="dayTitle" text="{day}" styleName="smallDateText" mouseEnabled="false"/>
+		<s:Label id="dateTitle" text="{date}" styleName="bigDateText" paddingBottom="0" paddingTop="-3" mouseEnabled="false"/>
+		<s:Label id="monthTitle" text="{month}" styleName="smallDateText" paddingTop="-5" mouseEnabled="false"/>
+	</s:VGroup>
+	
+	
+	
+	
+</s:Group>

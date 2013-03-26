@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:widgets="view.widgets.*"
+		 
+		 height="300"
+		 
+		 >
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import events.UIEvent;
+			
+			import view.widgets.activityTag;
+			
+			public var tags:Array;
+			
+			private var tagUIElements:Array;
+			
+			public function getActivity():String{
+				for each(var tag:activityTag in tagUIElements){
+					if(tag.selected){
+						return tag.key;
+					}
+				}
+				return null;
+			}
+			
+			public function buildTags():void{
+				tagUIElements = new Array();
+				tagsHGroup.removeAllElements();
+				
+				
+				var cols:int = Math.ceil(tags.length/10);
+				var tagCount:int = 0;
+				
+				for(var i:int = 0; i<cols; i++){
+					var vg:VGroup = new VGroup();
+					vg.gap = 2;
+					
+					for(var j:int = 0; j<10; j++){
+						var tag:activityTag = new activityTag();
+						tag.title = tags[tagCount].name;
+						tag.key = tags[tagCount].key;
+						tag.alpha = .6;
+						tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
+						tag.addEventListener(MouseEvent.ROLL_OVER, tag_overHandler);
+						tag.addEventListener(MouseEvent.ROLL_OUT, tag_outHandler);
+						vg.addElement(tag);
+						tagUIElements.push(tag);
+						tagCount++;
+						if(tagCount == tags.length){
+							break;
+						}
+					}
+					tagsHGroup.addElement(vg);
+				}
+			}
+			
+			protected function tag_clickHandler(event:MouseEvent):void
+			{				
+				var tag:activityTag = event.target as activityTag;
+				deselectAllTags();
+				tag.selectMe();
+				tag.alpha = 1;
+				newActivityInput.text = "new activity";
+				newActivityInput.styleName = "textFieldNewActivityBlank";
+				stage.focus = null;
+				
+			}
+			protected function tag_overHandler(event:MouseEvent):void
+			{				
+				var tag:activityTag = event.target as activityTag;
+				tag.alpha = 1;
+			}
+			protected function tag_outHandler(event:MouseEvent):void
+			{				
+				var tag:activityTag = event.target as activityTag;
+				if(!tag.selected){
+					tag.alpha = .6;
+				}
+			}
+			
+			private function deselectAllTags():void{
+				for each(var tag:activityTag in tagUIElements){
+					tag.deselectMe();
+					tag.alpha = .6;
+				}
+			}
+			
+			protected function newActivityInput_focusInHandler(event:FocusEvent):void
+			{
+				deselectAllTags();
+				if(newActivityInput.text == "new activity"){
+					newActivityInput.text = "";
+					newActivityInput.styleName = "textFieldNewActivityContent";
+				}
+			}
+			
+			protected function newActivityInput_focusOutHandler(event:FocusEvent):void
+			{
+				if(newActivityInput.text == ""){
+					newActivityInput.text = "new activity";
+					newActivityInput.styleName = "textFieldNewActivityBlank";
+				}
+			}
+			
+			
+			
+			/*triggered on successful creation of the workout in DB*/
+			public function workoutAdded(event:UIEvent):void{
+				deselectAllTags();
+				newActivityInput.text = "new activity";
+				newActivityInput.styleName = "textFieldNewActivityBlank";
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup>
+		
+		<s:HGroup>
+			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
+			<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
+		</s:HGroup>
+		
+		<s:HGroup id="tagsHGroup">
+			
+			<!--build this-->
+			<!--<s:VGroup gap="2">
+				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
+				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
+				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
+				max 10 before making new VGroup
+			</s:VGroup>-->
+			
+		</s:HGroup>
+
+			
+		<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity"
+					 focusIn="newActivityInput_focusInHandler(event)"
+					 focusOut="newActivityInput_focusOutHandler(event)"
+					 />
+	
+		
+	</s:VGroup>
+	
+	
+</s:Group>

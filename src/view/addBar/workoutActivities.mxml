@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:addBar="view.addBar.*"
+		 
+		 width="100%" 
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import events.UIEvent;
+			
+			[Bindable] public var myActivities:Array;
+			
+			public function getActivities():String{ //TODO: build and return an array
+				return myActivitiesGroup.getActivity();
+			}
+			
+			public function buildMyActivities(event:UIEvent):void{
+				myActivitiesGroup.tags = myActivities;
+				myActivitiesGroup.buildTags();
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:HGroup paddingLeft="20" paddingRight="20">
+		<addBar:activityGroup id="myActivitiesGroup"/>
+	</s:HGroup>
+	
+	
+</s:Group>

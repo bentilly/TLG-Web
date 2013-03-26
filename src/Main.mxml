@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:view="view.*"
+			   
+			   frameRate="30"
+			   backgroundColor="#26bc3b" xmlns:maps="maps.*"
+			   resize="application1_resizeHandler(event)"
+			   addedToStage="application1_addedToStageHandler(event)"
+			   >
+	
+	
+	
+	<fx:Style source="/css/fonts.css"/>
+	<fx:Style source="/css/styles.css"/>
+	
+		
+		<fx:Script>
+			<![CDATA[
+				protected function application1_resizeHandler(event:ResizeEvent):void
+				{
+					sizeContent();
+				}
+				protected function application1_addedToStageHandler(event:Event):void
+				{
+					sizeContent();
+					
+				}
+				private function sizeContent():void{
+					try{
+						content.height = stage.stageHeight;
+						content.width = stage.stageWidth;
+					}catch(e:Error){
+						trace('nothing on stage');
+					}
+				}
+				
+				
+			]]>
+		</fx:Script>
+		
+		<fx:Script>
+		<![CDATA[
+			import mx.events.ResizeEvent;
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<maps:TLGEventMap/>
+	</fx:Declarations>
+	
+	
+	<view:tlgContent id="content"/>
+	
+	
+	
+	
+</s:Application>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:addBar="view.addBar.*"
+		 
+		 height = "100%" 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import events.UIEvent;
+			protected function commentInput_focusInHandler(event:FocusEvent):void
+			{
+				if(commentInput.text == "comments"){
+					commentInput.text = "";
+					commentInput.styleName = "workoutCommentContent";
+				}
+			}
+			
+			protected function commentInput_focusOutHandler(event:FocusEvent):void
+			{
+				if(commentInput.text == ""){
+					commentInput.text = "comments";
+					commentInput.styleName = "workoutCommentStart";
+				}
+			}
+			
+			
+			
+			//TODO: VALIDATION
+			public function getWODate():Date{
+				return woDateSelector.getWODate();
+			}
+			public function getWODuration():int{
+				return woDurationSelector.getWODuration();
+			}
+			public function getWOComment():String{
+				
+				if(commentInput.text != 'comments'){
+					return commentInput.text;
+				}
+				return '';
+			}
+			
+			/*triggered on successful creation of the workout in DB*/
+			public function workoutAdded(event:UIEvent):void{
+				commentInput.text = "comments";
+				commentInput.styleName = "workoutCommentStart";
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:HGroup height="100%" gap="20">
+		<s:VGroup paddingLeft="20" gap="18">
+			<addBar:workoutDateSelector id="woDateSelector"/>
+			<addBar:workoutTimeEntry id="woDurationSelector"/>
+			<s:TextArea id="commentInput" width="100%" height="110" text="comments" styleName="workoutCommentStart" 
+						focusIn="commentInput_focusInHandler(event)"
+						focusOut="commentInput_focusOutHandler(event)"
+						/>
+		</s:VGroup>
+		<s:Line height="100%" right="0" alpha=".2">
+			<s:stroke>
+				<s:SolidColorStroke color="0xffffff" weight="1"/>
+			</s:stroke>
+		</s:Line>
+	</s:HGroup>
+	
+	
+	
+	
+	
+</s:Group>

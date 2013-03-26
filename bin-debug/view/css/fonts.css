@@ -1,0 +1,11 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+@font-face{
+	src:url("../assets/OpenSans-CondLight.ttf");
+	fontStyle: normal;
+	fontWeight: normal;
+	fontFamily: OS-condLight;
+}
+

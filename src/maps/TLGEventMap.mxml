@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns="http://mate.asfusion.com/"
+		  
+		  >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import business.ResponseManager;
+			import business.Services;
+			
+			import events.RequestEvent;
+			import events.UIEvent;
+			
+			import view.tlgContent;
+			import view.addBar.activityGroup;
+			import view.addBar.addBar;
+			import view.addBar.addWorkout;
+			import view.addBar.workoutActivities;
+			import view.addBar.workoutDate;
+			import view.addBar.workoutDetails;
+			import view.addBar.workoutTimeEntry;
+			import view.dashboard.myGroups_dash;
+			import view.dashboard.myTraining_dash;
+			
+			
+			[Bindable] private var services:Services = new Services();
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		
+		<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
+		<!--Initializes event dispatchers in Managers so they can send events-->
+		<EventHandlers type="{FlexEvent.PREINITIALIZE}">
+			<ObjectBuilder generator="{ResponseManager}" constructorArguments="{scope.dispatcher}" />
+		</EventHandlers>
+		
+		<!--Main API request-->
+		<EventHandlers type="{RequestEvent.TLG_API_REQUEST}" debug="true">
+			<HTTPServiceInvoker instance="{services.tlgApiRequest}" debug="true">
+				<Request data="{event.requestJson}"/>
+				<resultHandlers>
+					<MethodInvoker generator="{ResponseManager}" method="handleResponse" arguments="{[event, resultObject]}"/>
+				</resultHandlers>
+				<faultHandlers>
+					<MethodInvoker generator="{ResponseManager}" method="handleFault" arguments="{[event, fault, resultObject]}"/>
+				</faultHandlers>
+			</HTTPServiceInvoker>
+		</EventHandlers>
+		
+		
+		<Injectors target="{tlgContent}">
+			<!--Events-->
+			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
+			<ListenerInjector eventType="{UIEvent.GOT_GROUPS}" method="gotGroups"/>
+			<ListenerInjector eventType="{UIEvent.GO_HOME}" method="goHome"/>
+			<!--Properties-->
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups" targetKey="myGroups"/>
+		</Injectors>
+		
+		<Injectors target="{addBar}">
+			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			
+			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+		</Injectors>
+		
+		<Injectors target="{myTraining_dash}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+		</Injectors>
+		
+		<Injectors target="{myGroups_dash}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups" targetKey="myGroups"/>
+		</Injectors>
+		
+		<Injectors target="{workoutActivities}">
+			<!--Events-->
+			<ListenerInjector eventType="{UIEvent.GOT_MY_ACTIVITES}" method="buildMyActivities"/>
+			<!--Properties-->
+			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities" targetKey="myActivities"/>
+		</Injectors>
+		
+		<Injectors target="{addWorkout}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+		</Injectors>
+		
+		<Injectors target="{workoutTimeEntry}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+		</Injectors>
+		
+		<Injectors target="{workoutDetails}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+		</Injectors>
+		
+		<Injectors target="{activityGroup}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+		</Injectors>
+		
+		
+	</fx:Declarations>
+	
+	
+</EventMap>

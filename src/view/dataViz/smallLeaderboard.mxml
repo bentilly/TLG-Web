@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="creationCompleteHandler(event)"
+		 
+		 width="200"
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import spark.collections.Sort;
+			import spark.collections.SortField;
+			
+			
+			private var maxColHeight:Number = 60;
+			
+			[Bindable] private var dataCol:ArrayCollection = new ArrayCollection([
+				{name:"Dr Teeth", value:10}, 
+				{name:"Janice", value:2}, 
+				{name:"Kermit T Frog", value:15}, 
+				{name:"Miss Piggy", value:4}, 
+				{name:"Floyd Pepper", value:7},
+				{name:"Noo Zealand", value:6.5}, 
+				{name:"Bob", value:2}, 
+				{name:"Dr Teeth", value:3}, 
+				{name:"Kermit T Frog", value:0}, 
+				{name:"Noo Zealand", value:6}, 
+				{name:"Miss Piggy", value:8}, 
+				{name:"Janice", value:0}, 
+				{name:"Noo Zealand", value:1}
+			]);
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				var max:Number = 0;
+				
+				//get max value
+				for each(var v:Object in dataCol){
+					if(v.value > max){
+						max = v.value;
+					}
+				}
+				var scaleFactor:Number = maxColHeight / max;
+				
+				
+				sortLeaders();
+				
+				for each(var o:Object in dataCol){
+					var pc:personCol = new personCol();
+					pc.colHeight = o.value * scaleFactor;
+					pc.labelText = o.name;
+					if(o.name != "Floyd Pepper"){
+						pc.alpha = 0.5;
+					}
+					personCols.addElement(pc);
+				}
+				
+			}
+			
+			private function sortLeaders():void {
+				var dataSortField:SortField = new SortField();
+				dataSortField.name = "value";
+				dataSortField.numeric = true;
+				dataSortField.reverse();
+				
+				var numericDataSort:Sort = new Sort();
+				numericDataSort.fields = [dataSortField];
+				
+				dataCol.sort = numericDataSort;
+				dataCol.refresh();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<s:HGroup id="personCols" width="100%" height="100%" verticalAlign="bottom" horizontalAlign="center" gap="2"/>
+	<s:Label text="last 7 days" right="0" top="0" styleName="tinyWhite" alpha=".6"/>
+	
+	
+</s:Group>

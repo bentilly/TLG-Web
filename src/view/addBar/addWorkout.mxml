@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:addBar="view.addBar.*" 
+		 
+		 
+		 width="100%" 
+		 
+		 
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import events.RequestEvent;
+				
+			/*** IMPORTED ***/
+			[Bindable] public var token:String;
+			
+			
+			
+			public function addWorkoutData():void{
+				var woDate:Date = woDetails.getWODate();
+				var woDuration:int = woDetails.getWODuration();
+				var woComment:String = woDetails.getWOComment();
+				var woActivity:String = woActivitiesSelector.getActivities(); //TODO: make list of activities
+
+				
+				
+				
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'workout.addWorkout';
+				requestObj.token = token;
+				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
+				requestObj.duration = woDuration;
+				requestObj.comment = woComment;
+				requestObj.activity = woActivity; //TODO: this will be a list of activities - one for user and one per group
+				re.requestJson = JSON.stringify(requestObj);
+				dispatchEvent(re);
+				
+				
+			}
+			
+			//GO BUTTON
+			protected function goButton_rollOverHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#2a8796");
+				
+			}
+			
+			protected function goButton_rollOutHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#FFFFFF");
+			}
+			
+			protected function goButton_clickHandler(event:MouseEvent):void
+			{
+				stage.focus = null;
+				addWorkoutData();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup width="100%" height="100%" paddingTop="20" paddingLeft="20">
+		<s:Label id="addWorkoutTitle" text="ADD WORKOUT" styleName="h1_white" top="10" left="10"/>
+		<s:HGroup width="100%" height="320" paddingTop="20" gap="0">
+			<addBar:workoutDetails id="woDetails"/>
+			<s:Scroller width="100%" verticalScrollPolicy="off">
+				<addBar:workoutActivities id="woActivitiesSelector"/>
+			</s:Scroller>
+		</s:HGroup>
+	</s:VGroup>
+	
+	
+	<s:Label id="goButton" text="GO" styleName="h1_white" bottom="5" horizontalCenter="0" fontSize="38" 
+			 rollOver="goButton_rollOverHandler(event)"
+			 rollOut="goButton_rollOutHandler(event)"
+			 click="goButton_clickHandler(event)"/>
+	
+	
+</s:Group>

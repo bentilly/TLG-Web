@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 
+		 horizontalCenter="0"
+		 verticalCenter="0"
+		 
+		 currentState="loginState"
+		 alpha="0"
+		 creationComplete="creationCompleteHandler(event)"
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.crypto.MD5;
+			import com.greensock.TweenLite;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.validators.Validator;
+			
+			import events.RequestEvent;
+			
+			import view.tlgContent;
+			public var controller:tlgContent;
+			
+			
+			
+			// HANDLERS -----------------
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				TweenLite.to(this, .3, {alpha:1});
+				
+			}
+			
+			// GO button
+			protected function goButton_rollOverHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#7be6ff");
+				
+			}
+			
+			protected function goButton_rollOutHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#FFFFFF");
+				
+			}
+			
+			protected function goButton_clickHandler(event:MouseEvent):void
+			{
+				if(currentState == "loginState"){
+				
+					var validatorErrorArray:Array = Validator.validateAll([emailValidator, pwValidator]);
+					var isValidForm:Boolean = validatorErrorArray.length == 0;
+					if (isValidForm) {
+						var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+						var requestObj:Object = new Object();
+						requestObj.operation = 'token.createToken';
+						requestObj.email = emailInput.text;
+						requestObj.password = MD5.hash(passwordInput.text);
+						re.requestJson = JSON.stringify(requestObj);
+						dispatchEvent(re);
+						
+					} else {
+						Alert.show("The form is not valid!", "Somethings up");
+					}
+				}
+				
+			}
+			
+			// FORGOT button
+			protected function forgotButton_rollOverHandler(event:MouseEvent):void
+			{
+				forgotButton.setStyle("color", "#00a2ce");
+				
+			}
+			
+			protected function forgotButton_rollOutHandler(event:MouseEvent):void
+			{
+				forgotButton.setStyle("color", "#333333");
+				
+			}
+			
+			protected function forgotButton_clickHandler(event:MouseEvent):void
+			{
+				currentState ="forgotState";
+				
+			}
+			
+			
+			// LOG IN button
+			protected function loginButton_rollOverHandler(event:MouseEvent):void
+			{
+				loginButton.setStyle("color", "#00a2ce");
+				
+			}
+			
+			protected function loginButton_rollOutHandler(event:MouseEvent):void
+			{
+				loginButton.setStyle("color", "#333333");
+				
+			}
+			
+			protected function loginButton_clickHandler(event:MouseEvent):void
+			{
+				currentState ="loginState";
+				
+			}
+			
+			
+			
+			protected function batbHandler(event:MouseEvent):void
+			{
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'token.createToken';
+				requestObj.email = "b@b.com";
+				requestObj.password = MD5.hash("b");
+				re.requestJson = JSON.stringify(requestObj);
+				dispatchEvent(re);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<mx:EmailValidator id="emailValidator" source="{emailInput}" property="text" required="true"/>
+		<mx:StringValidator id="pwValidator" source="{passwordInput}" property="text" required="true"/>
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="loginState"/>
+		<s:State name="forgotState"/>
+	</s:states>
+	
+	
+	<s:VGroup gap="0">
+		<s:Group>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="LOGIN" paddingBottom="-6" paddingLeft="5" includeIn="loginState"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="FORGOT" paddingBottom="-6" paddingLeft="5" includeIn="forgotState"/>
+		</s:Group>
+		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="4">
+			<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
+				<s:Label text="email:" styleName="smallLight"/>
+				<s:TextInput id="emailInput" styleName="textFieldBold" width="300"/>
+				<s:Label text="password:" styleName="smallLight" excludeFrom="forgotState" paddingTop="8"/>
+				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState"/>
+				<s:HGroup gap="15">
+					<s:Label id="forgotButton" text="Forgot?" styleName="smallLight" paddingTop="15"
+							 useHandCursor="true" buttonMode="true"
+							 rollOver="forgotButton_rollOverHandler(event)"
+							 rollOut="forgotButton_rollOutHandler(event)"
+							 click="forgotButton_clickHandler(event)"
+							 excludeFrom="forgotState"
+							 />
+					<s:Label id="loginButton" text="Log in" styleName="smallLight" paddingTop="15"
+							 useHandCursor="true" buttonMode="true"
+							 rollOver="loginButton_rollOverHandler(event)"
+							 rollOut="loginButton_rollOutHandler(event)"
+							 click="loginButton_clickHandler(event)"
+							 excludeFrom="loginState"
+							 />
+				</s:HGroup>
+			</s:VGroup>
+		</s:BorderContainer>
+		<s:Group width="100%">
+			<s:Group right="0">
+				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
+						 useHandCursor="true" buttonMode="true"
+						 rollOver="goButton_rollOverHandler(event)"
+						 rollOut="goButton_rollOutHandler(event)"
+						 click="goButton_clickHandler(event)"
+						 />
+				</s:Group>
+			
+		</s:Group>
+		<s:Label text="go b@b" click="batbHandler(event)" />
+	</s:VGroup>
+	
+</s:Group>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 
+		 >
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import events.UIEvent;
+			
+			
+			//TODO: Validation
+			public function getWODuration():int{
+				var duration:int = (Number(hrInput.text)*60) + Number(minInput.text);
+				return duration;
+			}
+			
+			/*triggered on successful creation of the workout in DB*/
+			public function workoutAdded(event:UIEvent):void{
+				hrInput.text = "";
+				minInput.text = "";
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:HGroup verticalAlign="bottom">
+		<s:TextInput id="hrInput" styleName="workoutTextFieldBold" width="80"/>
+		<s:Label text="hr" styleName="hrMinLabels" paddingRight="20" alpha=".5" paddingBottom="5"/>
+		<s:TextInput id="minInput" styleName="workoutTextFieldBold" width="80"/>
+		<s:Label text="min" styleName="hrMinLabels" alpha=".5" paddingBottom="5"/>
+	</s:HGroup>
+	
+	
+	
+	
+	
+</s:Group>

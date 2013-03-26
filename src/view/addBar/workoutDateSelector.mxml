@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:addBar="view.addBar.*"
+		 creationComplete="creationCompleteHandler(event)"
+		 >
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.PopUpEvent;
+			
+			private var days:Array = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+			private var months:Array = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+			
+			private var workoutDates:Array;
+			
+			
+			public function getWODate():Date{
+				for each(var wd:workoutDate in workoutDates){
+					if(wd.selected){
+						return wd.myDate
+					}
+				}
+				return null;
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				workoutDates = new Array();
+				var d:workoutDate;
+				
+				d = new workoutDate();
+				d.day = "OTHER";
+				d.date = "?";
+				d.month = "DATE";
+				d.addEventListener(MouseEvent.ROLL_OVER, workoutDate_rollOverHandler);
+				d.addEventListener(MouseEvent.ROLL_OUT, workoutDate_rollOutHandler);
+				d.addEventListener(MouseEvent.CLICK, otherDate_clickHandler);
+				d.alpha = .5;
+				dateList.addElement(d);
+				
+				
+				var targetDate:Date = new Date();
+				var datesToShow:int = 6;
+				targetDate.setDate(targetDate.date - datesToShow);
+				for(var i:int; i<datesToShow; i++){
+					var wd:workoutDate = makeWorkoutDateFromDate(targetDate)
+					dateList.addElement(wd);
+					workoutDates.push(wd);
+					targetDate.setDate(targetDate.date + 1);
+				}
+				
+				var today:Date = new Date();
+				d = new workoutDate();
+				d.day = days[today.day] + " " + String(today.date);
+				d.date = "TODAY";
+				d.month = months[today.month];
+				d.myDate = today;
+				d.alpha = .5;
+				d.addEventListener(MouseEvent.ROLL_OVER, workoutDate_rollOverHandler);
+				d.addEventListener(MouseEvent.ROLL_OUT, workoutDate_rollOutHandler);
+				d.addEventListener(MouseEvent.CLICK, workoutDate_clickHandler);
+				dateList.addElement(d);
+				workoutDates.push(d);
+				d.selectMe()
+				
+			}
+			
+			private function makeWorkoutDateFromDate(d:Date):workoutDate{
+				var wd:workoutDate = new workoutDate();
+				wd.day = days[d.day];
+				wd.date = String(d.date);
+				wd.month = months[d.month];
+				wd.myDate = new Date(d.fullYear, d.month, d.date);
+				wd.alpha = .5;
+				wd.addEventListener(MouseEvent.ROLL_OVER, workoutDate_rollOverHandler);
+				wd.addEventListener(MouseEvent.ROLL_OUT, workoutDate_rollOutHandler);
+				wd.addEventListener(MouseEvent.CLICK, workoutDate_clickHandler);
+				
+				return wd;
+			}
+			
+			private function deselectAll():void{
+				for each(var wd:workoutDate in workoutDates){
+					wd.deselectMe();
+				}
+			}
+			
+			
+			
+			protected function workoutDate_rollOutHandler(event:MouseEvent):void
+			{
+				var target:workoutDate = event.target as workoutDate;
+				if(!target.selected){
+					target.alpha = .5;
+				}
+			}
+			protected function workoutDate_rollOverHandler(event:MouseEvent):void
+			{
+				var target:workoutDate = event.target as workoutDate;
+				target.alpha = 1;
+			}
+			protected function workoutDate_clickHandler(event:MouseEvent):void
+			{
+				deselectAll();
+				var target:workoutDate = event.target as workoutDate;
+				target.selectMe();
+			}
+			
+			
+			private function otherDate_clickHandler(event:MouseEvent):void{
+				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
+				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				dateChoosePU.addEventListener('close', updateOtherDate);
+				PopUpManager.centerPopUp(dateChoosePU);
+			}
+			private function updateOtherDate(event:PopUpEvent):void{
+				// If commit is false, do data is returned.
+				if (!event.commit)
+					return;
+				
+				var otherDate:Date = event.data as Date;
+				deselectAll();
+				//check for match
+				for each(var wd:workoutDate in workoutDates){
+					if(otherDate.toDateString() == wd.myDate.toDateString()){
+						wd.selectMe();
+						return
+					}
+				}
+				//didnt find a match. Set first date to this date and select
+				var targetWd:workoutDate = workoutDates[0];
+				targetWd.day = days[otherDate.day];
+				targetWd.date = String(otherDate.date);
+				targetWd.month = months[otherDate.month];
+				targetWd.myDate = new Date(otherDate.fullYear, otherDate.month, otherDate.date);
+				
+				targetWd.selectMe();
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<fx:Component className="dateChooserPopup">
+			<s:SkinnablePopUpContainer>
+				<fx:Script>
+					<![CDATA[
+						import mx.events.CalendarLayoutChangeEvent;
+						
+						protected function workoutDateChooser_changeHandler(event:CalendarLayoutChangeEvent):void
+						{
+							close(true, workoutDateChooser.selectedDate);
+						}
+						
+					]]>
+				</fx:Script>
+				<s:VGroup gap="0">
+					<s:Group>
+						<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="WORKOUT DATE" paddingBottom="-6" paddingLeft="2"/>
+					</s:Group>
+					<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
+						<s:VGroup paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+							<mx:DateChooser id="workoutDateChooser" change="workoutDateChooser_changeHandler(event)"/>
+						</s:VGroup>
+					</s:BorderContainer>
+				</s:VGroup>
+			</s:SkinnablePopUpContainer>
+		</fx:Component>
+		
+		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
+	</fx:Declarations>
+	
+	
+	<s:HGroup id="dateList" gap="17">
+		
+	</s:HGroup>
+	
+	
+	
+	
+</s:Group>

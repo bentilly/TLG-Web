@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:dashboard="view.dashboard.*"
+		 
+		 
+		 height="100%"
+		 
+		 resize="resizeHandler(event)"
+		 creationComplete="creationCompleteHandler(event)"
+		 
+		 >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.events.ResizeEvent;
+			
+			/*** IMPORTED ***/
+			[Bindable] public var myGroups:Array;
+			public var myTrainingSize:Number;
+			
+			/*** INTERNAL ***/
+			private var numGroups:int;
+			
+			protected function resizeHandler(event:ResizeEvent):void
+			{
+				resizeScroller()
+			}
+			
+			private function resizeScroller():void{
+				var stageWidth:Number = stage.width;
+				var myCalculatedWidth:Number = Math.round((stage.width / 100) * (100 - myTrainingSize));
+				
+				//(numgroups * groupwidth) + groupListPadding + (numGroups-1  * gap)
+				var groupListWidth:Number = (numGroups * 200) + 80 + ((numGroups-1) * 40);
+				
+				if(groupListWidth > myCalculatedWidth){
+					groupScroller.width = myCalculatedWidth;
+				}else{
+					groupScroller.width = groupListWidth;
+				}
+			}
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				
+				for each(var g:Object in myGroups){
+					var gd:group_dash = new group_dash();
+					gd.data = g;
+					groupList.addElement(gd);
+				}
+				var ag:addGroup = new addGroup();
+				groupList.addElement(ag);
+				
+				numGroups = myGroups.length + 1;
+				
+				resizeScroller()
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup id="container" horizontalCenter="0" verticalCenter="0" height="450">
+		
+		<s:Label text="Groups" styleName="h1_white" paddingBottom="20" paddingLeft="40"/>
+		
+		<s:Scroller id="groupScroller" height="430" verticalScrollPolicy="off">
+			<s:HGroup id="groupList" paddingLeft="40" paddingRight="40" gap="40">
+
+			</s:HGroup>
+		</s:Scroller>
+		
+	</s:VGroup>
+	
+</s:Group>

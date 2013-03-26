@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="creationCompleteHandler(event)"
+		 
+		 width="200"
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			
+			private var maxColHeight:Number = 60;
+			
+			[Bindable] private var dataCol:ArrayCollection = new ArrayCollection([
+				{day:"m", value:1}, 
+				{day:"t", value:2}, 
+				{day:"w", value:.5}, 
+				{day:"t", value:1.5}, 
+				{day:"f", value:.7},
+				{day:"s", value:3}, 
+				{day:"s", value:4.5}, 
+				{day:"m", value:3}, 
+				{day:"t", value:0}, 
+				{day:"w", value:1}, 
+				{day:"t", value:4.5}, 
+				{day:"f", value:0}, 
+				{day:"s", value:1},
+				{day:"s", value:2.2},
+				{day:"m", value:1}, 
+				{day:"t", value:2}, 
+				{day:"w", value:.5}, 
+				{day:"t", value:1.5}, 
+				{day:"f", value:.7},
+				{day:"s", value:3}, 
+			]);
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				var max:Number = 0;
+				
+				//get max value
+				for each(var v:Object in dataCol){
+					if(v.value > max){
+						max = v.value;
+					}
+				}
+				
+				var scaleFactor:Number = maxColHeight / max ;
+				
+				
+				for each(var o:Object in dataCol){
+					var dc:dayCol = new dayCol();
+					dc.colHeight = o.value * scaleFactor;
+					dc.labelText = o.day;
+					dayCols.addElement(dc);
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<s:HGroup id="dayCols" width="100%" height="100%" verticalAlign="bottom" horizontalAlign="center" gap="2"/>
+	<s:Label text="last 20 days" right="0" top="0" styleName="tinyWhite" alpha=".6"/>
+	
+	
+</s:Group>

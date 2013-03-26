@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 width="100%"
+		 
+		 filters="{ds}" xmlns:addBar="view.addBar.*"
+		 
+		 currentState="homeState"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import com.greensock.TweenLite;
+			
+			import events.UIEvent;
+			
+			/*** IMPORTED ***/
+			[Bindable] public var userName:String;
+			
+			/*** INTERNAL ***/
+			[Bindable] private var panelHeight:Number = 480;
+			[Bindable] private var peek:Number = 40;
+			[Bindable] private var plusDrop:Number = 15;
+			private var panelOpen:Boolean = false;
+			
+			protected function plusButton_clickHandler(event:MouseEvent):void
+			{
+				if(panelOpen){
+					closePanel();
+					panelOpen = false;
+				}else{
+					openPanel();
+					panelOpen = true;
+				}
+			}
+			private function closePanel():void{
+				TweenLite.to(container, .5, {y:(panelHeight*-1 + peek)});
+				TweenLite.to(plusGraphic, .5, {rotation:0});
+			}
+			private function openPanel():void{
+				TweenLite.to(container, .5, {y:0});
+				TweenLite.to(plusGraphic, .5, {rotation:45});
+			}
+			
+			protected function backButton_clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent = new UIEvent(UIEvent.GO_HOME);
+				dispatchEvent(uie);
+				currentState = 'homeState';
+			}
+			
+			public function goMyWorkouts(event:UIEvent):void{
+				currentState = "myWorkoutsState";
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:DropShadowFilter id="ds" alpha=".3" distance="2" angle="90" blurX="5"/>
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="homeState"/>
+		<s:State name="myWorkoutsState"/>
+	</s:states>
+	
+	<s:Group id="container" width="100%" height="{panelHeight}" y="{panelHeight*-1 + peek}">
+		
+		<!--Black bg-->
+		<s:BorderContainer backgroundColor="black" borderVisible="false" width="100%" height="{panelHeight - plusDrop}">
+		</s:BorderContainer>
+		<!--Coloured Bg-->
+		<s:BorderContainer backgroundColor="#b2d3db" borderVisible="false" width="100%" height="{panelHeight - peek}">
+		</s:BorderContainer>
+		
+	
+		<s:BorderContainer id="plusButton" backgroundColor="black" borderVisible="false" width="40" height="40" cornerRadius="4" horizontalCenter="0" useHandCursor="true" buttonMode="true" bottom="0" click="plusButton_clickHandler(event)">
+			<s:Graphic id="plusGraphic" horizontalCenter="0" verticalCenter="0">
+				<s:Rect id="rect1" width="26" height="8" horizontalCenter="0" verticalCenter="0">
+					<s:fill>
+						<s:SolidColor color="white"/>
+					</s:fill>
+				</s:Rect>
+				<s:Rect id="rect2" width="8" height="26" horizontalCenter="0" verticalCenter="0">
+					<s:fill>
+						<s:SolidColor color="white"/>
+					</s:fill>
+				</s:Rect>
+			</s:Graphic>
+		</s:BorderContainer>
+		
+		<s:Label text="TheLazyGibbon" styleName="tlgBrand" bottom="{plusDrop + 3}" left="5"/>
+		<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
+			<s:Button id="backButton" label="Home" click="backButton_clickHandler(event)"/>
+			<s:Label text="My Workouts" styleName="userName"/>
+		</s:HGroup>
+		<s:Label text="{userName}" styleName="userName" bottom="{plusDrop + 3}" right="5"/>
+		
+		<addBar:addWorkout height="{panelHeight - peek}"/>
+		
+	</s:Group>
+	
+	
+</s:Group>
