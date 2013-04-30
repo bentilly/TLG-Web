@@ -21,11 +21,16 @@
 			import view.addBar.addBar;
 			import view.addBar.addWorkout;
 			import view.addBar.workoutActivities;
-			import view.addBar.workoutDate;
 			import view.addBar.workoutDetails;
 			import view.addBar.workoutTimeEntry;
 			import view.dashboard.myGroups_dash;
 			import view.dashboard.myTraining_dash;
+			import view.myWorkouts.calendarChartDay;
+			import view.myWorkouts.myWorkoutsContent;
+			import view.myWorkouts.woListDay;
+			import view.myWorkouts.workoutList;
+			import view.popups.editTagPopup;
+			import view.popups.editWorkoutPopup;
 			
 			
 			[Bindable] private var services:Services = new Services();
@@ -56,12 +61,18 @@
 			</HTTPServiceInvoker>
 		</EventHandlers>
 		
+		<EventHandlers type="{UIEvent.LOGOUT}">
+			<MethodInvoker generator="{ResponseManager}" method="logout"/>
+		</EventHandlers>
+		
 		
 		<Injectors target="{tlgContent}">
 			<!--Events-->
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
 			<ListenerInjector eventType="{UIEvent.GOT_GROUPS}" method="gotGroups"/>
 			<ListenerInjector eventType="{UIEvent.GO_HOME}" method="goHome"/>
+			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="gotAllWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups" targetKey="myGroups"/>
@@ -69,8 +80,11 @@
 		
 		<Injectors target="{addBar}">
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
-			
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+		</Injectors>
+		<Injectors target="{myWorkoutsContent}">
+			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>
 		
 		<Injectors target="{myTraining_dash}">
@@ -84,6 +98,7 @@
 		<Injectors target="{workoutActivities}">
 			<!--Events-->
 			<ListenerInjector eventType="{UIEvent.GOT_MY_ACTIVITES}" method="buildMyActivities"/>
+			<ListenerInjector eventType="{UIEvent.ACTIVITIES_UPDATED}" method="updateMyActivities"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities" targetKey="myActivities"/>
 		</Injectors>
@@ -103,6 +118,41 @@
 		<Injectors target="{activityGroup}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
 		</Injectors>
+		
+		<Injectors target="{calendarChartDay}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
+		</Injectors>
+		
+		<Injectors target="{woListDay}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
+		</Injectors>
+		
+		<Injectors target="{workoutList}">
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
+		</Injectors>
+		
+		<Injectors target="{editWorkoutPopup}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
+		</Injectors>
+		
+		<Injectors target="{myWorkoutsContent}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
+			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="workoutUpdated"/>
+		</Injectors>
+		
+		<!--This stops them being removed from memory. Need to find other ways of passing this info in-->
+		<Injectors target="{editTagPopup}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<ListenerInjector eventType="{UIEvent.ACTIVITY_UPDATED}" method="activityUpdated"/>
+			<ListenerInjector eventType="{UIEvent.ACTIVITY_UPDATE_FAIL}" method="activityUpdateFail"/>
+		</Injectors>
+	
 		
 		
 	</fx:Declarations>

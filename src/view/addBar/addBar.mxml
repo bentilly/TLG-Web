@@ -55,6 +55,12 @@
 				currentState = "myWorkoutsState";
 			}
 			
+			protected function logoutBut_clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent = new UIEvent(UIEvent.LOGOUT);
+				dispatchEvent(uie);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -73,7 +79,7 @@
 		<s:BorderContainer backgroundColor="black" borderVisible="false" width="100%" height="{panelHeight - plusDrop}">
 		</s:BorderContainer>
 		<!--Coloured Bg-->
-		<s:BorderContainer backgroundColor="#b2d3db" borderVisible="false" width="100%" height="{panelHeight - peek}">
+		<s:BorderContainer backgroundColor="#b2d3db" borderVisible="false" width="100%" height="{panelHeight - peek - 2}">
 		</s:BorderContainer>
 		
 	
@@ -93,11 +99,16 @@
 		</s:BorderContainer>
 		
 		<s:Label text="TheLazyGibbon" styleName="tlgBrand" bottom="{plusDrop + 3}" left="5"/>
-		<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
+		<!--<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
 			<s:Button id="backButton" label="Home" click="backButton_clickHandler(event)"/>
 			<s:Label text="My Workouts" styleName="userName"/>
+		</s:HGroup>-->
+		<s:HGroup bottom="{plusDrop + 3}" right="5">
+			<s:Label text="{userName}" styleName="userName" />
+			<s:Label id="logoutBut" text="|  log out" styleName="tinyWhite" paddingTop="2" paddingRight="10" alpha=".6" 
+					 rollOut="{logoutBut.alpha = .6}" rollOver="{logoutBut.alpha = 1}" click="logoutBut_clickHandler(event)"
+					 />
 		</s:HGroup>
-		<s:Label text="{userName}" styleName="userName" bottom="{plusDrop + 3}" right="5"/>
 		
 		<addBar:addWorkout height="{panelHeight - peek}"/>
 		

@@ -11,21 +11,35 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import business.data.Activity;
+			
 			import events.UIEvent;
 			
+			import view.popups.editTagPopup;
 			import view.widgets.activityTag;
 			
-			public var tags:Array;
+			public var myActivities:Array;
 			
 			private var tagUIElements:Array;
 			
 			public function getActivity():String{
 				for each(var tag:activityTag in tagUIElements){
 					if(tag.selected){
-						return tag.key;
+						return tag.activity._key;
 					}
 				}
 				return null;
+			}
+			
+			public function getNewActivity():String{
+				if(newActivityInput.text == 'new activity' || newActivityInput.text == ''){
+					return null
+				}else{
+					return newActivityInput.text;
+				}
 			}
 			
 			public function buildTags():void{
@@ -33,7 +47,7 @@
 				tagsHGroup.removeAllElements();
 				
 				
-				var cols:int = Math.ceil(tags.length/10);
+				var cols:int = Math.ceil(myActivities.length/10);
 				var tagCount:int = 0;
 				
 				for(var i:int = 0; i<cols; i++){
@@ -42,8 +56,7 @@
 					
 					for(var j:int = 0; j<10; j++){
 						var tag:activityTag = new activityTag();
-						tag.title = tags[tagCount].name;
-						tag.key = tags[tagCount].key;
+						tag.activity = myActivities[tagCount];
 						tag.alpha = .6;
 						tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
 						tag.addEventListener(MouseEvent.ROLL_OVER, tag_overHandler);
@@ -51,7 +64,7 @@
 						vg.addElement(tag);
 						tagUIElements.push(tag);
 						tagCount++;
-						if(tagCount == tags.length){
+						if(tagCount == myActivities.length){
 							break;
 						}
 					}
@@ -59,15 +72,40 @@
 				}
 			}
 			
+			public function updateTags():void{
+				buildTags();
+			}
+			
+			public function selectActivity(activity:Activity):void{
+				//find tag
+				for each(var tag:activityTag in tagUIElements){
+					if(tag.activity == activity){
+						//select it
+						tag.selectMe();
+						tag.alpha = 1;
+						break;
+					}
+				}
+				//no need to deal with new activity or deselecting for now
+			}
+			
 			protected function tag_clickHandler(event:MouseEvent):void
 			{				
-				var tag:activityTag = event.target as activityTag;
-				deselectAllTags();
-				tag.selectMe();
-				tag.alpha = 1;
-				newActivityInput.text = "new activity";
-				newActivityInput.styleName = "textFieldNewActivityBlank";
-				stage.focus = null;
+				if(event.target is activityTag){
+					var tag:activityTag = event.target as activityTag;
+					deselectAllTags();
+					tag.selectMe();
+					tag.alpha = 1;
+					newActivityInput.text = "new activity";
+					newActivityInput.styleName = "textFieldNewActivityBlank";
+					stage.focus = null;
+				}else if(event.target is Label){
+					//clicked edit. Open modal edit popup
+					var editTagPU:editTagPopup = new editTagPopup();
+					editTagPU.tag = (event.target.parent as activityTag).activity;
+					editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+					PopUpManager.centerPopUp(editTagPU);
+				}
 				
 			}
 			protected function tag_overHandler(event:MouseEvent):void
@@ -133,17 +171,7 @@
 			<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
 		</s:HGroup>
 		
-		<s:HGroup id="tagsHGroup">
-			
-			<!--build this-->
-			<!--<s:VGroup gap="2">
-				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
-				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
-				<widgets:activityTag click="activitytag1_clickHandler(event)"/>
-				max 10 before making new VGroup
-			</s:VGroup>-->
-			
-		</s:HGroup>
+		<s:HGroup id="tagsHGroup"/>
 
 			
 		<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity"

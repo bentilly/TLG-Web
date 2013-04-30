@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 minWidth="0"
+		 width="100%"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			
+			import spark.components.Group;
+			
+			import business.utils;
+			import business.data.Workout;
+			
+			import events.UIEvent;
+			
+			public var myDayWOs:Array; //Array of Workout objects
+			public var woBlocks:Array; //Array of calendarWorkoutBlock objects
+			public var myDate:Date;
+			[Bindable] public var colWidth:Number;
+			[Bindable] public var dayString:String = 'T';
+			[Bindable] public var dateString:String = '15';
+			
+			
+			private var utils:business.utils = new business.utils();
+			
+			
+			public function setWeekend():void{
+				dateLabel.styleName = "calDayWELabel";
+				dayLabel.styleName = "calDayWELabel";
+			}
+			
+			public function buildWorkouts():void{
+				woBlocks = [];
+				for each(var w:Workout in myDayWOs){
+					woBlocks.push(addBlockToColumn(w));
+					
+				}
+			}
+			
+			private function addBlockToColumn(workout:Workout):UIComponent{
+				
+				var block:calendarWorkoutBlock = new calendarWorkoutBlock();
+				block.workout = workout;
+				block.activity = workout._activities[0];
+				columnDisplay.addElement(block);
+				return block;
+				
+			}
+			
+			public function resizeMe():void
+			{
+				for each(var block:calendarWorkoutBlock in woBlocks){
+					block.blockRect.width = (colWidth-4);
+				}
+			}
+			
+			public function workoutAdded(event:UIEvent):void{
+				if(utils.getSortNumberFromDate(event.workout._date) == utils.getSortNumberFromDate(myDate)){
+					myDayWOs.push(event.workout);
+					columnDisplay.removeAllElements();
+					buildWorkouts();
+				}
+			}
+			
+			public function workoutUpdated(event:UIEvent):void{
+				//do any of this day's workouts match the updated one
+				var workoutPresent:Boolean = false;
+				for(var w:int = 0; w < myDayWOs.length; w++){
+					var wo:Workout = myDayWOs[w];
+					if(wo == event.workout){
+						workoutPresent = true;
+						
+						//find block
+						var updatedBlock:calendarWorkoutBlock;
+						var blockIndex:int;
+						for(var i:int = 0; i< woBlocks.length; i++){
+							var block:calendarWorkoutBlock = woBlocks[i];
+							if(block.workout == event.workout){
+								updatedBlock = block;
+								blockIndex = i;
+								break
+							}
+						}
+						
+						//does the date still match this day?
+						if(  utils.getSortNumberFromDate(myDate) == utils.getSortNumberFromDate(event.workout._date)  ){
+							//check activity
+							updatedBlock.activity = event.workout._activities[0];
+
+						}else{
+							//delete it from this day
+							columnDisplay.removeElement(updatedBlock);
+							woBlocks.splice(blockIndex, 1);
+							myDayWOs.splice(w, 1);
+							break;
+						}
+						break;
+					}
+				}
+				
+				//if its not here, should it be?
+				if(!workoutPresent){
+					workoutAdded(event);
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup gap="0" minWidth="0">
+		<s:VGroup id="columnDisplay" height="160" minWidth="0" gap="1" verticalAlign="bottom">
+			<!--<s:Graphic bottom="0" minWidth="0">
+				<s:Rect height="25" width="{colWidth-6}" minWidth="0">
+					<s:fill>
+						<s:SolidColor color="#bada55"/>
+					</s:fill>
+				</s:Rect>
+			</s:Graphic>-->
+		</s:VGroup>
+		<s:Label id="dateLabel" text="{dateString}" width="100%" textAlign="center" styleName="calDayLabel" height="15" paddingTop="5" minWidth="0" alpha=".7"/>
+		<s:Label id="dayLabel" text="{dayString}" width="100%" textAlign="center" styleName="calDayLabel" height="14" minWidth="0" alpha=".7"/>
+	</s:VGroup>
+	
+	
+</s:Group>

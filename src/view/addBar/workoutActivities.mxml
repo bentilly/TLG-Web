@@ -5,24 +5,43 @@
 		 xmlns:addBar="view.addBar.*"
 		 
 		 width="100%" 
-		 
+		 creationComplete="group1_creationCompleteHandler(event)"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
 			import events.UIEvent;
 			
-			[Bindable] public var myActivities:Array;
+			[Bindable] public var myActivities:Array = [];
 			
 			public function getActivities():String{ //TODO: build and return an array
 				return myActivitiesGroup.getActivity();
 			}
-			
-			public function buildMyActivities(event:UIEvent):void{
-				myActivitiesGroup.tags = myActivities;
-				myActivitiesGroup.buildTags();
+			public function setActivities(activities:Array):void{
+				//myActivities = activities;
+				buildMyActivities(new UIEvent(UIEvent.ACTIVITIES_UPDATED));
+				myActivitiesGroup.selectActivity(activities[0]); //only one until GROUPS
+			}
+			public function getNewActivity():String{
+				return myActivitiesGroup.getNewActivity();
 			}
 			
+			public function buildMyActivities(event:UIEvent):void{
+				myActivitiesGroup.myActivities = myActivities;
+				myActivitiesGroup.buildTags();
+			}
+			public function updateMyActivities(event:UIEvent):void{
+				myActivitiesGroup.myActivities = myActivities;
+				myActivitiesGroup.updateTags();
+			}
+			
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				buildMyActivities(new UIEvent(UIEvent.ACTIVITIES_UPDATED));
+			}
 			
 		]]>
 	</fx:Script>

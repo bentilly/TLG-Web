@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:addBar="view.addBar.*"
+			   
+			   filters="{[dsFliter]}"
+			   
+			   creationComplete="creationCompleteHandler(event)" 
+			   
+			   >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ResizeEvent;
+			import mx.managers.PopUpManager;
+			
+			import business.data.Workout;
+			
+			import events.RequestEvent;
+			import events.UIEvent;
+			
+			//import events.RequestEvent;
+			
+			/*** IMPORTED ***/
+			[Bindable] public var token:String;
+			
+			
+			[Bindable] public var workout:Workout;
+			
+			protected function closeHandler(event:CloseEvent):void
+			{
+				stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+				PopUpManager.removePopUp(this);
+				
+			}
+			
+			// GO button
+			protected function goButton_rollOverHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#7be6ff");
+				
+			}
+			
+			protected function goButton_rollOutHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#FFFFFF");
+				
+			}
+			
+			// CANCEL button
+			protected function cancelButton_rollOverHandler(event:MouseEvent):void
+			{
+				cancelButton.setStyle("color", "#7be6ff");
+				
+			}
+			
+			protected function cancelButton_rollOutHandler(event:MouseEvent):void
+			{
+				cancelButton.setStyle("color", "#FFFFFF");
+				
+			}
+			
+			protected function cancelButton_clickHandler(event:MouseEvent):void
+			{
+				stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+				close();
+			}
+			
+			protected function goButton_clickHandler(event:MouseEvent):void
+			{
+				var woDate:Date = woDetails.getWODate();
+				var woDuration:int = woDetails.getWODuration();
+				var woComment:String = woDetails.getWOComment();
+				var woActivity:String = woActivitiesSelector.getActivities(); //TODO: make list of activities
+				var newWO:String = woActivitiesSelector.getNewActivity();
+				
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'workout.updateWorkout';
+				requestObj.token = token;
+				requestObj.key = workout._key;
+				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
+				requestObj.duration = woDuration;
+				requestObj.comment = woComment;
+				requestObj.activity = woActivity; //TODO: this will be a list of activities - one for user and one per group
+				requestObj.newActivity = newWO;
+				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
+				dispatchEvent(re);
+				
+				
+				trace('closing editWorkoutPopup'); 
+				try{
+					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+					close();
+				}catch(e:Error){
+					
+				}
+			}
+
+			public function workoutUpdated(event:UIEvent):void{
+				trace('closing editWorkoutPopup'); 
+				try{
+					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+					close();
+				}catch(e:Error){
+					
+				}
+			}
+			
+			
+			
+			protected function resizeHandler(event:Event):void
+			{
+				this.width = stage.stageWidth * 0.8;
+				PopUpManager.centerPopUp(this);
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				stage.addEventListener(ResizeEvent.RESIZE, resizeHandler);
+				resizeHandler(new Event(Event.RESIZE));
+				setWorkoutToEdit();
+			}
+			private function setWorkoutToEdit():void{
+				woDetails.setWODate(workout._date);
+				woDetails.setDuration(workout._duration);
+				woDetails.setWOComment(workout._comment);
+				woActivitiesSelector.setActivities(workout._activities);
+				
+				
+				
+			}
+			
+			
+			
+			protected function deleteBut_rollOverHandler(event:MouseEvent):void
+			{
+				//deleteBut.alpha = 1;
+			}
+			
+			protected function deleteBut_rollOutHandler(event:MouseEvent):void
+			{
+				//deleteBut.alpha = .5;
+			}
+			
+			protected function deleteBut_clickHandler(event:MouseEvent):void
+			{
+				editWindowBG.setStyle('borderAlpha', 1);
+				woDetails.mouseChildren = false;
+				woActivitiesSelector.mouseChildren = false;
+				//deleteBut.setStyle('color', '#AA0000');
+				goButton.text = 'DELETE'
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
+	</fx:Declarations>
+	
+	<s:VGroup gap="0" width="100%">
+		<s:Group>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="EDIT WORKOUT" paddingBottom="-6" paddingLeft="2"/>
+		</s:Group>
+		<s:BorderContainer id="editWindowBG" backgroundColor="#b2d3db" borderVisible="true" cornerRadius="6"  width="100%" borderColor="#AA0000" borderWeight="3" borderAlpha="0">
+			
+			<s:VGroup id="editWindowContent" width="100%" height="100%" paddingTop="20" paddingLeft="20">
+				<s:HGroup width="100%" height="340" paddingTop="20" gap="0">
+					<s:VGroup>
+						<addBar:workoutDetails id="woDetails"/>
+						<!--TODO: delete workout-->
+						<!--<s:Label id="deleteBut" text="Delete this workout" styleName="h2_white" paddingTop="10" paddingLeft="17" paddingBottom="10" alpha=".5"
+								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>-->
+					</s:VGroup>
+					<s:Scroller width="100%" verticalScrollPolicy="off">
+						<addBar:workoutActivities id="woActivitiesSelector"/>
+					</s:Scroller>
+				</s:HGroup>
+			</s:VGroup>
+			
+		</s:BorderContainer>
+		<s:Group width="100%">
+			<s:HGroup right="0">
+				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
+						 useHandCursor="true" buttonMode="true"
+						 rollOver="goButton_rollOverHandler(event)" rollOut="goButton_rollOutHandler(event)"  click="goButton_clickHandler(event)"
+						 />
+			</s:HGroup>
+			<s:Group left="0">
+				<s:Label id="cancelButton" fontFamily="OS-condBold" color="white" fontSize="30" text="CANCEL"
+						 useHandCursor="true" buttonMode="true"
+						 rollOver="cancelButton_rollOverHandler(event)" rollOut="cancelButton_rollOutHandler(event)" click="cancelButton_clickHandler(event)"
+						 />
+			</s:Group>
+			
+		</s:Group>
+		
+	</s:VGroup>
+	
+	
+	
+</s:SkinnablePopUpContainer>

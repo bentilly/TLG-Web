@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:fxg="assets.fxg.*"
+		 
+		width="100%"
+		
+		creationComplete="creationCompleteHandler(event)"
+		
+		
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import business.data.Activity;
+			import business.data.Workout;
+			
+			import view.popups.editTagPopup;
+			import view.popups.editWorkoutPopup;
+			import view.widgets.activityTag;
+
+			
+			[Bindable] public var workout:Workout;
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				buildTags();
+			}
+			public function buildTags():void{
+				tagGroup.removeAllElements(); //Memory leak?
+				for each( var a:Activity in workout._activities){
+					var tag:activityTag = new activityTag();
+					tag.activity = a;
+					tag.selectMe();
+					tag.setForWhiteBg();
+					tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
+					tagGroup.addElement(tag);
+				}
+			}
+			
+			protected function tag_clickHandler(event:MouseEvent):void
+			{				
+				if(event.target is activityTag){
+					
+					
+					
+				}else if(event.target is Label){
+					//clicked edit. Open modal edit popup
+					var editTagPU:editTagPopup = new editTagPopup();
+					editTagPU.tag = (event.target.parent as activityTag).activity;
+					editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+					PopUpManager.centerPopUp(editTagPU);
+					
+				}
+				
+			}
+			
+			protected function rollOverHandler(event:MouseEvent):void
+			{
+				bgRect.alpha = .1;
+				editLabel.visible = true;
+			}
+			
+			protected function rollOutHandler(event:MouseEvent):void
+			{
+				bgRect.alpha = .0;
+				editLabel.visible = false;
+			}
+			
+			protected function editLabel_clickHandler(event:MouseEvent):void
+			{
+				//clicked edit. Open modal edit popup
+				var editWorkoutPU:editWorkoutPopup = new editWorkoutPopup();
+				editWorkoutPU.workout = workout;
+				editWorkoutPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(editWorkoutPU);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Rect id="bgRect" width="100%" height="100%" alpha="0">
+		<s:fill>
+			<s:SolidColor color="#000000"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:HGroup width="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="15" rollOver="rollOverHandler(event)" rollOut="rollOutHandler(event)" mouseOver="rollOverHandler(event)">
+		<s:HGroup id="durationGroup" gap="0" verticalAlign="baseline" width="90">
+			<s:Label id="hoursLabel" text="{workout._hrs}" styleName="durationNumbers"/>
+			<s:Label text="hr" styleName="durationlabel" paddingRight="2"/>
+			<s:Label id="minsLabel" text="{workout._mins}" styleName="durationNumbers"/>
+			<s:Label text="m" styleName="durationlabel"/>
+		</s:HGroup>
+		
+		<s:VGroup id="tagGroup" gap="2" width="220" paddingTop="5"/>
+		
+		<s:Label id="commentText" text="{workout._comment}" styleName="woComment" width="100%" minWidth="100" paddingTop="8" paddingBottom="5"/>
+		
+		<s:Label id="editLabel" text="edit" styleName="tagEdit" paddingTop="8" paddingLeft="20" paddingRight="10" visible="false" click="editLabel_clickHandler(event)"/>
+		
+	</s:HGroup>
+	
+	
+	
+	
+</s:Group>

@@ -6,12 +6,15 @@
 		 >
 	<fx:Script>
 		<![CDATA[
-			
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.events.PopUpEvent;
+			
+			import business.utils;
+			
+			private var utils:business.utils = new business.utils();
 			
 			private var days:Array = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 			private var months:Array = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -27,7 +30,31 @@
 				}
 				return null;
 			}
-			
+			public function setWODate(date:Date):void{
+				var dateSet:Boolean = false;
+				//is the date in workoutDates:Array already
+				for each(var wd:workoutDate in workoutDates){
+					if( utils.getSortNumberFromDate(date) == utils.getSortNumberFromDate(wd.myDate) ){
+						deselectAll();
+						wd.selectMe();
+						dateSet = true;
+						break;
+					}
+				}
+				if(!dateSet){
+				//add it as the 'other date' and select it
+					deselectAll();
+					var targetWd:workoutDate = workoutDates[0];
+					targetWd.day = days[date.day];
+					targetWd.date = String(date.date);
+					targetWd.month = months[date.month];
+					targetWd.myDate = new Date(date.fullYear, date.month, date.date);
+					
+					targetWd.selectMe();
+				}
+				
+				
+			}
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
 				workoutDates = new Array();
@@ -119,7 +146,7 @@
 				PopUpManager.centerPopUp(dateChoosePU);
 			}
 			private function updateOtherDate(event:PopUpEvent):void{
-				// If commit is false, do data is returned.
+				// If commit is false, no data is returned.
 				if (!event.commit)
 					return;
 				

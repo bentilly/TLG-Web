@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 
+		 height="200"
+		 
+		 resize="resizeHandler(event)"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ResizeEvent;
+			
+			import business.data.Workout;
+			
+			[Bindable] public var monthName:String;
+			public var myMonth:Date;
+			public var myMonthWOs:Array;
+			
+			
+			private var months:Array = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			private var days:Array = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+			private var dayObjects:Array;
+			
+			public function buildMonth():void{
+				dayObjects = new Array();
+				monthName = months[myMonth.month] + ' ' + myMonth.fullYear;
+				var dayCount:int = getDayCount(myMonth.fullYear, myMonth.month);
+				
+				for(var i:int = 0; i < dayCount; i++){
+					var day:calendarChartDay = new calendarChartDay();
+					//labels
+					var thisDate:Date = new Date(myMonth.fullYear, myMonth.month, i+1);
+					day.myDate = thisDate;
+					day.dateString = String(thisDate.date);
+					day.dayString = days[thisDate.day];
+					//Weekend highlighting
+					if(thisDate.day == 0 || thisDate.day == 6){
+						day.setWeekend();
+					}
+					//WOs for this day
+					var dayWOs:Array = [];
+					for each(var w:Workout in myMonthWOs){
+						if(w._date.date == thisDate.date){
+							dayWOs.push(w);
+						}
+					}
+					day.myDayWOs = dayWOs;
+					//trigger build
+					day.buildWorkouts();
+					//add
+					monthDays.addElement(day);
+					dayObjects.push(day);
+				}
+				
+				
+			}
+			
+			private function getDayCount(year:int, month:int):int{
+				var d:Date = new Date(year, month+1, 0);
+				return d.getDate();
+			}
+			
+			protected function resizeHandler(event:ResizeEvent):void
+			{
+				var dayCount:int = getDayCount(myMonth.fullYear, myMonth.month);
+				var colWidth:Number = Math.floor(this.width / dayCount);
+				for each(var d:calendarChartDay in dayObjects){
+					d.colWidth = colWidth;
+					d.resizeMe();
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Label id="monthLabel" text="{monthName}" styleName="monthTitle"/>
+	
+	<s:HGroup id="monthDays" width="100%" gap="0" y="35"/>
+	
+	
+	
+</s:Group>

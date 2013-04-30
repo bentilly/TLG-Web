@@ -29,19 +29,37 @@
 			
 			
 			//TODO: VALIDATION
+			//Date
 			public function getWODate():Date{
 				return woDateSelector.getWODate();
 			}
+			public function setWODate(date:Date):void{
+				woDateSelector.setWODate(date);				
+			}
+			//Duration
 			public function getWODuration():int{
 				return woDurationSelector.getWODuration();
 			}
+			public function setDuration(duration:Number):void{
+				woDurationSelector.setDuration(duration);
+			}
+			//comment
 			public function getWOComment():String{
-				
 				if(commentInput.text != 'comments'){
 					return commentInput.text;
 				}
 				return '';
 			}
+			public function setWOComment(comment:String):void{
+				if(comment == ''){
+					commentInput.text = "comments";
+					commentInput.styleName = "workoutCommentStart";
+				}else{
+					commentInput.text = comment;
+					commentInput.styleName = "workoutCommentContent";
+				}
+			}
+			
 			
 			/*triggered on successful creation of the workout in DB*/
 			public function workoutAdded(event:UIEvent):void{

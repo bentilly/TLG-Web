@@ -17,6 +17,11 @@
 				return duration;
 			}
 			
+			public function setDuration(duration:Number):void{
+				hrInput.text = String(  Math.floor(duration/60)  );
+				minInput.text = String(  duration - (Math.floor(duration/60)*60)  );
+			}
+			
 			/*triggered on successful creation of the workout in DB*/
 			public function workoutAdded(event:UIEvent):void{
 				hrInput.text = "";

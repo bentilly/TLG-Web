@@ -61,6 +61,8 @@
 						requestObj.email = emailInput.text;
 						requestObj.password = MD5.hash(passwordInput.text);
 						re.requestJson = JSON.stringify(requestObj);
+						trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+						trace(re.requestJson);
 						dispatchEvent(re);
 						
 					} else {
@@ -73,13 +75,13 @@
 			// FORGOT button
 			protected function forgotButton_rollOverHandler(event:MouseEvent):void
 			{
-				forgotButton.setStyle("color", "#00a2ce");
+				//forgotButton.setStyle("color", "#00a2ce");
 				
 			}
 			
 			protected function forgotButton_rollOutHandler(event:MouseEvent):void
 			{
-				forgotButton.setStyle("color", "#333333");
+				//forgotButton.setStyle("color", "#333333");
 				
 			}
 			
@@ -119,6 +121,8 @@
 				requestObj.email = "b@b.com";
 				requestObj.password = MD5.hash("b");
 				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
 				dispatchEvent(re);
 			}
 			
@@ -149,13 +153,13 @@
 				<s:Label text="password:" styleName="smallLight" excludeFrom="forgotState" paddingTop="8"/>
 				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState"/>
 				<s:HGroup gap="15">
-					<s:Label id="forgotButton" text="Forgot?" styleName="smallLight" paddingTop="15"
+					<!--<s:Label id="forgotButton" text="Forgot?" styleName="smallLight" paddingTop="15"
 							 useHandCursor="true" buttonMode="true"
 							 rollOver="forgotButton_rollOverHandler(event)"
 							 rollOut="forgotButton_rollOutHandler(event)"
 							 click="forgotButton_clickHandler(event)"
 							 excludeFrom="forgotState"
-							 />
+							 />-->
 					<s:Label id="loginButton" text="Log in" styleName="smallLight" paddingTop="15"
 							 useHandCursor="true" buttonMode="true"
 							 rollOver="loginButton_rollOverHandler(event)"
@@ -177,7 +181,7 @@
 				</s:Group>
 			
 		</s:Group>
-		<s:Label text="go b@b" click="batbHandler(event)" />
+		<!--<s:Label text="go b@b" click="batbHandler(event)" />-->
 	</s:VGroup>
 	
 </s:Group>

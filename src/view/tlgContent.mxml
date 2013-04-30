@@ -54,6 +54,8 @@
 				requestObj.operation = 'user.getGroups';
 				requestObj.token = token;
 				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
 				dispatchEvent(re);
 
 			}
@@ -107,9 +109,13 @@
 			}
 			private function killLoginWidget():void{
 				this.removeElement(loginWidget);
-				addMyTraining();
-				addMyGroups();
-				addTopAddBar();
+				
+				//go straight to personal training page (no groups)
+				/*addMyTraining();*/
+				/*addMyGroups();
+				addTopAddBar();*/
+				
+				preloadData();
 			}
 			
 			//topAddBar
@@ -183,9 +189,16 @@
 				requestObj.operation = 'user.getActivities';
 				requestObj.token = token;
 				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
 				dispatchEvent(re);
 			}
 			
+			//bypass dashboard - go straight to my training
+			public function gotAllWorkouts(event:UIEvent):void{
+				addTopAddBar();
+				TweenLite.delayedCall(2.5, clickMyTrainingDash_handler, [new MouseEvent(MouseEvent.CLICK)]);
+			}
 			
 			public function goHome(event:UIEvent):void{
 				dashGroup.x = -600;
@@ -200,7 +213,21 @@
 				myWorkouts.x = 0;
 				myWorkouts.visible = false;
 			}
-			
+			public function logout(event:Event):void{
+				TweenLite.to(myWorkouts, .5, {alpha:0, x:600, onComplete:killMyWorkouts});
+				tweenBGColour(0x26bc3b);
+				TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
+				
+				loginWidget = new loginUI();
+				loginWidget.alpha = 0;
+				this.addElement(loginWidget);
+				
+				TweenLite.to(loginWidget, 1, {alpha:1});
+				
+			}
+			private function killTopBar():void{
+				this.removeElement(topAddBar);
+			}
 		]]>
 	</fx:Script>
 	

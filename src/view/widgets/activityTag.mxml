@@ -4,23 +4,46 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:fxg="assets.fxg.*"
 		 
 		 currentState="deselectedState"
-		 mouseChildren="false"
+
+		 rollOver="rollOverHandler(event)"
+		 rollOut="rollOutHandler(event)"
+		 
+		 
+		 width="200"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import business.data.Activity;
 			
-			[Bindable] public var title:String = 'tag nametag nametag nametag nametag nametag nametag name';
-			public var key:String;
+			[Bindable] public var activity:Activity;
+
 			public var selected:Boolean = false;
+			
+			public function setForWhiteBg():void{
+				editLineStroke.color = 0x123456;
+				
+			}
 				
 			public function selectMe():void{
 				currentState = "selectedState"
-					selected = true;
+				selected = true;
 			}
 			public function deselectMe():void{
 				currentState = "deselectedState"
 				selected = false;
+			}
+			
+			protected function rollOverHandler(event:MouseEvent):void
+			{
+				editLine.visible = true;
+				editLabel.visible = true;
+			}
+			
+			protected function rollOutHandler(event:MouseEvent):void
+			{
+				editLine.visible = false;
+				editLabel.visible = false;
 			}
 			
 		]]>
@@ -35,16 +58,30 @@
 		<s:State name="selectedState"/>
 	</s:states>
 	
-	<s:HGroup gap="-1" includeIn="deselectedState">
+	<s:Line id="editLine" width="150" right="22" top="9" alpha=".2" visible="false">
+		<s:stroke>
+			<s:SolidColorStroke id="editLineStroke" color="white" weight="1"/>
+		</s:stroke>
+	</s:Line>
+	
+	<s:HGroup gap="-1" includeIn="deselectedState" mouseChildren="false" mouseEnabled="false">
 		<fxg:tagHead_white/>
-		<s:Label text="{title}" height="18" styleName="tagWhiteText" maxWidth="180" maxDisplayedLines="1"/>
-		<fxg:tagTail_white/>
+		<s:Label text="{activity._name}" height="18" styleName="tagWhiteText" maxWidth="160" maxDisplayedLines="1"/>
+		<s:Rect width="10" height="18"
+				topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
+			<s:fill><s:SolidColor color="{activity._colour}" /></s:fill>
+		</s:Rect>
 	</s:HGroup>
 	
-	<s:HGroup gap="-1" includeIn="selectedState">
+	<s:HGroup gap="-1" includeIn="selectedState" mouseChildren="false" mouseEnabled="false">
 		<fxg:tagHead_blue/>
-		<s:Label text="{title}" height="18" styleName="tagBlueText" maxWidth="180" maxDisplayedLines="1"/>
-		<fxg:tagTail_blue/>
+		<s:Label text="{activity._name}" height="18" styleName="tagBlueText" maxWidth="160" maxDisplayedLines="1"/>
+		<s:Rect width="10" height="18"
+				topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
+			<s:fill><s:SolidColor color="{activity._colour}" /></s:fill>
+		</s:Rect>
 	</s:HGroup>
+	
+	<s:Label id="editLabel" text="edit" right="0" styleName="tagEdit" top="5" visible="false"/>
 	
 </s:Group>

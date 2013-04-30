@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 width="100%"
+		 paddingTop="20"
+		 paddingRight="20"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import business.utils;
+			import business.data.Workout;
+			
+			import events.UIEvent;
+			
+			private var utils:business.utils = new business.utils();
+			
+			[Bindable] public var day:String;
+			[Bindable] public var date:String;
+			[Bindable] public var month:String;
+			public var myDate:Date;//passed in when created
+			public var myWorkouts:Array;
+			public var workoutUIElements:Array; //Array of woListWorkout objects on screen
+			
+			
+			
+			
+			public function buildWorkouts():void{
+				workoutUIElements = [];
+				for each(var wo:Workout in myWorkouts){
+					var wlwo:woListWorkout = new woListWorkout();
+					wlwo.workout = wo;
+					workoutUIElements.push(wlwo);
+					workoutsGroup.addElement(wlwo);
+					
+				}
+			}
+			
+			
+			public function workoutAdded(event:UIEvent):void{
+				if(utils.getSortNumberFromDate(event.workout._date) == utils.getSortNumberFromDate(myDate)){
+					myWorkouts.push(event.workout);
+					workoutsGroup.removeAllElements();
+					buildWorkouts();
+				}
+			}
+			
+			/*public function workoutUpdated(event:UIEvent):void{
+				var woPresent:Boolean = false;
+				//is it here
+				for(var w:int=0; w<myWorkouts.length; w++){
+					var wo:Workout = myWorkouts[w];
+					if(wo == event.workout){
+						woPresent = true;
+						
+						//find woListWorkout
+						var updatedUIElement:woListWorkout;
+						var wouiIndex:int;
+						for(var i:int=0; i<workoutUIElements.length; i++){
+							if(workoutUIElements[i].workout == event.workout){
+								updatedUIElement = workoutUIElements[i];
+								wouiIndex = i;
+								break;
+							}
+						}
+						
+						
+						//should it be here
+						if(utils.getSortNumberFromDate(myDate) == utils.getSortNumberFromDate(event.workout._date)){
+							//update tags
+							updatedUIElement.buildTags(); //Could optize by only updating changed tags.
+						}else{
+							//delete it
+							myWorkouts.splice(w, 1);
+							workoutUIElements.splice(wouiIndex, 1);
+							workoutsGroup.removeElement(updatedUIElement);
+						}
+						break;
+					}
+				}
+				
+				//should it be here
+				if(!woPresent){
+					workoutAdded(event);
+				}
+
+			}*/
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:VGroup horizontalAlign="center" gap="0" mouseEnabled="false" width="50">
+		<s:Label id="dayTitle" text="{day}" styleName="smallDateText" mouseEnabled="false" color="0x0D7F12"/>
+		<s:Label id="dateTitle" text="{date}" styleName="bigDateText" paddingBottom="0" paddingTop="-3" mouseEnabled="false"  color="0x0D7F12"/>
+		<s:Label id="monthTitle" text="{month}" styleName="smallDateText" paddingTop="-5" mouseEnabled="false"  color="0x0D7F12"/>
+	</s:VGroup>
+	
+	<s:Line height="100%">
+		<s:stroke>
+			<s:SolidColorStroke color="0x0D7F12" weight="1.5"/>
+		</s:stroke>
+	</s:Line>
+	
+	<s:VGroup id="workoutsGroup" width="100%" gap="1" paddingLeft="10"/>
+	
+	
+	
+	
+</s:HGroup>

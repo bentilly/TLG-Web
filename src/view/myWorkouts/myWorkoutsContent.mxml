@@ -1,11 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:myWorkouts="view.myWorkouts.*"
 		 
 		 width="100%" 
-		 height="100%"
+		 height="100%" 
+		 
+		 resize="resizeHandler(event)"
 		 >
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.greensock.TweenLite;
+			
+			import mx.events.ResizeEvent;
+			
+			import business.data.Workout;
+			
+			import events.UIEvent;
+			
+			/*** IMPORTED ***/
+			[Bindable] public var token:String;
+			[Bindable] public var myWorkouts:Array;
+			
+			
+			
+			private var monthWidth:Number;
+			private var edgeMonthWidth:Number = 160;
+			private var calMonthsArray:Array;
+			private var calBuilt:Boolean = false;
+			private var selectedMonth:Date;
+			
+			private function getMonthWorkouts(d:Date):Array{
+				var monthWOs:Array = [];
+				for each(var w:Workout in myWorkouts){
+					if(w._date.fullYear == d.fullYear && w._date.month == d.month){
+						monthWOs.push(w);
+					}
+				}
+				
+				return monthWOs;
+			}
+			
+			//thermonuclear. probably a memory leak. ripe for optimisation
+			public function workoutUpdated(event:UIEvent):void{
+				calBuilt = false;
+				workoutsList.removeAllElements();
+				calendarContent.removeAllElements();
+				goMyWorkouts(event);
+			}
+			public function logout(event:UIEvent):void{
+				calBuilt = false;
+				workoutsList.removeAllElements();
+				calendarContent.removeAllElements();
+			}
+			
+			public function goMyWorkouts(event:UIEvent):void
+			{
+				if(!calBuilt){
+					var now:Date = new Date();
+					selectedMonth = new Date(now.fullYear, now.month);
+					calMonthsArray = new Array();
+					for(var i:int = 0; i < 5; i++){
+						var cm:calendarChartMonth = new calendarChartMonth();
+						cm.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month + (i-2));
+						cm.myMonthWOs = getMonthWorkouts(cm.myMonth);
+						cm.buildMonth();
+						
+						cm.alpha = .5;
+						cm.monthLabel.scaleX = cm.monthLabel.scaleY = .7;
+						cm.monthLabel.y = 7;
+						calendarContent.addElement(cm);
+						calMonthsArray.push(cm);
+						
+						if(i==2){
+							cm.alpha = 1;
+							cm.monthLabel.scaleX = cm.monthLabel.scaleY = 1;
+							cm.monthLabel.y = 0;
+							
+							workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
+							workoutsList.myMonth = cm.myMonth;
+							workoutsList.buildWorkoutList();
+							
+							
+						}
+						if(i<2){
+							cm.monthLabel.x = monthWidth - edgeMonthWidth + 20;
+						}
+						
+						
+						
+					}
+					addMonthEventListeners();
+					resizeMonths();
+					calBuilt = true;
+				}
+				
+			}
+			
+			protected function resizeHandler(event:ResizeEvent):void
+			{
+				try{resizeMonths();}catch(e:Error){};
+			}
+			
+			private function resizeMonths():void{
+				monthWidth = this.width - (2 * edgeMonthWidth);
+				for(var i:int = 0; i < 5; i++){
+					var cm:calendarChartMonth = calMonthsArray[i];
+					cm.width = monthWidth;
+					cm.x = ((monthWidth * -2) + (i*monthWidth)) + edgeMonthWidth;
+					
+					if(i<2){
+						cm.monthLabel.x = cm.width - edgeMonthWidth + 20;
+					}
+					
+				}
+			}
+			
+			
+			
+			
+			
+			//Event handlers ::::::::::
+			
+			private function goPrevMonth(event:MouseEvent):void{
+				removeMonthEventListeners();
+				
+				//remove 5 from stage and array
+				var cm:calendarChartMonth = calMonthsArray.pop();
+				calendarContent.removeElement(cm);
+				
+				//move 0 - 3 to the right
+				var i:int = 0;
+				monthWidth = this.width - (2 * edgeMonthWidth);
+				for each(var m:calendarChartMonth in calMonthsArray){
+					var nowX:Number = m.x;
+					if(i==1){ //activate
+						TweenLite.to(m, 1, {x:nowX+monthWidth, alpha:1});
+						TweenLite.to(m.monthLabel, 1, {scaleX:1, scaleY:1, x:0, y:0});
+					}else if(i==2){ //deactivate
+						TweenLite.to(m, 1, {x:nowX+monthWidth, alpha:.5});
+						TweenLite.to(m.monthLabel, 1, {scaleX:.7, scaleY:.7, y:7});
+					}else{
+						TweenLite.to(m, 1, {x:nowX+monthWidth});
+					}
+					
+					i++;
+				}
+				TweenLite.delayedCall(1, finishGoPrevMonth);
+				
+			}
+			private function finishGoPrevMonth():void{
+				//add new month to 0 position (stage and arrary) TODO: do this after tweening? Maybe do it before
+				var newMonth:calendarChartMonth = new calendarChartMonth();
+				newMonth.width = monthWidth;
+				newMonth.x = (monthWidth * -2) + edgeMonthWidth;
+				newMonth.alpha = .5;
+				newMonth.monthLabel.scaleX = newMonth.monthLabel.scaleY = .7;
+				newMonth.monthLabel.y = 7;
+				newMonth.monthLabel.x = monthWidth - edgeMonthWidth + 20;
+				//set selected month and title
+				selectedMonth = calMonthsArray[2].myMonth;
+				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month-3);
+				//pass in workouts
+				newMonth.myMonthWOs = getMonthWorkouts(newMonth.myMonth);
+				//build and add
+				newMonth.buildMonth();
+				calMonthsArray.unshift(newMonth);
+				calendarContent.addElement(newMonth);
+				//add event listeners
+				TweenLite.delayedCall(.1, addMonthEventListeners);
+				
+				//Update workout list
+				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
+				workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
+				workoutsList.myMonth = cm.myMonth;
+				workoutsList.buildWorkoutList();
+				
+				
+				
+			}
+			
+			
+			
+			private function goNextMonth(event:MouseEvent):void{
+				removeMonthEventListeners();
+				
+				//remove 0 from stage and array
+				var cm:calendarChartMonth = calMonthsArray.shift();
+				calendarContent.removeElement(cm);
+				
+				//move 1 - 4 to the right
+				var i:int = 0;
+				monthWidth = this.width - (2 * edgeMonthWidth);
+				for each(var m:calendarChartMonth in calMonthsArray){
+					var nowX:Number = m.x;
+					
+					if(i==1){ //deactivate
+						TweenLite.to(m, 1, {x:nowX-monthWidth, alpha:.5});
+						var targetX:Number = m.width - edgeMonthWidth + 20;
+						TweenLite.to(m.monthLabel, 1, {scaleX:.7, scaleY:.7, x:targetX, y:7});
+					}else if(i==2){ //activate
+						TweenLite.to(m, 1, {x:nowX-monthWidth, alpha:1});
+						TweenLite.to(m.monthLabel, 1, {scaleX:1, scaleY:1, y:0});
+					}else{
+						TweenLite.to(m, 1, {x:nowX-monthWidth});
+					}
+					
+					
+					i++;
+				}
+				TweenLite.delayedCall(1, finishGoNextMonth);
+				
+			}
+			private function finishGoNextMonth():void{
+				//add new month to 5 position (stage and arrary) TODO: do this after tweening? Before?
+				var newMonth:calendarChartMonth = new calendarChartMonth();
+				newMonth.width = monthWidth;
+				newMonth.x = (monthWidth * 2) + edgeMonthWidth;
+				newMonth.alpha = .5;
+				newMonth.monthLabel.scaleX = newMonth.monthLabel.scaleY = .7;
+				newMonth.monthLabel.y = 7;
+				//set selected month and title
+				selectedMonth = calMonthsArray[2].myMonth;
+				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month+2);
+				//pass in workouts
+				newMonth.myMonthWOs = getMonthWorkouts(newMonth.myMonth);
+				//build and add
+				newMonth.buildMonth();
+				calMonthsArray.push(newMonth);
+				calendarContent.addElement(newMonth);
+
+				//add event listeners
+				TweenLite.delayedCall(.1, addMonthEventListeners);
+				
+				//Update workout list
+				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
+				workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
+				workoutsList.myMonth = cm.myMonth;
+				workoutsList.buildWorkoutList();
+				
+			}
+			
+			
+			
+			
+			private function addMonthEventListeners():void{
+				calMonthsArray[1].addEventListener(MouseEvent.CLICK, goPrevMonth);
+				calMonthsArray[3].addEventListener(MouseEvent.CLICK, goNextMonth);
+				//mousechildren
+				calMonthsArray[1].mouseChildren = false;
+				calMonthsArray[2].mouseChildren = true;
+				calMonthsArray[3].mouseChildren = false;
+			}
+			private function removeMonthEventListeners():void{
+				calMonthsArray[1].removeEventListener(MouseEvent.CLICK, goPrevMonth);
+				calMonthsArray[3].removeEventListener(MouseEvent.CLICK, goNextMonth);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
 	
 	
 	<fx:Declarations>
@@ -13,11 +272,20 @@
 	</fx:Declarations>
 	
 	<s:VGroup width="100%" height="100%" gap="0">
-		<s:Group width="100%" height="200">
-			<s:BorderContainer backgroundColor="#D6E8EA" width="100%" height="280" borderVisible="false"/>
+		<s:Group width="100%" height="280">
+			<s:BorderContainer backgroundColor="#D6E8EA" width="100%" height="100%" borderVisible="false">
+				<s:Group id="calendarContent" y="45" width="100%"/>
+			</s:BorderContainer>
 		</s:Group>
 		<s:Group width="100%" height="100%">
-			
+			<s:HGroup width="100%" height="100%">
+				<!--Stats and activities go here
+				<s:BorderContainer height="100%" width="400"/>
+				-->
+				<s:Scroller width="100%" height="100%" horizontalScrollPolicy="off">
+					<myWorkouts:workoutList id="workoutsList"/>
+				</s:Scroller>
+			</s:HGroup>
 		</s:Group>
 	</s:VGroup>
 	

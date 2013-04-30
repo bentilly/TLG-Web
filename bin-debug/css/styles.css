@@ -127,7 +127,7 @@ global{
 	fontSize: 14px;
 	color: #44bcd8;
 	paddingLeft:3px;
-	paddingRight:3px;
+	paddingRight:8px;
 	paddingTop:3px;
 	backgroundColor:white;
 }
@@ -136,11 +136,45 @@ global{
 	fontSize: 14px;
 	color: #FFF;
 	paddingLeft:3px;
-	paddingRight:3px;
+	paddingRight:8px;
 	paddingTop:3px;
 	backgroundColor:#2a8796;
 }
-
-
+.tagEdit{
+	fontFamily: "OS-reg";
+	fontSize: 10px;
+	color: #2a8796;
+}
+/* My Workouts */
+.monthTitle{
+	fontFamily: "OS-condBold";
+	fontSize: 30px;
+	color: #44BCD8;
+}
+.calDayLabel{
+	fontFamily: "OS-condBold";
+	fontSize: 11px;
+	color: #2a8796;
+}
+.calDayWELabel{
+	fontFamily: "OS-condBold";
+	fontSize: 11px;
+	color: #44BCD8;
+}
+.durationNumbers{
+	fontFamily: "OS-condBold";
+	fontSize: 32px;
+	color: #2A8796;
+}
+.durationlabel{
+	fontFamily: "OS-condBold";
+	fontSize: 16px;
+	color: #2A8796;
+}
+.woComment{
+	fontFamily: "OS-reg";
+	fontSize: 13px;
+	color: #2a8796;
+}
 
 
