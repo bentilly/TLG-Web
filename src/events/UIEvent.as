@@ -1,7 +1,7 @@
 package events{
 	import flash.events.Event;
 	
-	import business.data.Workout;
+	import business.dataObjects.Workout;
 	
 	public class UIEvent extends Event{
 

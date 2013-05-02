@@ -9,8 +9,8 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import business.data.Activity;
-			import business.data.Workout;
+			import business.dataObjects.Activity;
+			import business.dataObjects.Workout;
 			
 			[Bindable] public var workout:Workout;
 			[Bindable] public var activity:Activity;

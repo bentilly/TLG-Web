@@ -82,10 +82,6 @@
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
 		</Injectors>
-		<Injectors target="{myWorkoutsContent}">
-			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
-			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
-		</Injectors>
 		
 		<Injectors target="{myTraining_dash}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
@@ -142,8 +138,10 @@
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
 			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
-			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="workoutUpdated"/>
+			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>
 		
 		<!--This stops them being removed from memory. Need to find other ways of passing this info in-->

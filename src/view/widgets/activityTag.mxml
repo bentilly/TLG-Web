@@ -14,7 +14,12 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import business.data.Activity;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import business.dataObjects.Activity;
+			
+			import view.popups.editTagPopup;
 			
 			[Bindable] public var activity:Activity;
 
@@ -44,6 +49,14 @@
 			{
 				editLine.visible = false;
 				editLabel.visible = false;
+			}
+			
+			protected function editLabel_clickHandler(event:MouseEvent):void
+			{
+				var editTagPU:editTagPopup = new editTagPopup();
+				editTagPU.tag = (event.target.parent as activityTag).activity;
+				editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(editTagPU);
 			}
 			
 		]]>
@@ -82,6 +95,6 @@
 		</s:Rect>
 	</s:HGroup>
 	
-	<s:Label id="editLabel" text="edit" right="0" styleName="tagEdit" top="5" visible="false"/>
+	<s:Label id="editLabel" text="edit" right="0" styleName="tagEdit" top="5" visible="false" click="editLabel_clickHandler(event)"/>
 	
 </s:Group>

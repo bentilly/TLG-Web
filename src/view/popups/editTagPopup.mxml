@@ -4,14 +4,15 @@
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   
 			   filters="{[dsFliter]}"
+			   close="closeHandler(event)"
 			   >
 	<fx:Script>
 		<![CDATA[
-			import mx.events.CloseEvent;
-
 			import mx.managers.PopUpManager;
 			
-			import business.data.Activity;
+			import spark.events.PopUpEvent;
+			
+			import business.dataObjects.Activity;
 			
 			import events.RequestEvent;
 			
@@ -22,8 +23,9 @@
 			
 			[Bindable] public var tag:Activity;
 			
-			protected function closeHandler(event:CloseEvent):void
+			protected function closeHandler(event:PopUpEvent):void
 			{
+				trace('close editTagPopup');
 				PopUpManager.removePopUp(this);
 				
 			}

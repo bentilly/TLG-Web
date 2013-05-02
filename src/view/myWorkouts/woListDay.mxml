@@ -11,7 +11,7 @@
 	<fx:Script>
 		<![CDATA[
 			import business.utils;
-			import business.data.Workout;
+			import business.dataObjects.Workout;
 			
 			import events.UIEvent;
 			
@@ -22,19 +22,14 @@
 			[Bindable] public var month:String;
 			public var myDate:Date;//passed in when created
 			public var myWorkouts:Array;
-			public var workoutUIElements:Array; //Array of woListWorkout objects on screen
-			
-			
-			
 			
 			public function buildWorkouts():void{
-				workoutUIElements = [];
+				//clear screen
+				workoutsGroup.removeAllElements();
+				//add workout list items
 				for each(var wo:Workout in myWorkouts){
-					var wlwo:woListWorkout = new woListWorkout();
-					wlwo.workout = wo;
-					workoutUIElements.push(wlwo);
+					var wlwo:woListWorkout = wo.get_workoutListWorkout();
 					workoutsGroup.addElement(wlwo);
-					
 				}
 			}
 			
@@ -42,51 +37,9 @@
 			public function workoutAdded(event:UIEvent):void{
 				if(utils.getSortNumberFromDate(event.workout._date) == utils.getSortNumberFromDate(myDate)){
 					myWorkouts.push(event.workout);
-					workoutsGroup.removeAllElements();
 					buildWorkouts();
 				}
 			}
-			
-			/*public function workoutUpdated(event:UIEvent):void{
-				var woPresent:Boolean = false;
-				//is it here
-				for(var w:int=0; w<myWorkouts.length; w++){
-					var wo:Workout = myWorkouts[w];
-					if(wo == event.workout){
-						woPresent = true;
-						
-						//find woListWorkout
-						var updatedUIElement:woListWorkout;
-						var wouiIndex:int;
-						for(var i:int=0; i<workoutUIElements.length; i++){
-							if(workoutUIElements[i].workout == event.workout){
-								updatedUIElement = workoutUIElements[i];
-								wouiIndex = i;
-								break;
-							}
-						}
-						
-						
-						//should it be here
-						if(utils.getSortNumberFromDate(myDate) == utils.getSortNumberFromDate(event.workout._date)){
-							//update tags
-							updatedUIElement.buildTags(); //Could optize by only updating changed tags.
-						}else{
-							//delete it
-							myWorkouts.splice(w, 1);
-							workoutUIElements.splice(wouiIndex, 1);
-							workoutsGroup.removeElement(updatedUIElement);
-						}
-						break;
-					}
-				}
-				
-				//should it be here
-				if(!woPresent){
-					workoutAdded(event);
-				}
-
-			}*/
 			
 		]]>
 	</fx:Script>

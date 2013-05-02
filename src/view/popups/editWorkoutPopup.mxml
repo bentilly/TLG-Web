@@ -8,15 +8,18 @@
 			   
 			   creationComplete="creationCompleteHandler(event)" 
 			   
+			   close="closeHandler(event)"
+			   
 			   >
 	<fx:Script>
 		<![CDATA[
-			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
-			import business.data.Workout;
+			import spark.events.PopUpEvent;
+			
+			import business.dataObjects.Workout;
 			
 			import events.RequestEvent;
 			import events.UIEvent;
@@ -29,9 +32,11 @@
 			
 			[Bindable] public var workout:Workout;
 			
-			protected function closeHandler(event:CloseEvent):void
+			protected function closeHandler(event:PopUpEvent):void
 			{
-				stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+				//stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+				
+				trace('closing editWorkoutPopup');
 				PopUpManager.removePopUp(this);
 				
 			}
@@ -92,7 +97,7 @@
 				dispatchEvent(re);
 				
 				
-				trace('closing editWorkoutPopup'); 
+				 
 				try{
 					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
 					close();
@@ -102,7 +107,6 @@
 			}
 
 			public function workoutUpdated(event:UIEvent):void{
-				trace('closing editWorkoutPopup'); 
 				try{
 					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
 					close();
@@ -130,13 +134,8 @@
 				woDetails.setDuration(workout._duration);
 				woDetails.setWOComment(workout._comment);
 				woActivitiesSelector.setActivities(workout._activities);
-				
-				
-				
 			}
-			
-			
-			
+
 			protected function deleteBut_rollOverHandler(event:MouseEvent):void
 			{
 				//deleteBut.alpha = 1;
@@ -178,7 +177,7 @@
 								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>-->
 					</s:VGroup>
 					<s:Scroller width="100%" verticalScrollPolicy="off">
-						<addBar:workoutActivities id="woActivitiesSelector"/>
+						<addBar:workoutActivities id="woActivitiesSelector" editWorkoutMode="true"/>
 					</s:Scroller>
 				</s:HGroup>
 			</s:VGroup>

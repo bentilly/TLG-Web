@@ -34,5 +34,21 @@ package business
 			return Number(dString);
 		}
 		
+		public function compareDates(date1:Date, date2:Date):Boolean{ //returns true if the dates are the same
+			if( getSortNumberFromDate(date1) == getSortNumberFromDate(date2) ){
+				return true;
+			}
+			
+			return false;	
+		}
+		
+		public function compareMonths(date1:Date, date2:Date):Boolean{ //returns true if the months are the same
+			if( getMonthSortNumberFromDate(date1) == getMonthSortNumberFromDate(date2) ){
+				return true;
+			}
+			
+			return false;
+		}
+		
 	}
 }

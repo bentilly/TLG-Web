@@ -14,7 +14,7 @@
 			import spark.components.Group;
 			
 			import business.utils;
-			import business.data.Workout;
+			import business.dataObjects.Workout;
 			
 			import events.UIEvent;
 			

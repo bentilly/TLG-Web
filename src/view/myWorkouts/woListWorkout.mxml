@@ -13,19 +13,16 @@
 	
 	<fx:Script>
 		<![CDATA[
-			
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
-			import business.data.Activity;
-			import business.data.Workout;
+			import business.dataObjects.Activity;
+			import business.dataObjects.Workout;
 			
-			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
 			import view.widgets.activityTag;
-
-			
+				
 			[Bindable] public var workout:Workout;
 			
 			
@@ -33,35 +30,21 @@
 			{
 				buildTags();
 			}
+			
 			public function buildTags():void{
-				tagGroup.removeAllElements(); //Memory leak?
-				for each( var a:Activity in workout._activities){
-					var tag:activityTag = new activityTag();
-					tag.activity = a;
+				//clear screen
+				tagGroup.removeAllElements();
+				//get tags for workouts
+				for each(var a:Activity in workout._activities){
+					var tag:activityTag = a.get_workoutListItemActivityTag();
 					tag.selectMe();
 					tag.setForWhiteBg();
-					tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
+					//add to screen
 					tagGroup.addElement(tag);
 				}
 			}
 			
-			protected function tag_clickHandler(event:MouseEvent):void
-			{				
-				if(event.target is activityTag){
-					
-					
-					
-				}else if(event.target is Label){
-					//clicked edit. Open modal edit popup
-					var editTagPU:editTagPopup = new editTagPopup();
-					editTagPU.tag = (event.target.parent as activityTag).activity;
-					editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
-					PopUpManager.centerPopUp(editTagPU);
-					
-				}
-				
-			}
-			
+			/* --------- Event handlers -----------*/			
 			protected function rollOverHandler(event:MouseEvent):void
 			{
 				bgRect.alpha = .1;

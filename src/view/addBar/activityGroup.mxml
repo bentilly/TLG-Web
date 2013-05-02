@@ -11,22 +11,23 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.core.FlexGlobals;
-			import mx.managers.PopUpManager;
-			
-			import business.data.Activity;
+			import business.dataObjects.Activity;
 			
 			import events.UIEvent;
 			
-			import view.popups.editTagPopup;
 			import view.widgets.activityTag;
 			
 			public var myActivities:Array;
 			
-			private var tagUIElements:Array;
+			//Flags
+			public var editWorkoutMode:Boolean = false; //activityGroup used by addBar and editWorkoutPopup. Need to use appropriate activityTag UI Element.
+
 			
-			public function getActivity():String{
-				for each(var tag:activityTag in tagUIElements){
+			public function getActivity():String{				
+				for each(var a:Activity in myActivities){
+					//get tag
+					var tag:activityTag = a.get_addBarActivityTag();
+					//check for selected
 					if(tag.selected){
 						return tag.activity._key;
 					}
@@ -43,31 +44,40 @@
 			}
 			
 			public function buildTags():void{
-				tagUIElements = new Array();
 				tagsHGroup.removeAllElements();
-				
-				
-				var cols:int = Math.ceil(myActivities.length/10);
 				var tagCount:int = 0;
-				
+				//split tags into columns if more than 10
+				var cols:int = Math.ceil(myActivities.length/10);
 				for(var i:int = 0; i<cols; i++){
+					//VGroup for tag column
 					var vg:VGroup = new VGroup();
 					vg.gap = 2;
 					
+					//add tags to column
 					for(var j:int = 0; j<10; j++){
-						var tag:activityTag = new activityTag();
-						tag.activity = myActivities[tagCount];
+						//get tag from Activity
+						var activity:Activity = myActivities[j] as Activity;
+						var tag:activityTag;
+						//check which UI Element to use
+						if(editWorkoutMode){
+							tag = activity.get_editWorkoutActivityTag();
+						}else{
+							tag = activity.get_addBarActivityTag();
+						}
+						//set interaction
 						tag.alpha = .6;
 						tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
 						tag.addEventListener(MouseEvent.ROLL_OVER, tag_overHandler);
 						tag.addEventListener(MouseEvent.ROLL_OUT, tag_outHandler);
+						//add tag to column
 						vg.addElement(tag);
-						tagUIElements.push(tag);
+						//counting
 						tagCount++;
 						if(tagCount == myActivities.length){
 							break;
 						}
 					}
+					//add column to screen
 					tagsHGroup.addElement(vg);
 				}
 			}
@@ -77,16 +87,15 @@
 			}
 			
 			public function selectActivity(activity:Activity):void{
-				//find tag
-				for each(var tag:activityTag in tagUIElements){
-					if(tag.activity == activity){
-						//select it
-						tag.selectMe();
-						tag.alpha = 1;
-						break;
-					}
+				//get tag from Activity
+				var tag:activityTag;
+				if(editWorkoutMode){
+					tag = activity.get_editWorkoutActivityTag();
+				}else{
+					tag = activity.get_addBarActivityTag();
 				}
-				//no need to deal with new activity or deselecting for now
+				//select it
+				tag.selectMe();
 			}
 			
 			protected function tag_clickHandler(event:MouseEvent):void
@@ -99,12 +108,6 @@
 					newActivityInput.text = "new activity";
 					newActivityInput.styleName = "textFieldNewActivityBlank";
 					stage.focus = null;
-				}else if(event.target is Label){
-					//clicked edit. Open modal edit popup
-					var editTagPU:editTagPopup = new editTagPopup();
-					editTagPU.tag = (event.target.parent as activityTag).activity;
-					editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
-					PopUpManager.centerPopUp(editTagPU);
 				}
 				
 			}
@@ -122,7 +125,15 @@
 			}
 			
 			private function deselectAllTags():void{
-				for each(var tag:activityTag in tagUIElements){
+				for each(var a:Activity in myActivities){
+					//get tag
+					var tag:activityTag;
+					if(editWorkoutMode){
+						tag = a.get_editWorkoutActivityTag();
+					}else{
+						tag = a.get_addBarActivityTag();
+					}
+					//deselect
 					tag.deselectMe();
 					tag.alpha = .6;
 				}

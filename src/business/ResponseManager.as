@@ -1,15 +1,16 @@
 package business{
 	import flash.events.IEventDispatcher;
-
+	
+	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
 	
-	import business.data.Activity;
-	import business.data.Workout;
+	import business.dataObjects.Activity;
+	import business.dataObjects.Workout;
+	import business.dataObjects.WorkoutDay;
+	import business.dataObjects.WorkoutMonth;
 	
 	import events.RequestEvent;
 	import events.UIEvent;
-	
-	
 	
 	
 	
@@ -17,6 +18,7 @@ package business{
 		
 		/*** INTERNAL ***/
 		private var dispatcher:IEventDispatcher;
+		private var utils:business.utils = new business.utils();
 		
 		
 		/*** EXPORT ***/
@@ -25,7 +27,12 @@ package business{
 		[Bindable] public var userName:String; //returned when someone logs in
 		[Bindable] public var myGroups:Array; //array of groups I am a member of
 		[Bindable] public var myActivities:Array; //array of personal activities
-		[Bindable] public var myWorkouts:Array;
+		[Bindable] public var myWorkouts:Array;  //all the workouts in a single pile. The master version of the data
+		
+		//organising workouts
+		public var workoutsByDay:Array;  //Array of WorkoutGroup objects containind a days worth of workouts. Organises workouts by day.
+		public var workoutDaysByMonth:Array; //Array of WorkoutDay objects containind a days worth of workouts. Organises workouts by day.
+		[Bindable] public var workoutDaysByMonth_collection:ArrayCollection; //ArrayCollection for use in UI
 		
 		public function ResponseManager(dispatcher:IEventDispatcher){
 			this.dispatcher = dispatcher; //creates a dispatcher so this class can send events. Initiated in TLGEventMap.mxml
@@ -58,6 +65,7 @@ package business{
 						userName = result.name;
 						token_createToken_handler();
 						break;
+					//USER
 					case "user.getGroups":
 						myGroups = result.groups;
 						user_getGroups_handler();
@@ -65,6 +73,10 @@ package business{
 					case "user.getActivities":
 						user_getActivities_handler(result.activities);
 						break;
+					case "user.getAllWorkouts":
+						user_getAllWorkouts_handler(result.workouts);
+						break;
+					//WORKOUT
 					case "workout.addWorkout":
 						Alert.show("Workout added","Success");
 						workout_addWorkout_handler(result, request);
@@ -72,9 +84,7 @@ package business{
 					case "workout.updateWorkout":
 						workout_updateWorkout_handler(result, request);
 						break;
-					case "user.getAllWorkouts":
-						user_getAllWorkouts_handler(result.workouts);
-						break;
+					//ACTIVITY
 					case "activity.updateActivity":
 						activity_updateActivity_handler(result.workouts);
 						break;
@@ -165,13 +175,13 @@ package business{
 						}
 					}
 				}
-				
-				
 				var w:Workout = new Workout(o, activities);
 				myWorkouts.push(w);
 			}
-			//sort
-			myWorkouts.sortOn('_date');
+			
+			buildWorkoutsByDay();
+			buildWorkoutDaysByMonth();
+			
 			
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_ALL_WORKOUTS);
 			dispatcher.dispatchEvent(uie);
@@ -214,6 +224,9 @@ package business{
 			
 			var w:Workout = new Workout(wo, activities);
 			myWorkouts.push(w);
+			
+			buildWorkoutsByDay();
+			buildWorkoutDaysByMonth();
 			
 			uie = new UIEvent(UIEvent.WORKOUT_ADDED);
 			uie.workout = w;
@@ -269,6 +282,74 @@ package business{
 			dispatcher.dispatchEvent(uie);
 			
 		}
+		
+//Workout tools
+		private function buildWorkoutsByDay():void{
+			//clear / create array
+			workoutsByDay = new Array();
+			
+			//sort master array
+			myWorkouts.sortOn('_date');
+						
+			var prevDay:WorkoutDay = null;
+			var d:Date;
+			var wos:Array;
+			for each(var w:Workout in myWorkouts){
+				if(prevDay){
+					if( utils.compareDates(prevDay._date, w._date) ){
+						//add to day
+						prevDay.addWorkout(w);
+					}else{
+						//new day
+						d = new Date(w._date.fullYear, w._date.month, w._date.date);
+						wos = [w];
+						prevDay = new WorkoutDay(d, wos);
+						workoutsByDay.push(prevDay);
+					}
+				}else{
+					//first day
+					d = new Date(w._date.fullYear, w._date.month, w._date.date);
+					wos = [w];
+					prevDay = new WorkoutDay(d, wos);
+					workoutsByDay.push(prevDay);
+				}
+			}
+		}
+		
+		private function buildWorkoutDaysByMonth():void{
+			//clear / create array
+			workoutDaysByMonth = new Array();
+			
+			//sort input array
+			workoutsByDay.sortOn('_date');
+			
+			var prevMonth:WorkoutMonth = null;
+			var d:Date;
+			var woDays:Array;
+			for each(var wd:WorkoutDay in workoutsByDay){
+				if(prevMonth){
+					if( utils.compareMonths(prevMonth._date, wd._date) ){
+						//add to month
+						prevMonth.addWorkoutDay(wd);
+					}else{
+						d = new Date(wd._date.fullYear, wd._date.month);
+						woDays = [wd];
+						prevMonth = new WorkoutMonth(d, woDays);
+						workoutDaysByMonth.push(prevMonth);
+					}
+				}else{
+					//first month
+					d = new Date(wd._date.fullYear, wd._date.month);
+					woDays = [wd];
+					prevMonth = new WorkoutMonth(d, woDays);
+					workoutDaysByMonth.push(prevMonth);
+				}
+			}
+			
+			workoutDaysByMonth_collection = new ArrayCollection(workoutDaysByMonth);
+		}
+		
+		
 		
 //-----ACTIVITY-----//
 		private function activity_updateActivity_handler(result:Object):void{

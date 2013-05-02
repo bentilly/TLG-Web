@@ -12,7 +12,7 @@
 		<![CDATA[
 			import mx.events.ResizeEvent;
 			
-			import business.data.Workout;
+			import business.dataObjects.Workout;
 			
 			[Bindable] public var monthName:String;
 			public var myMonth:Date;

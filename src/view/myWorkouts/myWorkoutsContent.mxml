@@ -15,15 +15,19 @@
 		<![CDATA[
 			import com.greensock.TweenLite;
 			
+			import mx.collections.ArrayCollection;
 			import mx.events.ResizeEvent;
 			
-			import business.data.Workout;
+			import business.utils;
+			import business.dataObjects.Workout;
+			import business.dataObjects.WorkoutMonth;
 			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
 			[Bindable] public var myWorkouts:Array;
+			[Bindable] public var workoutDaysByMonth_collection:ArrayCollection;
 			
 			
 			
@@ -32,6 +36,9 @@
 			private var calMonthsArray:Array;
 			private var calBuilt:Boolean = false;
 			private var selectedMonth:Date;
+			
+			
+			private var utils:business.utils = new business.utils();
 			
 			private function getMonthWorkouts(d:Date):Array{
 				var monthWOs:Array = [];
@@ -97,6 +104,21 @@
 					resizeMonths();
 					calBuilt = true;
 				}
+				
+				
+				/* -------- LIST --------*/
+				
+				//clear list
+				workoutsListComponent.dataProvider = null;
+				//Find this WorkoutMonth and set as dataprovider
+				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+					if( utils.compareMonths(month._date, selectedMonth) ){
+						workoutsListComponent.dataProvider = month._workoutDays_collection;
+						break;
+					}
+				}
+				
+				
 				
 			}
 			
@@ -180,6 +202,19 @@
 				workoutsList.buildWorkoutList();
 				
 				
+			/* -------- LIST --------*/
+				
+				//clear list
+				workoutsListComponent.dataProvider = null;
+				//Find this WorkoutMonth and set as dataprovider
+				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+					if( utils.compareMonths(month._date, cm.myMonth) ){
+						workoutsListComponent.dataProvider = month._workoutDays_collection;
+						break;
+					}
+				}
+				
+				
 				
 			}
 			
@@ -242,6 +277,19 @@
 				workoutsList.myMonth = cm.myMonth;
 				workoutsList.buildWorkoutList();
 				
+				
+				/* -------- LIST --------*/
+				
+				//clear list
+				workoutsListComponent.dataProvider = null;
+				//Find this WorkoutMonth and set as dataprovider
+				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+					if( utils.compareMonths(month._date, cm.myMonth) ){
+						workoutsListComponent.dataProvider = month._workoutDays_collection;
+						break;
+					}
+				}
+				
 			}
 			
 			
@@ -282,9 +330,22 @@
 				<!--Stats and activities go here
 				<s:BorderContainer height="100%" width="400"/>
 				-->
-				<s:Scroller width="100%" height="100%" horizontalScrollPolicy="off">
+				<s:Scroller width="50%" height="100%" horizontalScrollPolicy="off">
 					<myWorkouts:workoutList id="workoutsList"/>
 				</s:Scroller>
+				<s:List id="workoutsListComponent" width="50%" height="100%" itemRenderer="view.skinsAndRenderers.workoutListDayRenderer">
+					<!--<s:itemRenderer>
+						<fx:Component>
+							<s:ItemRenderer>
+								<s:HGroup verticalCenter="0" left="2" right="2" top="2" bottom="2">
+									<s:Label text="workout day:  "/>
+									<s:Label text="{data._date}"/>
+									
+								</s:HGroup>
+							</s:ItemRenderer>
+						</fx:Component>
+					</s:itemRenderer>-->
+				</s:List>
 			</s:HGroup>
 		</s:Group>
 	</s:VGroup>

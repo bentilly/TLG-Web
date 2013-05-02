@@ -18,7 +18,7 @@
 	<fx:Script>
 		<![CDATA[
 			import business.utils;
-			import business.data.Workout;
+			import business.dataObjects.Workout;
 			
 			import events.UIEvent;
 			
@@ -46,7 +46,6 @@
 					wold.month = months[woDay.date.month];
 					wold.myWorkouts = woDay.workouts;
 					wold.buildWorkouts();
-					//workoutDayUIelementsArray.push(wold);
 					this.addElement(wold);
 				}
 			}

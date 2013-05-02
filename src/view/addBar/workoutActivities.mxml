@@ -16,11 +16,13 @@
 			
 			[Bindable] public var myActivities:Array = [];
 			
+			//Flags
+			public var editWorkoutMode:Boolean = false;
+			
 			public function getActivities():String{ //TODO: build and return an array
 				return myActivitiesGroup.getActivity();
 			}
 			public function setActivities(activities:Array):void{
-				//myActivities = activities;
 				buildMyActivities(new UIEvent(UIEvent.ACTIVITIES_UPDATED));
 				myActivitiesGroup.selectActivity(activities[0]); //only one until GROUPS
 			}
@@ -30,6 +32,7 @@
 			
 			public function buildMyActivities(event:UIEvent):void{
 				myActivitiesGroup.myActivities = myActivities;
+				myActivitiesGroup.editWorkoutMode = editWorkoutMode;
 				myActivitiesGroup.buildTags();
 			}
 			public function updateMyActivities(event:UIEvent):void{
