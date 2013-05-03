@@ -12,7 +12,7 @@ package business.dataObjects
 		//UI components
 		private var addBarActivityTag:activityTag;
 		private var editWorkoutActivityTag:activityTag;
-		private var workoutListItemActivityTag:activityTag;
+		//private var workoutListItemActivityTag:activityTag;
 		
 		
 		public function Activity(o:Object)
@@ -23,7 +23,7 @@ package business.dataObjects
 			
 			build_addBarActivityTag();
 			build_editWorkoutActivityTag();
-			build_workoutListItemActivityTag();
+			//build_workoutListItemActivityTag();
 		}
 		
 		
@@ -45,12 +45,12 @@ package business.dataObjects
 			return editWorkoutActivityTag;
 		}
 		//Workout list items
-		private function build_workoutListItemActivityTag():void{
+		/*private function build_workoutListItemActivityTag():void{
 			workoutListItemActivityTag = new activityTag();
 			workoutListItemActivityTag.activity = this;
-		}
-		public function get_workoutListItemActivityTag():activityTag{
+		}*/
+		/*public function get_workoutListItemActivityTag():activityTag{
 			return workoutListItemActivityTag;
-		}
+		}*/
 	}
 }

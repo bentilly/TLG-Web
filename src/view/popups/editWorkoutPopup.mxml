@@ -13,12 +13,15 @@
 			   >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
+			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
+			import business.dataObjects.Activity;
 			import business.dataObjects.Workout;
 			
 			import events.RequestEvent;
@@ -28,17 +31,16 @@
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
+			[Bindable] public var myActivities_collection:ArrayCollection;
 			
 			
 			[Bindable] public var workout:Workout;
 			
 			protected function closeHandler(event:PopUpEvent):void
-			{
-				//stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
-				
+			{				
 				trace('closing editWorkoutPopup');
+				stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
 				PopUpManager.removePopUp(this);
-				
 			}
 			
 			// GO button
@@ -78,8 +80,6 @@
 				var woDate:Date = woDetails.getWODate();
 				var woDuration:int = woDetails.getWODuration();
 				var woComment:String = woDetails.getWOComment();
-				var woActivity:String = woActivitiesSelector.getActivities(); //TODO: make list of activities
-				var newWO:String = woActivitiesSelector.getNewActivity();
 				
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
 				var requestObj:Object = new Object();
@@ -89,8 +89,18 @@
 				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
 				requestObj.duration = woDuration;
 				requestObj.comment = woComment;
-				requestObj.activity = woActivity; //TODO: this will be a list of activities - one for user and one per group
-				requestObj.newActivity = newWO;
+				//activity
+				var activityKey:String = null;
+				if(activitiesList.selectedIndex > -1){
+					activityKey = activitiesList.selectedItem._key;
+				}
+				var newActivity:String = "";
+				if(newActivityInput.text != 'new activity'){
+					newActivity = newActivityInput.text;
+				}
+				requestObj.activity = activityKey;
+				requestObj.newActivity = newActivity;
+				
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 				trace(re.requestJson);
@@ -99,7 +109,6 @@
 				
 				 
 				try{
-					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
 					close();
 				}catch(e:Error){
 					
@@ -108,7 +117,7 @@
 
 			public function workoutUpdated(event:UIEvent):void{
 				try{
-					stage.removeEventListener(ResizeEvent.RESIZE, resizeHandler);
+					
 					close();
 				}catch(e:Error){
 					
@@ -133,7 +142,18 @@
 				woDetails.setWODate(workout._date);
 				woDetails.setDuration(workout._duration);
 				woDetails.setWOComment(workout._comment);
-				woActivitiesSelector.setActivities(workout._activities);
+				
+				//find activity to select
+				var count:int = 0
+				for each(var a:Activity in myActivities_collection){
+					if(a == workout._activities[0]){
+						activitiesList.selectedIndex = count;
+						break;
+					}
+					count++;
+				}
+				
+				
 			}
 
 			protected function deleteBut_rollOverHandler(event:MouseEvent):void
@@ -150,9 +170,38 @@
 			{
 				editWindowBG.setStyle('borderAlpha', 1);
 				woDetails.mouseChildren = false;
-				woActivitiesSelector.mouseChildren = false;
+				//woActivitiesSelector.mouseChildren = false;
 				//deleteBut.setStyle('color', '#AA0000');
 				goButton.text = 'DELETE'
+			}
+			
+			//New Activity
+			protected function newActivityInput_focusInHandler(event:FocusEvent):void
+			{
+				activitiesList.selectedIndex = -1;
+				if(newActivityInput.text == "new activity"){
+					newActivityInput.text = "";
+					newActivityInput.styleName = "textFieldNewActivityContent";
+				}
+			}
+			
+			protected function newActivityInput_focusOutHandler(event:FocusEvent):void
+			{
+				if(newActivityInput.text == ""){
+					newActivityInput.text = "new activity";
+					newActivityInput.styleName = "textFieldNewActivityBlank";
+				}
+			}
+			
+			
+			
+			
+			protected function activitiesList_changeHandler(event:IndexChangeEvent):void
+			{
+				if(activitiesList.selectedIndex > -1){
+					newActivityInput.text = "new activity";
+					newActivityInput.styleName = "textFieldNewActivityBlank";
+				}
 			}
 			
 		]]>
@@ -176,9 +225,31 @@
 						<!--<s:Label id="deleteBut" text="Delete this workout" styleName="h2_white" paddingTop="10" paddingLeft="17" paddingBottom="10" alpha=".5"
 								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>-->
 					</s:VGroup>
-					<s:Scroller width="100%" verticalScrollPolicy="off">
+					
+					<!--<s:Scroller width="100%" verticalScrollPolicy="off">
 						<addBar:workoutActivities id="woActivitiesSelector" editWorkoutMode="true"/>
-					</s:Scroller>
+					</s:Scroller>-->
+					
+					<s:VGroup paddingLeft="15">
+						<s:HGroup>
+							<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
+							<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
+						</s:HGroup>
+						
+						<s:List id="activitiesList" dataProvider="{myActivities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
+								borderVisible="false" contentBackgroundAlpha="0" change="activitiesList_changeHandler(event)"
+								>
+							<s:layout>
+								<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="0"/>
+							</s:layout>
+						</s:List>
+						
+						<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity" 
+									 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)"/>
+						
+					</s:VGroup>
+					
+					
 				</s:HGroup>
 			</s:VGroup>
 			

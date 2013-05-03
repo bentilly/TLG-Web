@@ -38,7 +38,7 @@
 			}
 			
 			private function addWorkoutDaysToScreen():void{
-				for each(var woDay:Object in workoutsByDayArray){
+				/*for each(var woDay:Object in workoutsByDayArray){
 					var wold:woListDay = new woListDay();
 					wold.myDate = woDay.date;
 					wold.day = days[woDay.date.day];
@@ -47,7 +47,7 @@
 					wold.myWorkouts = woDay.workouts;
 					wold.buildWorkouts();
 					this.addElement(wold);
-				}
+				}*/
 			}
 			
 			private function buildWorkoutsByDay():void{

@@ -17,9 +17,9 @@
 			
 			private var utils:business.utils = new business.utils();
 			
-			[Bindable] public var day:String;
+			/*[Bindable] public var day:String;
 			[Bindable] public var date:String;
-			[Bindable] public var month:String;
+			[Bindable] public var month:String;*/
 			public var myDate:Date;//passed in when created
 			public var myWorkouts:Array;
 			
@@ -48,11 +48,11 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:VGroup horizontalAlign="center" gap="0" mouseEnabled="false" width="50">
+	<!--<s:VGroup horizontalAlign="center" gap="0" mouseEnabled="false" width="50">
 		<s:Label id="dayTitle" text="{day}" styleName="smallDateText" mouseEnabled="false" color="0x0D7F12"/>
 		<s:Label id="dateTitle" text="{date}" styleName="bigDateText" paddingBottom="0" paddingTop="-3" mouseEnabled="false"  color="0x0D7F12"/>
 		<s:Label id="monthTitle" text="{month}" styleName="smallDateText" paddingTop="-5" mouseEnabled="false"  color="0x0D7F12"/>
-	</s:VGroup>
+	</s:VGroup>-->
 	
 	<s:Line height="100%">
 		<s:stroke>

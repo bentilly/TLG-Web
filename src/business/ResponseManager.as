@@ -27,6 +27,7 @@ package business{
 		[Bindable] public var userName:String; //returned when someone logs in
 		[Bindable] public var myGroups:Array; //array of groups I am a member of
 		[Bindable] public var myActivities:Array; //array of personal activities
+		[Bindable] public var myActivities_collection:ArrayCollection; //array of personal activities
 		[Bindable] public var myWorkouts:Array;  //all the workouts in a single pile. The master version of the data
 		
 		//organising workouts
@@ -148,6 +149,8 @@ package business{
 			
 			//sort
 			myActivities.sortOn('_name', Array.CASEINSENSITIVE);
+			
+			myActivities_collection = new ArrayCollection(myActivities);
 			
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_MY_ACTIVITES);
 			dispatcher.dispatchEvent(uie);
@@ -289,7 +292,7 @@ package business{
 			workoutsByDay = new Array();
 			
 			//sort master array
-			myWorkouts.sortOn('_date');
+			myWorkouts.sortOn('_date', Array.DESCENDING);
 						
 			var prevDay:WorkoutDay = null;
 			var d:Date;
@@ -321,7 +324,7 @@ package business{
 			workoutDaysByMonth = new Array();
 			
 			//sort input array
-			workoutsByDay.sortOn('_date');
+			workoutsByDay.sortOn('_date', Array.DESCENDING);
 			
 			var prevMonth:WorkoutMonth = null;
 			var d:Date;

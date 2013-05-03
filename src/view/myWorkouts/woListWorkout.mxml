@@ -35,13 +35,13 @@
 				//clear screen
 				tagGroup.removeAllElements();
 				//get tags for workouts
-				for each(var a:Activity in workout._activities){
+				/*for each(var a:Activity in workout._activities){
 					var tag:activityTag = a.get_workoutListItemActivityTag();
 					tag.selectMe();
 					tag.setForWhiteBg();
 					//add to screen
 					tagGroup.addElement(tag);
-				}
+				}*/
 			}
 			
 			/* --------- Event handlers -----------*/			

@@ -132,6 +132,7 @@
 		
 		<Injectors target="{editWorkoutPopup}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
 			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
 		</Injectors>
 		

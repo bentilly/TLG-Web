@@ -8,6 +8,8 @@
 		 rollOver="rollOverHandler(event)"
 		 rollOut="rollOutHandler(event)"
 		 
+		 creationComplete="creationCompleteHandler(event)"
+		 
 		 
 		 width="200"
 		 >
@@ -15,6 +17,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import business.dataObjects.Activity;
@@ -23,7 +26,17 @@
 			
 			[Bindable] public var activity:Activity;
 
+			//flags
 			public var selected:Boolean = false;
+			public var whiteBG:Boolean = false;
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				if(whiteBG){
+					setForWhiteBg();
+				}
+			}
 			
 			public function setForWhiteBg():void{
 				editLineStroke.color = 0x123456;
@@ -79,7 +92,7 @@
 	
 	<s:HGroup gap="-1" includeIn="deselectedState" mouseChildren="false" mouseEnabled="false">
 		<fxg:tagHead_white/>
-		<s:Label text="{activity._name}" height="18" styleName="tagWhiteText" maxWidth="160" maxDisplayedLines="1"/>
+		<s:Label text="{activity._name}" height="18" styleName="tagWhiteText" maxWidth="150" maxDisplayedLines="1"/>
 		<s:Rect width="10" height="18"
 				topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
 			<s:fill><s:SolidColor color="{activity._colour}" /></s:fill>
@@ -88,7 +101,7 @@
 	
 	<s:HGroup gap="-1" includeIn="selectedState" mouseChildren="false" mouseEnabled="false">
 		<fxg:tagHead_blue/>
-		<s:Label text="{activity._name}" height="18" styleName="tagBlueText" maxWidth="160" maxDisplayedLines="1"/>
+		<s:Label text="{activity._name}" height="18" styleName="tagBlueText" maxWidth="150" maxDisplayedLines="1"/>
 		<s:Rect width="10" height="18"
 				topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
 			<s:fill><s:SolidColor color="{activity._colour}" /></s:fill>

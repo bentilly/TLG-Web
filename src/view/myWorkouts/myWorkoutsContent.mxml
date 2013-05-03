@@ -54,13 +54,13 @@
 			//thermonuclear. probably a memory leak. ripe for optimisation
 			public function workoutUpdated(event:UIEvent):void{
 				calBuilt = false;
-				workoutsList.removeAllElements();
+				//workoutsList.removeAllElements();
 				calendarContent.removeAllElements();
 				goMyWorkouts(event);
 			}
 			public function logout(event:UIEvent):void{
 				calBuilt = false;
-				workoutsList.removeAllElements();
+				//workoutsList.removeAllElements();
 				calendarContent.removeAllElements();
 			}
 			
@@ -87,9 +87,9 @@
 							cm.monthLabel.scaleX = cm.monthLabel.scaleY = 1;
 							cm.monthLabel.y = 0;
 							
-							workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
+							/*workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
 							workoutsList.myMonth = cm.myMonth;
-							workoutsList.buildWorkoutList();
+							workoutsList.buildWorkoutList();*/
 							
 							
 						}
@@ -196,10 +196,10 @@
 				TweenLite.delayedCall(.1, addMonthEventListeners);
 				
 				//Update workout list
-				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
+				/*var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
 				workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
 				workoutsList.myMonth = cm.myMonth;
-				workoutsList.buildWorkoutList();
+				workoutsList.buildWorkoutList();*/
 				
 				
 			/* -------- LIST --------*/
@@ -207,15 +207,13 @@
 				//clear list
 				workoutsListComponent.dataProvider = null;
 				//Find this WorkoutMonth and set as dataprovider
+				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
 				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
 					if( utils.compareMonths(month._date, cm.myMonth) ){
 						workoutsListComponent.dataProvider = month._workoutDays_collection;
 						break;
 					}
 				}
-				
-				
-				
 			}
 			
 			
@@ -272,10 +270,10 @@
 				TweenLite.delayedCall(.1, addMonthEventListeners);
 				
 				//Update workout list
-				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
+				/*var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
 				workoutsList.myMonthWorkoutsArray = cm.myMonthWOs;
 				workoutsList.myMonth = cm.myMonth;
-				workoutsList.buildWorkoutList();
+				workoutsList.buildWorkoutList();*/
 				
 				
 				/* -------- LIST --------*/
@@ -283,6 +281,7 @@
 				//clear list
 				workoutsListComponent.dataProvider = null;
 				//Find this WorkoutMonth and set as dataprovider
+				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
 				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
 					if( utils.compareMonths(month._date, cm.myMonth) ){
 						workoutsListComponent.dataProvider = month._workoutDays_collection;
@@ -330,21 +329,12 @@
 				<!--Stats and activities go here
 				<s:BorderContainer height="100%" width="400"/>
 				-->
-				<s:Scroller width="50%" height="100%" horizontalScrollPolicy="off">
-					<myWorkouts:workoutList id="workoutsList"/>
-				</s:Scroller>
-				<s:List id="workoutsListComponent" width="50%" height="100%" itemRenderer="view.skinsAndRenderers.workoutListDayRenderer">
-					<!--<s:itemRenderer>
-						<fx:Component>
-							<s:ItemRenderer>
-								<s:HGroup verticalCenter="0" left="2" right="2" top="2" bottom="2">
-									<s:Label text="workout day:  "/>
-									<s:Label text="{data._date}"/>
-									
-								</s:HGroup>
-							</s:ItemRenderer>
-						</fx:Component>
-					</s:itemRenderer>-->
+				<s:List id="workoutsListComponent" width="100%" height="100%" itemRenderer="view.skinsAndRenderers.workoutList_dayRenderer"
+						borderVisible="false" horizontalScrollPolicy="off"
+						>
+					<s:layout>
+						<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1"/>
+					</s:layout>
 				</s:List>
 			</s:HGroup>
 		</s:Group>

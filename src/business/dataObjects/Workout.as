@@ -1,5 +1,7 @@
 package business.dataObjects
 {
+	import mx.collections.ArrayCollection;
+	
 	import view.myWorkouts.woListWorkout;
 
 	public class Workout
@@ -11,6 +13,7 @@ package business.dataObjects
 		[Bindable] public var _mins:String;
 		[Bindable] public var _comment:String;
 		public var _activities:Array; //Array of Activity objects
+		[Bindable] public var _activities_collection:ArrayCollection; //Array of Activity objects
 		
 		//UI components
 		private var workoutListWorkout:woListWorkout;
@@ -33,6 +36,7 @@ package business.dataObjects
 			setHrsMins(_duration);
 			_comment = o.comment;
 			_activities = activities;
+			_activities_collection = new ArrayCollection(_activities);
 			
 			//UI Elements
 			build_workoutListWorkout();

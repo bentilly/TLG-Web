@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="false"
+				
+				width="100%"
+				
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import business.dataObjects.Workout;
+			
+			import view.popups.editWorkoutPopup;
+			
+			protected function editLabel_clickHandler(event:MouseEvent):void
+			{
+				//clicked edit. Open modal edit popup
+				var editWorkoutPU:editWorkoutPopup = new editWorkoutPopup();
+				editWorkoutPU.workout = data as Workout;
+				editWorkoutPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(editWorkoutPU);
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<!--Draw backgrounds manually-->
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="hovered"/>
+		<s:State name="selected"/>
+	</s:states>
+	
+	<s:Rect id="theBackgroundObject" top="0" bottom="0" left="0" right="0">
+		<s:fill>
+			<s:SolidColor color="#FFFFFF" color.hovered="#EEEEEE"/>
+		</s:fill>
+	</s:Rect>
+	<!--END Draw backgrounds-->
+	
+	<s:HGroup width="100%" gap="0" paddingLeft="20" paddingBottom="5" paddingTop="7">
+		<s:HGroup id="durationGroup" gap="0" verticalAlign="baseline" width="90">
+			<s:Label id="hoursLabel" text="{data._hrs}" styleName="durationNumbers"/>
+			<s:Label text="hr" styleName="durationlabel" paddingRight="2"/>
+			<s:Label id="minsLabel" text="{data._mins}" styleName="durationNumbers"/>
+			<s:Label text="m" styleName="durationlabel"/>
+		</s:HGroup>
+		
+		<!--<s:VGroup id="tagGroup" gap="2" width="220" paddingTop="5"/>-->
+		<s:HGroup paddingTop="6">
+			<s:List dataProvider="{data._activities_collection}" itemRenderer="view.skinsAndRenderers.workoutList_activityRenderer"
+					borderVisible="false" contentBackgroundAlpha="0"
+					>
+				<s:layout>
+					<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="0"/>
+				</s:layout>
+			</s:List>
+		</s:HGroup>
+		
+		<s:Label id="commentText" text="{data._comment}" styleName="woComment" paddingTop="8" paddingBottom="5" paddingLeft="10" width="100%"/>
+		
+		<s:Label id="editLabel" text="edit" styleName="tagEdit" paddingTop="8" paddingLeft="20" paddingRight="10" visible="false" visible.hovered="true" visible.selected="true" click="editLabel_clickHandler(event)"/>
+		
+	</s:HGroup>
+	
+</s:ItemRenderer>
