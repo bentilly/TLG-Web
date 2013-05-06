@@ -9,11 +9,10 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import business.dataObjects.Activity;
 			import business.dataObjects.Workout;
 			
 			[Bindable] public var workout:Workout;
-			[Bindable] public var activity:Activity;
+			//[Bindable] public var activity:Activity;
 			
 			
 		]]>
@@ -24,7 +23,7 @@
 	</fx:Declarations>
 	
 	<s:Rect id="blockRect" width="10" height="{workout._duration/2}">
-		<s:fill><s:SolidColor color="{activity._colour}" /></s:fill>
+		<s:fill><s:SolidColor color="{workout._activities_collection.getItemAt(0)._colour}" /></s:fill>
 	</s:Rect>
 	
 	

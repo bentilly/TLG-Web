@@ -12,11 +12,16 @@
 		<![CDATA[
 			import mx.events.ResizeEvent;
 			
+			import business.utils;
 			import business.dataObjects.Workout;
+			import business.dataObjects.WorkoutDay;
+			import business.dataObjects.WorkoutMonth;
 			
 			[Bindable] public var monthName:String;
 			public var myMonth:Date;
-			public var myMonthWOs:Array;
+			public var myMonthData:WorkoutMonth;
+			
+			private var utils:business.utils = new business.utils();
 			
 			
 			private var months:Array = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -41,9 +46,13 @@
 					}
 					//WOs for this day
 					var dayWOs:Array = [];
-					for each(var w:Workout in myMonthWOs){
-						if(w._date.date == thisDate.date){
-							dayWOs.push(w);
+					if(myMonthData){
+						for each(var wd:WorkoutDay in myMonthData._workoutDays_collection){
+							if( utils.compareDates(day.myDate, wd._date) ){
+								for each(var w:Workout in wd._workouts_collection){
+									dayWOs.push(w);
+								}
+							}
 						}
 					}
 					day.myDayWOs = dayWOs;

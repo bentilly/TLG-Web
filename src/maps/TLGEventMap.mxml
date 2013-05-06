@@ -27,8 +27,6 @@
 			import view.dashboard.myTraining_dash;
 			import view.myWorkouts.calendarChartDay;
 			import view.myWorkouts.myWorkoutsContent;
-			import view.myWorkouts.woListDay;
-			import view.myWorkouts.workoutList;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
 			
@@ -113,34 +111,25 @@
 		
 		<Injectors target="{activityGroup}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
 		</Injectors>
 		
 		<Injectors target="{calendarChartDay}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
-			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
-		</Injectors>
-		
-		<Injectors target="{woListDay}">
-			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
-			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
-		</Injectors>
-		
-		<Injectors target="{workoutList}">
-			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
-			<!--<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>-->
+			<ListenerInjector eventType="{UIEvent.WORKOUT_DATE_CHANGED}" method="workoutDateChanged"/>
+			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="buildWorkouts"/>
 		</Injectors>
 		
 		<Injectors target="{editWorkoutPopup}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
-			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
+
 		</Injectors>
 		
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>
+			<!--<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
-			<ListenerInjector eventType="{UIEvent.WORKOUT_UPDATED}" method="workoutUpdated"/>
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>

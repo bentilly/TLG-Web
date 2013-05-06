@@ -17,8 +17,7 @@ package business.dataObjects
 		}
 		
 		public function addWorkoutDay(workoutDay:WorkoutDay):void{
-			_workoutDays.push(workoutDay);
-			_workoutDays_collection.refresh();
+			_workoutDays_collection.addItem(workoutDay);
 		}
 		
 		

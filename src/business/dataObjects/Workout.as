@@ -1,8 +1,6 @@
 package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
-	
-	import view.myWorkouts.woListWorkout;
 
 	public class Workout
 	{
@@ -15,8 +13,6 @@ package business.dataObjects
 		public var _activities:Array; //Array of Activity objects
 		[Bindable] public var _activities_collection:ArrayCollection; //Array of Activity objects
 		
-		//UI components
-		private var workoutListWorkout:woListWorkout;
 		
 		
 		public function Workout(o:Object, activities:Array)
@@ -37,25 +33,11 @@ package business.dataObjects
 			_comment = o.comment;
 			_activities = activities;
 			_activities_collection = new ArrayCollection(_activities);
-			
-			//UI Elements
-			build_workoutListWorkout();
 		}
 		
 		private function setHrsMins(duration:Number):void{
 			_hrs = String(  Math.floor(_duration/60)  );
 			_mins = String(  _duration - ( Math.floor(_duration/60)*60 )  );
-		}
-		
-		
-		/* ------- UI components -------- */
-		// Workout list
-		private function build_workoutListWorkout():void{
-			workoutListWorkout = new woListWorkout();
-			workoutListWorkout.workout = this;
-		}
-		public function get_workoutListWorkout():woListWorkout{
-			return workoutListWorkout;
 		}
 		
 	}

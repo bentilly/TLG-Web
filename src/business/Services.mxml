@@ -6,8 +6,8 @@
 	<fx:Script>
 		<![CDATA[
 			
-			[Bindable] public var URLPrefix:String = "http://localhost:8091"; //Local DEV
-			//[Bindable] public var URLPrefix:String = ""; //PROD
+			//[Bindable] public var URLPrefix:String = "http://localhost:8091"; //Local DEV
+			[Bindable] public var URLPrefix:String = ""; //PROD
 			
 		]]>
 	</fx:Script>

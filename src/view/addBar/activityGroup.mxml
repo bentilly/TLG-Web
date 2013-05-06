@@ -11,19 +11,22 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			
 			import business.dataObjects.Activity;
 			
 			import events.UIEvent;
 			
-			import view.widgets.activityTag;
-			
-			public var myActivities:Array;
+			/*** IMPORTED ***/
+			[Bindable] public var myActivities_collection:ArrayCollection;
 			
 			//Flags
 			public var editWorkoutMode:Boolean = false; //activityGroup used by addBar and editWorkoutPopup. Need to use appropriate activityTag UI Element.
 
 			
-			public function getActivity():String{				
+			/*public function getActivity():String{				
 				for each(var a:Activity in myActivities){
 					//get tag
 					var tag:activityTag = a.get_addBarActivityTag();
@@ -31,6 +34,15 @@
 					if(tag.selected){
 						return tag.activity._key;
 					}
+				}
+				return null;
+			}*/
+			
+			
+			
+			public function getActivity():String{
+				if(activitiesList.selectedIndex > -1){
+					return activitiesList.selectedItem._key;
 				}
 				return null;
 			}
@@ -43,7 +55,7 @@
 				}
 			}
 			
-			public function buildTags():void{
+			/*public function buildTags():void{
 				tagsHGroup.removeAllElements();
 				var tagCount:int = 0;
 				//split tags into columns if more than 10
@@ -80,25 +92,36 @@
 					//add column to screen
 					tagsHGroup.addElement(vg);
 				}
-			}
+			}*/
 			
-			public function updateTags():void{
+			/*public function updateTags():void{
 				buildTags();
-			}
+			}*/
 			
 			public function selectActivity(activity:Activity):void{
 				//get tag from Activity
-				var tag:activityTag;
+				/*var tag:activityTag;
 				if(editWorkoutMode){
 					tag = activity.get_editWorkoutActivityTag();
 				}else{
 					tag = activity.get_addBarActivityTag();
+				}*/
+				
+				var count:int = 0;
+				for each(var a:Activity in myActivities_collection){
+					if(a == activity){
+						activitiesList.selectedIndex = count;
+						break;
+					}
+					count++;
 				}
+				
+/*				
 				//select it
-				tag.selectMe();
+				tag.selectMe();*/
 			}
 			
-			protected function tag_clickHandler(event:MouseEvent):void
+			/*protected function tag_clickHandler(event:MouseEvent):void
 			{				
 				if(event.target is activityTag){
 					var tag:activityTag = event.target as activityTag;
@@ -110,8 +133,18 @@
 					stage.focus = null;
 				}
 				
+			}*/
+			
+			protected function activitiesList_changeHandler(event:IndexChangeEvent):void
+			{
+				if(activitiesList.selectedIndex > -1){
+					newActivityInput.text = "new activity";
+					newActivityInput.styleName = "textFieldNewActivityBlank";
+				}
 			}
-			protected function tag_overHandler(event:MouseEvent):void
+			
+			
+			/*protected function tag_overHandler(event:MouseEvent):void
 			{				
 				var tag:activityTag = event.target as activityTag;
 				tag.alpha = 1;
@@ -137,11 +170,11 @@
 					tag.deselectMe();
 					tag.alpha = .6;
 				}
-			}
+			}*/
 			
 			protected function newActivityInput_focusInHandler(event:FocusEvent):void
 			{
-				deselectAllTags();
+				activitiesList.selectedIndex = -1;
 				if(newActivityInput.text == "new activity"){
 					newActivityInput.text = "";
 					newActivityInput.styleName = "textFieldNewActivityContent";
@@ -160,7 +193,7 @@
 			
 			/*triggered on successful creation of the workout in DB*/
 			public function workoutAdded(event:UIEvent):void{
-				deselectAllTags();
+				//deselectAllTags();
 				newActivityInput.text = "new activity";
 				newActivityInput.styleName = "textFieldNewActivityBlank";
 			}
@@ -175,7 +208,7 @@
 	</fx:Declarations>
 	
 	
-	<s:VGroup>
+	<!--<s:VGroup>
 		
 		<s:HGroup>
 			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
@@ -190,6 +223,26 @@
 					 focusOut="newActivityInput_focusOutHandler(event)"
 					 />
 	
+		
+	</s:VGroup>-->
+	
+	
+	<s:VGroup paddingLeft="15">
+		<s:HGroup>
+			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
+			<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
+		</s:HGroup>
+		
+		<s:List id="activitiesList" dataProvider="{myActivities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
+				borderVisible="false" contentBackgroundAlpha="0" change="activitiesList_changeHandler(event)"
+				>
+			<s:layout>
+				<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="0"/>
+			</s:layout>
+		</s:List>
+		
+		<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity" 
+					 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)"/>
 		
 	</s:VGroup>
 	

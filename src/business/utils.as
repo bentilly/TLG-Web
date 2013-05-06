@@ -1,5 +1,10 @@
 package business
 {
+	import mx.collections.ArrayCollection;
+	
+	import spark.collections.Sort;
+	import spark.collections.SortField;
+
 	public class utils
 	{
 		public function utils()
@@ -49,6 +54,37 @@ package business
 			
 			return false;
 		}
+		
+		public function sortArrayCollection(ar:ArrayCollection, fieldName:String, isNumeric:Boolean=false, order:String='ASC'):void 
+		{
+			var dataSortField:SortField = new SortField();
+			dataSortField.name = fieldName;
+			dataSortField.numeric = isNumeric;
+			if (order.toUpperCase() == "DESC") { 
+				dataSortField.descending = true; 
+			}
+			
+			var numericDataSort:Sort = new Sort();
+			numericDataSort.fields = [dataSortField];
+			ar.sort = numericDataSort;
+			ar.refresh();
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	}
 }

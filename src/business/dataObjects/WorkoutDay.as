@@ -17,8 +17,7 @@ package business.dataObjects
 		}
 		
 		public function addWorkout(workout:Workout):void{
-			_workouts.push(workout);
-			_workouts_collection.refresh(); //might not work
+			_workouts_collection.addItem(workout);
 		}
 		
 		

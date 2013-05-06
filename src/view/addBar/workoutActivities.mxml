@@ -31,19 +31,23 @@
 			}
 			
 			public function buildMyActivities(event:UIEvent):void{
-				myActivitiesGroup.myActivities = myActivities;
+				//myActivitiesGroup.myActivities = myActivities;
 				myActivitiesGroup.editWorkoutMode = editWorkoutMode;
-				myActivitiesGroup.buildTags();
+				//myActivitiesGroup.buildTags();
 			}
 			public function updateMyActivities(event:UIEvent):void{
-				myActivitiesGroup.myActivities = myActivities;
-				myActivitiesGroup.updateTags();
+				//myActivitiesGroup.myActivities = myActivities;
+				//myActivitiesGroup.updateTags();
 			}
 			
 			
 			protected function group1_creationCompleteHandler(event:FlexEvent):void
 			{
 				buildMyActivities(new UIEvent(UIEvent.ACTIVITIES_UPDATED));
+			}
+			
+			public function deselectActivites():void{
+				myActivitiesGroup.activitiesList.selectedIndex = -1;
 			}
 			
 		]]>

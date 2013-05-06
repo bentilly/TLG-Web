@@ -14,7 +14,7 @@ package events{
 		public static const ACTIVITY_UPDATE_FAIL:String = "activityUpdateFail_event";
 		
 		public static const WORKOUT_ADDED:String = "workoutAdded_event";
-		public static const WORKOUT_UPDATED:String = "workoutUpdated_event";
+		public static const WORKOUT_DATE_CHANGED:String = "workoutDateChanged_event";
 		public static const GOT_ALL_WORKOUTS:String = "gotAllWorkouts_event";
 		
 		

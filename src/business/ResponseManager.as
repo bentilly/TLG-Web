@@ -28,7 +28,7 @@ package business{
 		[Bindable] public var myGroups:Array; //array of groups I am a member of
 		[Bindable] public var myActivities:Array; //array of personal activities
 		[Bindable] public var myActivities_collection:ArrayCollection; //array of personal activities
-		[Bindable] public var myWorkouts:Array;  //all the workouts in a single pile. The master version of the data
+		//[Bindable] public var myWorkouts:Array;  //all the workouts in a single pile. The master version of the data
 		
 		//organising workouts
 		public var workoutsByDay:Array;  //Array of WorkoutGroup objects containind a days worth of workouts. Organises workouts by day.
@@ -104,14 +104,7 @@ package business{
 					default:
 						break;
 				}
-				
-				
-				
-				
 			}
-			
-			
-			
 		}
 		
 		public function handleFault(event:RequestEvent, fault:Object, resultObject:Object):void{
@@ -126,7 +119,7 @@ package business{
 			userName = '';
 			myGroups = [];
 			myActivities = [];
-			myWorkouts = [];
+			//myWorkouts = [];
 		}
 		
 //-----TOKEN-----//
@@ -149,7 +142,6 @@ package business{
 			
 			//sort
 			myActivities.sortOn('_name', Array.CASEINSENSITIVE);
-			
 			myActivities_collection = new ArrayCollection(myActivities);
 			
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_MY_ACTIVITES);
@@ -167,7 +159,11 @@ package business{
 		}
 		
 		private function user_getAllWorkouts_handler(workouts:Array):void{
-			myWorkouts = new Array();
+			//myWorkouts = new Array();
+			
+			//make empty collection
+			workoutDaysByMonth_collection = new ArrayCollection([]);
+			
 			for each(var o:Object in workouts){
 				//match activities
 				var activities:Array = [];
@@ -178,14 +174,14 @@ package business{
 						}
 					}
 				}
+				//create workout
 				var w:Workout = new Workout(o, activities);
-				myWorkouts.push(w);
+				
+				addWorkoutToCollection(w);
+
 			}
 			
-			buildWorkoutsByDay();
-			buildWorkoutDaysByMonth();
-			
-			
+			//Changes screen in UI
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_ALL_WORKOUTS);
 			dispatcher.dispatchEvent(uie);
 		}
@@ -199,13 +195,12 @@ package business{
 			if(result.activityKey){
 				var o:Object = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
 				firstActivity = new Activity(o);
-				myActivities.push(firstActivity);
 				
-				//sort
-				myActivities.sortOn('_name', Array.CASEINSENSITIVE);
+				//add to collection
+				myActivities_collection.addItem(firstActivity);
+				//sort by _name
+				utils.sortArrayCollection(myActivities_collection, '_name');
 				
-				uie = new UIEvent(UIEvent.ACTIVITIES_UPDATED);
-				dispatcher.dispatchEvent(uie);
 			}else{
 				for each(var a:Activity in myActivities){
 					if(a._key == request.activity){
@@ -214,8 +209,9 @@ package business{
 					}
 				}
 			}
-			//Add workout locally
 			
+			
+			//Add workout locally
 			var activities:Array = [];
 			if(firstActivity){ activities.push(firstActivity); };
 			
@@ -226,31 +222,75 @@ package business{
 			wo.comment = request.comment;
 			
 			var w:Workout = new Workout(wo, activities);
-			myWorkouts.push(w);
-			
-			buildWorkoutsByDay();
-			buildWorkoutDaysByMonth();
+
+			//add to workoutDaysByMonth_collection which should update UI
+			addWorkoutToCollection(w);
 			
 			uie = new UIEvent(UIEvent.WORKOUT_ADDED);
 			uie.workout = w;
 			dispatcher.dispatchEvent(uie);
 		}
 		
+		private function addWorkoutToCollection(w:Workout):void{
+			var newDay:WorkoutDay
+			var newMonth:WorkoutMonth
+			
+			var monthExists:Boolean = false;
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				//does WorkoutMonth exist?
+				if( utils.compareMonths(wm._date, w._date) ){
+					monthExists = true;
+					//this month
+					var dayExists:Boolean = false;
+					for each(var wd:WorkoutDay in wm._workoutDays_collection){
+						//does WorkoutDay exist
+						if( utils.compareDates(wd._date, w._date) ){
+							dayExists = true;
+							//add workout to workoutDay
+							wd.addWorkout(w);
+							utils.sortArrayCollection(wd._workouts_collection, '_date', true, 'DESC');
+							break;
+						}
+					}
+					if(!dayExists){
+						//make day
+						newDay = new WorkoutDay(new Date(w._date.fullYear, w._date.month, w._date.date) , [w]);
+						//add to month
+						wm.addWorkoutDay(newDay);
+						utils.sortArrayCollection(wm._workoutDays_collection, '_date', true, 'DESC');
+						break;
+					}
+				}
+			}
+			
+			if(!monthExists){
+				//make month and day
+				//make day
+				newDay = new WorkoutDay(new Date(w._date.fullYear, w._date.month, w._date.date) , [w]);
+				//make month
+				newMonth = new WorkoutMonth(new Date(w._date.fullYear, w._date.month, w._date.date) , [newDay]);
+				workoutDaysByMonth_collection.addItem(newMonth);
+			}
+		}
+		
+/////////////////////////
+		
 		private function workout_updateWorkout_handler(result:Object, request:Object):void{
 			var uie:UIEvent;
 			//sort out the activity
 			var firstActivity:Activity; //Until GROUPS, there will only be one
 			if(result.activityKey){
+				//New Activity
 				var o:Object = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
 				firstActivity = new Activity(o);
-				myActivities.push(firstActivity);
 				
-				//sort
-				myActivities.sortOn('_name', Array.CASEINSENSITIVE);
+				//add to collection
+				myActivities_collection.addItem(firstActivity);
+				//sort by _name
+				utils.sortArrayCollection(myActivities_collection, '_name');
 				
-				uie = new UIEvent(UIEvent.ACTIVITIES_UPDATED);
-				dispatcher.dispatchEvent(uie);
 			}else{
+				//Existing activity
 				for each(var a:Activity in myActivities){
 					if(a._key == request.activity){
 						firstActivity = a;
@@ -259,98 +299,51 @@ package business{
 				}
 			}
 			
-			//find and update local workout
-			var activities:Array = [];
-			if(firstActivity){ activities.push(firstActivity); };
+			
+			//workout Object
 			var wo:Object = new Object();
 			wo.key = result.key;
 			wo.date = request.date;
 			wo.duration = request.duration;
 			wo.comment = request.comment;
 			
-			var updatedWorkout:Workout;
-			for each(var w:Workout in myWorkouts){
-				if(result.key == w._key){
-					w.updateWorkout(wo, activities);
-					updatedWorkout = w;
-					break;
-				}
-			}
-			
-			//sort myWorkouts
-			myWorkouts.sortOn('_date');
-			
-			uie = new UIEvent(UIEvent.WORKOUT_UPDATED);
-			uie.workout = updatedWorkout;
-			dispatcher.dispatchEvent(uie);
-			
-		}
-		
-//Workout tools
-		private function buildWorkoutsByDay():void{
-			//clear / create array
-			workoutsByDay = new Array();
-			
-			//sort master array
-			myWorkouts.sortOn('_date', Array.DESCENDING);
-						
-			var prevDay:WorkoutDay = null;
-			var d:Date;
-			var wos:Array;
-			for each(var w:Workout in myWorkouts){
-				if(prevDay){
-					if( utils.compareDates(prevDay._date, w._date) ){
-						//add to day
-						prevDay.addWorkout(w);
-					}else{
-						//new day
-						d = new Date(w._date.fullYear, w._date.month, w._date.date);
-						wos = [w];
-						prevDay = new WorkoutDay(d, wos);
-						workoutsByDay.push(prevDay);
+			var workoutDateChanged:Boolean = false;
+			var workoutToShift:Workout;
+			//find and remove local workout
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				var dayCount:int = 0;
+				for each(var wd:WorkoutDay in wm._workoutDays_collection){
+					var workoutCount:int = 0;
+					for each(var w:Workout in wd._workouts_collection){
+						if(result.key == w._key){
+							//update
+							w.updateWorkout(wo, [firstActivity]);
+							//if different dates
+							if( !utils.compareDates(w._date, wd._date) ){
+								workoutToShift = wd._workouts_collection.removeItemAt(workoutCount) as Workout;
+								addWorkoutToCollection(	workoutToShift );
+								workoutDateChanged = true;
+								//remove empty days
+								if(wd._workouts_collection.length == 0){
+									wm._workoutDays_collection.removeItemAt(dayCount);
+								}
+							}
+							break;
+						}
+						workoutCount++;
 					}
-				}else{
-					//first day
-					d = new Date(w._date.fullYear, w._date.month, w._date.date);
-					wos = [w];
-					prevDay = new WorkoutDay(d, wos);
-					workoutsByDay.push(prevDay);
-				}
-			}
-		}
-		
-		private function buildWorkoutDaysByMonth():void{
-			//clear / create array
-			workoutDaysByMonth = new Array();
-			
-			//sort input array
-			workoutsByDay.sortOn('_date', Array.DESCENDING);
-			
-			var prevMonth:WorkoutMonth = null;
-			var d:Date;
-			var woDays:Array;
-			for each(var wd:WorkoutDay in workoutsByDay){
-				if(prevMonth){
-					if( utils.compareMonths(prevMonth._date, wd._date) ){
-						//add to month
-						prevMonth.addWorkoutDay(wd);
-					}else{
-						d = new Date(wd._date.fullYear, wd._date.month);
-						woDays = [wd];
-						prevMonth = new WorkoutMonth(d, woDays);
-						workoutDaysByMonth.push(prevMonth);
-					}
-				}else{
-					//first month
-					d = new Date(wd._date.fullYear, wd._date.month);
-					woDays = [wd];
-					prevMonth = new WorkoutMonth(d, woDays);
-					workoutDaysByMonth.push(prevMonth);
+					dayCount++;
 				}
 			}
 			
-			workoutDaysByMonth_collection = new ArrayCollection(workoutDaysByMonth);
+			//tell calendar chart to move a workout block
+			if(workoutDateChanged){
+				uie = new UIEvent(UIEvent.WORKOUT_DATE_CHANGED);
+				uie.workout = workoutToShift;
+				dispatcher.dispatchEvent(uie);
+			}
 		}
+
 		
 		
 		

@@ -46,7 +46,6 @@
 				
 				var block:calendarWorkoutBlock = new calendarWorkoutBlock();
 				block.workout = workout;
-				block.activity = workout._activities[0];
 				columnDisplay.addElement(block);
 				return block;
 				
@@ -60,53 +59,38 @@
 			}
 			
 			public function workoutAdded(event:UIEvent):void{
-				if(utils.getSortNumberFromDate(event.workout._date) == utils.getSortNumberFromDate(myDate)){
+				if( utils.compareDates(event.workout._date, myDate) ){
 					myDayWOs.push(event.workout);
 					columnDisplay.removeAllElements();
 					buildWorkouts();
 				}
+				resizeMe();
 			}
 			
-			public function workoutUpdated(event:UIEvent):void{
-				//do any of this day's workouts match the updated one
-				var workoutPresent:Boolean = false;
+			public function workoutDateChanged(event:UIEvent):void{
+				//is the changed workout in this day
 				for(var w:int = 0; w < myDayWOs.length; w++){
 					var wo:Workout = myDayWOs[w];
 					if(wo == event.workout){
-						workoutPresent = true;
+						//remove from array
+						myDayWOs.splice(w, 1);
 						
-						//find block
+						//find and remove block from screen
 						var updatedBlock:calendarWorkoutBlock;
 						var blockIndex:int;
 						for(var i:int = 0; i< woBlocks.length; i++){
 							var block:calendarWorkoutBlock = woBlocks[i];
 							if(block.workout == event.workout){
-								updatedBlock = block;
-								blockIndex = i;
-								break
+								columnDisplay.removeElement(block);
+								break;
 							}
-						}
-						
-						//does the date still match this day?
-						if(  utils.getSortNumberFromDate(myDate) == utils.getSortNumberFromDate(event.workout._date)  ){
-							//check activity
-							updatedBlock.activity = event.workout._activities[0];
-
-						}else{
-							//delete it from this day
-							columnDisplay.removeElement(updatedBlock);
-							woBlocks.splice(blockIndex, 1);
-							myDayWOs.splice(w, 1);
-							break;
 						}
 						break;
 					}
 				}
 				
-				//if its not here, should it be?
-				if(!workoutPresent){
-					workoutAdded(event);
-				}
+				//add to this day if needed
+				workoutAdded(event);
 				
 			}
 			
