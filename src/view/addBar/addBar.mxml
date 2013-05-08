@@ -8,16 +8,28 @@
 		 filters="{ds}" xmlns:addBar="view.addBar.*"
 		 
 		 currentState="homeState"
+		 creationComplete="creationCompleteHandler(event)"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.MD5;
 			import com.greensock.TweenLite;
+			
+			import mx.events.FlexEvent;
 			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var userName:String;
+			[Bindable] public var userEmail:String;
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(userEmail).toString() + '?s=12';
+				gravatarImage.validateNow();			
+			}
 			
 			/*** INTERNAL ***/
 			[Bindable] private var panelHeight:Number = 480;
@@ -99,11 +111,12 @@
 		</s:BorderContainer>
 		
 		<s:Label text="TheLazyGibbon" styleName="tlgBrand" bottom="{plusDrop + 3}" left="5"/>
-		<!--<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
+		<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
 			<s:Button id="backButton" label="Home" click="backButton_clickHandler(event)"/>
 			<s:Label text="My Workouts" styleName="userName"/>
-		</s:HGroup>-->
+		</s:HGroup>
 		<s:HGroup bottom="{plusDrop + 3}" right="5">
+			<s:Image id="gravatarImage"/>
 			<s:Label text="{userName}" styleName="userName" />
 			<s:Label id="logoutBut" text="|  log out" styleName="tinyWhite" paddingTop="2" paddingRight="10" alpha=".6" 
 					 rollOut="{logoutBut.alpha = .6}" rollOver="{logoutBut.alpha = 1}" click="logoutBut_clickHandler(event)"

@@ -11,6 +11,7 @@ package business{
 	
 	import events.RequestEvent;
 	import events.UIEvent;
+
 	
 	
 	
@@ -25,6 +26,7 @@ package business{
 		//token is used to authenticate this user on every request. Use token.creatToken to log in and get a new token.
 		[Bindable] public var token:String;
 		[Bindable] public var userName:String; //returned when someone logs in
+		[Bindable] public var userEmail:String;
 		[Bindable] public var myGroups:Array; //array of groups I am a member of
 		[Bindable] public var myActivities:Array; //array of personal activities
 		[Bindable] public var myActivities_collection:ArrayCollection; //array of personal activities
@@ -64,6 +66,7 @@ package business{
 					case "token.createToken":
 						token = result.token;
 						userName = result.name;
+						userEmail = request.email;
 						token_createToken_handler();
 						break;
 					//USER
@@ -159,8 +162,6 @@ package business{
 		}
 		
 		private function user_getAllWorkouts_handler(workouts:Array):void{
-			//myWorkouts = new Array();
-			
 			//make empty collection
 			workoutDaysByMonth_collection = new ArrayCollection([]);
 			
@@ -232,8 +233,8 @@ package business{
 		}
 		
 		private function addWorkoutToCollection(w:Workout):void{
-			var newDay:WorkoutDay
-			var newMonth:WorkoutMonth
+			var newDay:WorkoutDay;
+			var newMonth:WorkoutMonth;
 			
 			var monthExists:Boolean = false;
 			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
@@ -313,14 +314,33 @@ package business{
 			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
 				var dayCount:int = 0;
 				for each(var wd:WorkoutDay in wm._workoutDays_collection){
-					var workoutCount:int = 0;
-					for each(var w:Workout in wd._workouts_collection){
-						if(result.key == w._key){
-							//update
-							w.updateWorkout(wo, [firstActivity]);
-							//if different dates
-							if( !utils.compareDates(w._date, wd._date) ){
-								workoutToShift = wd._workouts_collection.removeItemAt(workoutCount) as Workout;
+					
+
+					
+					
+					for(var i:int = 0; i<wd._workouts_collection.length; i++){
+						if(result.key == wd._workouts_collection.getItemAt(i)._key){
+							wd._workouts_collection.getItemAt(i).updateWorkout(wo, [firstActivity]);
+							if( !utils.compareDates(wd._workouts_collection.getItemAt(i)._date, wd._date) ){
+								trace('-'+wd._workouts_collection.length);
+								
+								//some wierd thing where it wont remove the first item. Probably doing something wrong somewhere.
+								if(wd._workouts_collection.length > 1 && i == 0){
+									workoutToShift = wd._workouts_collection.getItemAt(i) as Workout;
+									
+									var newWorkoutArray:Array = [];
+									for each(var tw:Workout in wd._workouts_collection){
+										if(tw._key != wd._workouts_collection.getItemAt(i)._key){
+											newWorkoutArray.push(tw);
+										}
+									}
+									wd._workouts = newWorkoutArray;
+									wd._workouts_collection = new ArrayCollection(newWorkoutArray);
+									
+								}else{
+									workoutToShift = wd._workouts_collection.removeItemAt(i) as Workout;
+								}
+								trace('--'+wd._workouts_collection.length);
 								addWorkoutToCollection(	workoutToShift );
 								workoutDateChanged = true;
 								//remove empty days
@@ -330,8 +350,10 @@ package business{
 							}
 							break;
 						}
-						workoutCount++;
 					}
+					
+					
+					
 					dayCount++;
 				}
 			}

@@ -5,9 +5,10 @@
 		 xmlns:login="view.login.*"
 		 xmlns:addBar="view.addBar.*" 
 		 xmlns:dashboard="view.dashboard.*"
+		 xmlns:myWorkouts="view.myWorkouts.*"
 		 
 		 creationComplete="creationCompleteHandler(event)"
-		 resize="resizeHandler(event)" xmlns:myWorkouts="view.myWorkouts.*"
+		 resize="resizeHandler(event)"
 		 addedToStage="addedToStageHandler(event)"
 		 
 		 >
@@ -15,7 +16,6 @@
 	<fx:Script>
 		<![CDATA[
 			import com.greensock.TweenLite;
-			import com.greensock.TweenMax;
 			import com.greensock.easing.Bounce;
 			
 			import mx.events.FlexEvent;
@@ -33,7 +33,7 @@
 			private var myTrainingSize:Number;
 			
 			/* UI Elements */
-			private var loginWidget:loginUI;
+			/*private var loginWidget:loginUI;*/
 			private var topAddBar:addBar;
 			private var myTrainingDash: myTraining_dash;
 			private var myGroupsDash:myGroups_dash;
@@ -82,9 +82,9 @@
 			//core
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
-				loginWidget = new loginUI();
+				/*loginWidget = new loginUI();
 				loginWidget.alpha = 0;
-				this.addElement(loginWidget);
+				loginHolder.addElement(loginWidget);*/
 			}
 			protected function resizeHandler(event:ResizeEvent):void
 			{
@@ -94,94 +94,18 @@
 			{
 				sizeDashGroup();
 			}
-			private function sizeDashGroup():void{
-				try{
-					dashGroup.width = this.width;
-					dashGroup.height = this.height;
-				}catch(e:Error){
-					trace('nothing on stage yet');
-				}
-			}
+			
 			
 			//login
 			private function removeLogin():void{
-				TweenLite.to(loginWidget, .5, {alpha:0, onComplete:killLoginWidget});
-			}
-			private function killLoginWidget():void{
-				this.removeElement(loginWidget);
-				
-				//go straight to personal training page (no groups)
-				/*addMyTraining();*/
-				/*addMyGroups();
-				addTopAddBar();*/
 				
 				preloadData();
-			}
-			
-			//topAddBar
-			private function addTopAddBar():void{
-				topAddBar = new addBar();
-				topAddBar.y = -100;
-				topAddBar.depth = 100; ///put it on top
-				this.addElement(topAddBar);
-				TweenLite.to(topAddBar, 1.5, {y:0, ease:Bounce.easeOut, delay:.8});
-			}
-			
-			//myTraining
-			private function addMyTraining():void{
-				myTrainingDash = new myTraining_dash();
-				myTrainingDash.id = 'myTrainingDash';
-				myTrainingDash.mouseChildren = false;
-				myTrainingDash.percentWidth = myTrainingSize;
-				myTrainingDash.alpha = 0;
-				myTrainingDash.addEventListener(MouseEvent.CLICK, clickMyTrainingDash_handler);
-				dashGroup.addElement(myTrainingDash);
-				TweenLite.to(myTrainingDash, 1, {alpha:1});
-			}
-			
-			
-			private function clickMyTrainingDash_handler(event:MouseEvent):void{
-				TweenLite.to(dashGroup, .5, {alpha:0, x:-600, onComplete:killDash});
-				myWorkouts.visible = true;
-				myWorkouts.alpha = 0;
-				myWorkouts..x = 600;
-				TweenLite.to(myWorkouts, .5, {alpha:1, x:0});
-				
-				tweenBGColour(0xffffff);
-				
-				var uie:UIEvent = new UIEvent(UIEvent.GO_MYWORKOUTS);
-				dispatchEvent(uie);
-				
 				
 			}
-			private function tweenBGColour(targetColor:Number):void{
-				var currentBGColour:Number = bgCol.getStyle('backgroundColor');
-				
-				
-				var myStyle:Object = {backgroundColor:currentBGColour};
-				TweenMax.to(myStyle, 1, {hexColors:{backgroundColor:targetColor}, onUpdate:updateStyle});
-				function updateStyle():void {
-					bgCol.setStyle("backgroundColor", myStyle.backgroundColor);
-				}
-			}
-			
-			private function killDash():void{
-				dashGroup.x = 0;
-				dashGroup.visible = false;
-			}
-			//myGroups
-			private function addMyGroups():void{
-				myGroupsDash = new myGroups_dash();
-				myGroupsDash.percentWidth = 100 - myTrainingSize;
-				myGroupsDash.alpha = 0;
-				myGroupsDash.myTrainingSize = myTrainingSize;
-				dashGroup.addElement(myGroupsDash);
-				TweenLite.to(myGroupsDash, 1, {alpha:1, onComplete:preloadData});
-				
+			private function killLoginWidget():void{
+				/*loginHolder.removeElement(loginWidget);*/
 				
 			}
-			
-			//Preload data. Once UI is built go get activities and other data
 			private function preloadData():void{
 				//myActivities
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
@@ -194,52 +118,138 @@
 				dispatchEvent(re);
 			}
 			
-			//bypass dashboard - go straight to my training
 			public function gotAllWorkouts(event:UIEvent):void{
 				addTopAddBar();
-				TweenLite.delayedCall(2.5, clickMyTrainingDash_handler, [new MouseEvent(MouseEvent.CLICK)]);
+				addMyTraining();
+				addMyGroups();
+			}
+			
+			//topAddBar
+			private function addTopAddBar():void{
+				topAddBar = new addBar();
+				topAddBar.y = -100;
+				topAddBar.depth = 100; ///put it on top
+				this.addElement(topAddBar);
+				TweenLite.to(topAddBar, 45, {y:0, ease:Bounce.easeOut, useFrames:true});
+			}
+			
+			//myTraining
+			//issues!
+			private function addMyTraining():void{
+				myTrainingDash = new myTraining_dash();
+				myTrainingDash.id = 'myTrainingDash';
+				myTrainingDash.mouseChildren = false;
+				myTrainingDash.addEventListener(MouseEvent.CLICK, clickMyTrainingDash_handler);
+				dashGroup.addElement(myTrainingDash);
+				
+				//tell My Workouts to build first view. Not visible yet
+				var uie:UIEvent = new UIEvent(UIEvent.BUILD_MYWORKOUTS);
+				dispatchEvent(uie);
+			}
+			//myGroups
+			private function addMyGroups():void{
+				myGroupsDash = new myGroups_dash();
+				myGroupsDash.myTrainingSize = myTrainingSize;
+				dashGroup.addElement(myGroupsDash);
+				
+				sizeDashGroup();
+				setDashStart();
+				
+				//TweenLite.delayedCall(1, buildMyTraining);
+				
+			}
+			private function setDashStart():void{
+				myTrainingDash.x = (myTrainingDash.width * -1) - 15;
+				myGroupsDash.right = (myGroupsDash.width * -1) - 15;
+				TweenLite.delayedCall(2.5, revealDash);
+			}
+			private function clickMyTrainingDash_handler(event:MouseEvent):void{
+				myWorkouts.visible = true;
+				hideDash();
+				
+				var uie:UIEvent = new UIEvent(UIEvent.GO_MYWORKOUTS);
+				dispatchEvent(uie);
+			}
+			
+			private function killDash():void{
+				dashGroup.x = 0;
+				dashGroup.visible = false;
 			}
 			
 			public function goHome(event:UIEvent):void{
-				dashGroup.x = -600;
+				/*dashGroup.x = -600;
 				dashGroup.alpha = 0;
 				dashGroup.visible = true;
 				sizeDashGroup();
 				TweenLite.to(dashGroup, .5, {alpha:1, x:0});
-				TweenLite.to(myWorkouts, .5, {alpha:0, x:600, onComplete:killMyWorkouts});
-				tweenBGColour(0x26bc3b);
+				TweenLite.to(myWorkouts, .5, {alpha:0, x:600, onComplete:killMyWorkouts});*/
+				
+				revealDash();
+				
 			}
 			private function killMyWorkouts():void{
 				myWorkouts.x = 0;
 				myWorkouts.visible = false;
 			}
 			public function logout(event:Event):void{
-				TweenLite.to(myWorkouts, .5, {alpha:0, x:600, onComplete:killMyWorkouts});
-				tweenBGColour(0x26bc3b);
 				TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
 				
-				loginWidget = new loginUI();
+				/*loginWidget = new loginUI();
 				loginWidget.alpha = 0;
-				this.addElement(loginWidget);
+				loginHolder.addElement(loginWidget);*/
 				
-				TweenLite.to(loginWidget, 1, {alpha:1});
+				myWorkouts.visible = false;
+				hideDash();
 				
 			}
+			
 			private function killTopBar():void{
 				this.removeElement(topAddBar);
 			}
+			
+			
+			//control Dashboard UI
+			private function sizeDashGroup():void{
+				try{
+					dashGroup.width = stage.stageWidth;
+					dashGroup.height = stage.stageHeight;
+					
+					myTrainingDash.width = stage.stageWidth / 2;
+					myGroupsDash.width = stage.stageWidth / 2;
+					
+					
+					
+				}catch(e:Error){
+					trace('nothing on stage yet');
+				}
+			}
+			private function revealDash():void{
+				TweenLite.to(myTrainingDash, 15, {x:0, useFrames:true});
+				TweenLite.to(myGroupsDash, 15, {right:0, useFrames:true});
+				
+			}
+			private function hideDash():void{
+				var target:Number = (myTrainingDash.width * -1) - 15;				
+				TweenLite.to(myTrainingDash, 0.6, {x:target});
+				TweenLite.to(myGroupsDash, 0.6, {right:target});
+				
+			}
+			
+			
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:GlowFilter color="#000000" id="outerShadowFilter" blurX="30" blurY="30" alpha=".1"/>
 	</fx:Declarations>
 	
 	<s:BorderContainer id="bgCol" backgroundColor="#26bc3b" width="100%" height="100%" borderVisible="false"/>
 	
+	<login:loginUI id="loginWidget"/>
+	
 	<myWorkouts:myWorkoutsContent id="myWorkouts" visible="false"/>
 	
-	<s:HGroup id="dashGroup" gap="0"/>
+	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}"/>
 	
 	
 	

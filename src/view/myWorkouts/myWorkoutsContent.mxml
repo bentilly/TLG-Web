@@ -61,6 +61,9 @@
 				calBuilt = false;
 				calendarContent.removeAllElements();
 			}
+			public function buildMyWorkouts(event:Event):void{
+				goMyWorkouts(new UIEvent(UIEvent.GO_MYWORKOUTS));
+			}
 			
 			public function goMyWorkouts(event:UIEvent):void
 			{

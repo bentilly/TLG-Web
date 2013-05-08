@@ -79,10 +79,12 @@
 		<Injectors target="{addBar}">
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
 		</Injectors>
 		
 		<Injectors target="{myTraining_dash}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
 		</Injectors>
 		
 		<Injectors target="{myGroups_dash}">
@@ -128,9 +130,9 @@
 		
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<!--<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
-			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			<!--<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>-->
+			<ListenerInjector eventType="{UIEvent.BUILD_MYWORKOUTS}" method="buildMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>
 		
