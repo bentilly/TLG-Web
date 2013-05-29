@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 width="100%" 
+		 height="100%"
+		 
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import business.dataObjects.TlgGroup;
+			
+			import view.popups.addTagPopup;
+			import view.skinsAndRenderers.editWorkout_activityRenderer;
+			
+			/*** IMPORT ***/
+			[Bindable] public var token:String;
+			[Bindable] public var currentGroup:TlgGroup;
+			
+			protected function addActivityLabel_clickHandler(event:MouseEvent):void
+			{
+				var addTagPU:addTagPopup = new addTagPopup();
+				addTagPU.token = token;
+				addTagPU.groupKey = currentGroup._key;
+				addTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(addTagPU);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:BorderContainer backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
+		<s:VGroup width="100%" height="100%">
+			<s:HGroup paddingTop="40" paddingLeft="15" gap="15">
+				<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="56" height="56"/>
+				<s:Label text="{currentGroup._name}" styleName="h1_white" color="#123456" fontSize="40" paddingTop="10"/>
+			</s:HGroup>
+			
+			<s:Scroller width="100%" height="100%">
+				<s:HGroup paddingRight="20" paddingLeft="20" paddingTop="20">
+					
+					<s:VGroup paddingRight="50">
+						<s:DataGroup dataProvider="{currentGroup._members_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
+							<s:layout>
+								<s:VerticalLayout/>
+							</s:layout>
+						</s:DataGroup>
+						
+						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" width="150" textAlign="right" paddingTop="20"/>
+					</s:VGroup>
+					
+					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>
+					
+					<s:VGroup paddingLeft="10">
+						<s:Label text="Group activities" styleName="leaderboardName" paddingBottom="20"/>
+						<s:List id="activitiesList" dataProvider="{currentGroup._activities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
+								borderVisible="false" contentBackgroundAlpha="0"
+								>
+							<s:layout>
+								<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="3"/>
+							</s:layout>
+						</s:List>
+						<s:Label id="addActivityLabel" text="+ add activity" styleName="durationlabel" click="addActivityLabel_clickHandler(event)" visible="{currentGroup._admin}"
+								 paddingTop="20"/>
+					</s:VGroup>
+					
+				</s:HGroup>
+			</s:Scroller>
+			
+		</s:VGroup>
+	</s:BorderContainer>
+	
+	
+</s:Group>

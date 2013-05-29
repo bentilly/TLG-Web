@@ -56,11 +56,16 @@
 				
 				return null;
 			}
-			
+//Logout
 			public function logout(event:UIEvent):void{
+				TweenLite.delayedCall(18, clearCalendar, [], true); //delay while dash closes
+			}
+			private function clearCalendar():void{
 				calBuilt = false;
 				calendarContent.removeAllElements();
 			}
+			
+			
 			public function buildMyWorkouts(event:Event):void{
 				goMyWorkouts(new UIEvent(UIEvent.GO_MYWORKOUTS));
 			}

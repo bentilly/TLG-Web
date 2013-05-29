@@ -5,56 +5,38 @@
 		 
 		 
 		 height="100%"
-		 
-		 resize="resizeHandler(event)"
+
 		 creationComplete="creationCompleteHandler(event)"
 		 
 		 >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
-			import mx.events.ResizeEvent;
+			
+			import business.dataObjects.TlgGroup;
 			
 			/*** IMPORTED ***/
-			[Bindable] public var myGroups:Array;
+			[Bindable] public var myGroups_collection:ArrayCollection;
 			public var myTrainingSize:Number;
 			
 			/*** INTERNAL ***/
 			private var numGroups:int;
 			
-			protected function resizeHandler(event:ResizeEvent):void
-			{
-				resizeScroller();
-			}
-			
-			private function resizeScroller():void{
-				var stageWidth:Number = stage.width;
-				var myCalculatedWidth:Number = Math.round((stage.width / 100) * (100 - myTrainingSize));
-				
-				var groupListWidth:Number = (numGroups * 200) + 80 + ((numGroups-1) * 40);
-				
-				if(groupListWidth > myCalculatedWidth){
-					groupScroller.width = myCalculatedWidth;
-				}else{
-					groupScroller.width = groupListWidth;
-				}
-			}
-			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
 				
-				for each(var g:Object in myGroups){
+				for each(var g:TlgGroup in myGroups_collection){
 					var gd:group_dash = new group_dash();
-					gd.data = g;
+					gd.tlgGroup = g;
 					groupList.addElement(gd);
 				}
 				var ag:addGroup = new addGroup();
 				groupList.addElement(ag);
 				
-				numGroups = myGroups.length + 1;
-				
-				resizeScroller();
+				numGroups = myGroups_collection.length + 1;
+
 				
 			}
 			
@@ -70,11 +52,12 @@
 				<s:SolidColorStroke color="0xffffff" weight="1"/>
 			</s:stroke>
 		</s:Line>
-		<s:VGroup id="container" horizontalCenter="0" verticalCenter="0" height="450">
+		
+		<s:VGroup id="container" horizontalCenter="0" verticalCenter="0" height="100%">
 			
-			<s:Label text="Groups" styleName="h1_white" paddingBottom="20" paddingLeft="40"/>
+			<s:Label id="dashLabel" text="Groups" styleName="h1_white" paddingBottom="20" paddingLeft="40"/>
 			
-			<s:Scroller id="groupScroller" height="430" verticalScrollPolicy="off">
+			<s:Scroller id="groupScroller" height="100%" verticalScrollPolicy="off">
 				<s:HGroup id="groupList" paddingLeft="40" paddingRight="40" gap="40">
 	
 				</s:HGroup>

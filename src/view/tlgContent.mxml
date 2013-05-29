@@ -9,15 +9,20 @@
 		 
 		 creationComplete="creationCompleteHandler(event)"
 		 resize="resizeHandler(event)"
-		 addedToStage="addedToStageHandler(event)"
+		 addedToStage="addedToStageHandler(event)" xmlns:myGroups="view.myGroups.*"
 		 
+		 
+		 width="100%"
+		 height="100%"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
 			import com.greensock.TweenLite;
 			import com.greensock.easing.Bounce;
+			import com.greensock.easing.Cubic;
 			
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			import mx.events.ResizeEvent;
 			
@@ -32,6 +37,9 @@
 			/*** INTERNAL ***/
 			private var myTrainingSize:Number;
 			
+			//Flags
+			private var uiState:int = 0; //0 = login, 1 = dashboard, 2 = Workouts, 3 = Groups
+			
 			/* UI Elements */
 			/*private var loginWidget:loginUI;*/
 			private var topAddBar:addBar;
@@ -41,70 +49,57 @@
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
-			[Bindable] public var myGroups:Array;
+			[Bindable] public var myGroups_collection:ArrayCollection;
 			
 			
-			/*** OUTSIDE EVENTS ***/
+			//core
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+
+			}
+			protected function resizeHandler(event:ResizeEvent):void
+			{
+				trace('resizeHandler');
+				sizeDashGroup();
+			}
+			protected function addedToStageHandler(event:Event):void
+			{
+				trace('addedToStageHandler');
+				sizeDashGroup();
+			}
+			
+			
+			//login
 			public function userLoggedIn(event:UIEvent):void{
 				//TODO: show spinner
 				
 				//need to know GROUPS before building UI
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
 				var requestObj:Object = new Object();
-				requestObj.operation = 'user.getGroups';
+				requestObj.operation = 'user.getAllMyGroups';
 				requestObj.token = token;
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 				trace(re.requestJson);
 				dispatchEvent(re);
-
+				
 			}
 			public function gotGroups(event:UIEvent):void{
-				switch(myGroups.length){
+				switch(myGroups_collection.length){
 					case 0:
-						myTrainingSize = 66;
+						myTrainingSize = 0.6666;
 						trace("0 groups");
 						break;
 					case 1:
-						myTrainingSize = 50;
+						myTrainingSize = 0.5;
 						trace("1 group");
 						break
 					default:
-						myTrainingSize = 33;
+						myTrainingSize = 0.3333;
 						trace("1+ groups");
 						break;
 				}
-				removeLogin();
-			}
-			
-			
-			/*** INTERNAL ***/
-			//core
-			protected function creationCompleteHandler(event:FlexEvent):void
-			{
-				/*loginWidget = new loginUI();
-				loginWidget.alpha = 0;
-				loginHolder.addElement(loginWidget);*/
-			}
-			protected function resizeHandler(event:ResizeEvent):void
-			{
-				sizeDashGroup();
-			}
-			protected function addedToStageHandler(event:Event):void
-			{
-				sizeDashGroup();
-			}
-			
-			
-			//login
-			private function removeLogin():void{
-				
 				preloadData();
-				
-			}
-			private function killLoginWidget():void{
-				/*loginHolder.removeElement(loginWidget);*/
-				
 			}
 			private function preloadData():void{
 				//myActivities
@@ -134,7 +129,6 @@
 			}
 			
 			//myTraining
-			//issues!
 			private function addMyTraining():void{
 				myTrainingDash = new myTraining_dash();
 				myTrainingDash.id = 'myTrainingDash';
@@ -151,25 +145,16 @@
 				myGroupsDash = new myGroups_dash();
 				myGroupsDash.myTrainingSize = myTrainingSize;
 				dashGroup.addElement(myGroupsDash);
-				
+				trace('addMyGroups()');
 				sizeDashGroup();
 				setDashStart();
-				
-				//TweenLite.delayedCall(1, buildMyTraining);
-				
 			}
 			private function setDashStart():void{
 				myTrainingDash.x = (myTrainingDash.width * -1) - 15;
 				myGroupsDash.right = (myGroupsDash.width * -1) - 15;
 				TweenLite.delayedCall(2.5, revealDash);
 			}
-			private function clickMyTrainingDash_handler(event:MouseEvent):void{
-				myWorkouts.visible = true;
-				hideDash();
-				
-				var uie:UIEvent = new UIEvent(UIEvent.GO_MYWORKOUTS);
-				dispatchEvent(uie);
-			}
+			
 			
 			private function killDash():void{
 				dashGroup.x = 0;
@@ -177,32 +162,28 @@
 			}
 			
 			public function goHome(event:UIEvent):void{
-				/*dashGroup.x = -600;
-				dashGroup.alpha = 0;
-				dashGroup.visible = true;
-				sizeDashGroup();
-				TweenLite.to(dashGroup, .5, {alpha:1, x:0});
-				TweenLite.to(myWorkouts, .5, {alpha:0, x:600, onComplete:killMyWorkouts});*/
-				
 				revealDash();
-				
 			}
 			private function killMyWorkouts():void{
 				myWorkouts.x = 0;
 				myWorkouts.visible = false;
 			}
+			
+			
+			//logout
 			public function logout(event:Event):void{
-				TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
-				
-				/*loginWidget = new loginUI();
-				loginWidget.alpha = 0;
-				loginHolder.addElement(loginWidget);*/
-				
-				myWorkouts.visible = false;
-				hideDash();
+				if(uiState == 1){
+					TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
+					myWorkouts.visible = false;
+					myGroup.visible = false;
+					hideDash();
+					uiState = 0;
+				}else{
+					revealDash();
+					TweenLite.delayedCall(16, logout, [null], true);
+				}
 				
 			}
-			
 			private function killTopBar():void{
 				this.removeElement(topAddBar);
 			}
@@ -210,29 +191,60 @@
 			
 			//control Dashboard UI
 			private function sizeDashGroup():void{
-				try{
-					dashGroup.width = stage.stageWidth;
-					dashGroup.height = stage.stageHeight;
-					
-					myTrainingDash.width = stage.stageWidth / 2;
-					myGroupsDash.width = stage.stageWidth / 2;
+				try{				
+					myTrainingDash.width = (stage.stageWidth * myTrainingSize) + 1; //one pixel gap sometimes because of rounding widths
+					myGroupsDash.width = stage.stageWidth - myTrainingDash.width;
+					myGroupsDash.groupScroller.width = stage.stageWidth - myTrainingDash.width;
 					
 					
+					myTrainingDash.dashLabel.setStyle('paddingTop', stage.stageHeight/4);
+					myGroupsDash.dashLabel.setStyle('paddingTop', stage.stageHeight/4);
+					
+					if(uiState != 1){ //curtains open
+						myTrainingDash.x = (myTrainingDash.width * -1) - 15;
+						myGroupsDash.right = (myGroupsDash.width * -1) - 15;
+					}
+					
+					
+					trace('sized');
 					
 				}catch(e:Error){
 					trace('nothing on stage yet');
 				}
 			}
 			private function revealDash():void{
+				uiState = 1;
 				TweenLite.to(myTrainingDash, 15, {x:0, useFrames:true});
 				TweenLite.to(myGroupsDash, 15, {right:0, useFrames:true});
 				
 			}
 			private function hideDash():void{
-				var target:Number = (myTrainingDash.width * -1) - 15;				
-				TweenLite.to(myTrainingDash, 0.6, {x:target});
-				TweenLite.to(myGroupsDash, 0.6, {right:target});
+				var myTrainingDashTarget:Number = (myTrainingDash.width * -1) - 15;
+				var myGroupsDashTarget:Number = (myGroupsDash.width * -1) - 15;
+				TweenLite.to(myTrainingDash, 0.6, {x:myTrainingDashTarget, ease:Cubic.easeIn});
+				TweenLite.to(myGroupsDash, 0.6, {right:myGroupsDashTarget, ease:Cubic.easeIn});
 				
+			}
+			
+			
+//Go to a group
+			public function goGroup(event:UIEvent):void{
+				//assumes you are on the dashboard
+				myWorkouts.visible = false;
+				myGroup.visible = true;
+				
+				uiState = 3;
+				hideDash();
+			}
+			
+			/** Event handlers **/
+			private function clickMyTrainingDash_handler(event:MouseEvent):void{
+				myWorkouts.visible = true;
+				myGroup.visible = false;
+				hideDash();
+				uiState = 2;
+				var uie:UIEvent = new UIEvent(UIEvent.GO_MYWORKOUTS);
+				dispatchEvent(uie);
 			}
 			
 			
@@ -248,10 +260,11 @@
 	<login:loginUI id="loginWidget"/>
 	
 	<myWorkouts:myWorkoutsContent id="myWorkouts" visible="false"/>
+	<myGroups:myGroupContent id="myGroup" visible="false"/>
 	
-	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}"/>
+	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
 	
-	
+	<s:Label id="iteration" text="8" styleName="tinyWhite" right="3" bottom="3" alpha=".4"/>
 	
 	
 </s:Group>

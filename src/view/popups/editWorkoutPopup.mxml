@@ -80,6 +80,8 @@
 				var woDate:Date = woDetails.getWODate();
 				var woDuration:int = woDetails.getWODuration();
 				var woComment:String = woDetails.getWOComment();
+				var woActivities:Array = woActivitiesSelector.getActivities();
+				var newWO:String = woActivitiesSelector.getNewActivity();
 				
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
 				var requestObj:Object = new Object();
@@ -89,25 +91,13 @@
 				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
 				requestObj.duration = woDuration;
 				requestObj.comment = woComment;
-				//activity
-				var activityKey:String = null;
-				if(activitiesList.selectedIndex > -1){
-					activityKey = activitiesList.selectedItem._key;
-				}
-				var newActivity:String = "";
-				if(newActivityInput.text != 'new activity'){
-					newActivity = newActivityInput.text;
-				}
-				requestObj.activity = activityKey;
-				requestObj.newActivity = newActivity;
-				
+				requestObj.activities = woActivities;
+				requestObj.newActivity = newWO;
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 				trace(re.requestJson);
 				dispatchEvent(re);
 				
-				
-				 
 				try{
 					close();
 				}catch(e:Error){
@@ -137,21 +127,30 @@
 				stage.addEventListener(ResizeEvent.RESIZE, resizeHandler);
 				resizeHandler(new Event(Event.RESIZE));
 				setWorkoutToEdit();
+				
+				
+				
+				
 			}
 			private function setWorkoutToEdit():void{
 				woDetails.setWODate(workout._date);
 				woDetails.setDuration(workout._duration);
 				woDetails.setWOComment(workout._comment);
 				
-				//find activity to select
-				var count:int = 0
+				//find select activities
+				woActivitiesSelector.selectWorkoutActivites(workout)
+				
+				
+				
+				
+				/*var count:int = 0
 				for each(var a:Activity in myActivities_collection){
 					if(a == workout._activities[0]){
-						activitiesList.selectedIndex = count;
+						//activitiesList.selectedIndex = count;
 						break;
 					}
 					count++;
-				}
+				}*/
 				
 				
 			}
@@ -178,19 +177,19 @@
 			//New Activity
 			protected function newActivityInput_focusInHandler(event:FocusEvent):void
 			{
-				activitiesList.selectedIndex = -1;
+				/*activitiesList.selectedIndex = -1;
 				if(newActivityInput.text == "new activity"){
 					newActivityInput.text = "";
 					newActivityInput.styleName = "textFieldNewActivityContent";
-				}
+				}*/
 			}
 			
 			protected function newActivityInput_focusOutHandler(event:FocusEvent):void
 			{
-				if(newActivityInput.text == ""){
+				/*if(newActivityInput.text == ""){
 					newActivityInput.text = "new activity";
 					newActivityInput.styleName = "textFieldNewActivityBlank";
-				}
+				}*/
 			}
 			
 			
@@ -198,10 +197,10 @@
 			
 			protected function activitiesList_changeHandler(event:IndexChangeEvent):void
 			{
-				if(activitiesList.selectedIndex > -1){
+				/*if(activitiesList.selectedIndex > -1){
 					newActivityInput.text = "new activity";
 					newActivityInput.styleName = "textFieldNewActivityBlank";
-				}
+				}*/
 			}
 			
 		]]>
@@ -226,11 +225,20 @@
 								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>-->
 					</s:VGroup>
 					
+					
+					
+					<s:Scroller width="100%" verticalScrollPolicy="off">
+						<addBar:workoutActivities id="woActivitiesSelector"/>
+					</s:Scroller>
+					
+					
+					
+					
 					<!--<s:Scroller width="100%" verticalScrollPolicy="off">
 						<addBar:workoutActivities id="woActivitiesSelector" editWorkoutMode="true"/>
 					</s:Scroller>-->
 					
-					<s:VGroup paddingLeft="15">
+					<!--<s:VGroup paddingLeft="15">
 						<s:HGroup>
 							<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
 							<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
@@ -247,7 +255,7 @@
 						<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity" 
 									 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)"/>
 						
-					</s:VGroup>
+					</s:VGroup>-->
 					
 					
 				</s:HGroup>

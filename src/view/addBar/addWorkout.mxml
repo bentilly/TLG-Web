@@ -24,7 +24,7 @@
 				var woDate:Date = woDetails.getWODate();
 				var woDuration:int = woDetails.getWODuration();
 				var woComment:String = woDetails.getWOComment();
-				var woActivity:String = woActivitiesSelector.getActivities(); //TODO: make list of activities
+				var woActivities:Array = woActivitiesSelector.getActivities();
 				var newWO:String = woActivitiesSelector.getNewActivity();
 
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
@@ -34,7 +34,7 @@
 				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
 				requestObj.duration = woDuration;
 				requestObj.comment = woComment;
-				requestObj.activity = woActivity; //TODO: this will be a list of activities - one for user and one per group
+				requestObj.activities = woActivities;
 				requestObj.newActivity = newWO;
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);

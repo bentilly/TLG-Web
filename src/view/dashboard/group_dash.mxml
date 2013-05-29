@@ -8,13 +8,23 @@
 		 height="400"
 		 width="200"
 		 
-		 
+		 click="clickHandler(event)"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import business.dataObjects.TlgGroup;
 			
-			[Bindable] public var data:Object;
+			import events.UIEvent;
+			
+			[Bindable] public var tlgGroup:TlgGroup;
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent = new UIEvent(UIEvent.GO_GROUP);
+				uie.tlgGroup = tlgGroup;
+				dispatchEvent(uie);
+			}
 			
 		]]>
 	</fx:Script>
@@ -28,8 +38,8 @@
 	
 		<s:VGroup>
 			<s:Image source="@Embed(source='../../assets/angrymonkey.png')"/>
-			<s:Label text="{data.name}" styleName="h2_white" width="200" height="50"/>
-			<dataViz:smallLeaderboard/>
+			<s:Label text="{tlgGroup._name}" styleName="h2_white" width="200" height="50"/>
+			<!--<dataViz:smallLeaderboard/>-->
 		</s:VGroup>
 
 	

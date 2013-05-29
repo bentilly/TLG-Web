@@ -57,7 +57,7 @@
 					}
 					day.myDayWOs = dayWOs;
 					//trigger build
-					day.buildWorkouts();
+					day.buildWorkouts(null);
 					//add
 					monthDays.addElement(day);
 					dayObjects.push(day);

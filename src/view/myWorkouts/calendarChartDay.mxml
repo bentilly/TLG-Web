@@ -34,11 +34,10 @@
 				dayLabel.styleName = "calDayWELabel";
 			}
 			
-			public function buildWorkouts():void{
+			public function buildWorkouts(event:Event):void{
 				woBlocks = [];
 				for each(var w:Workout in myDayWOs){
 					woBlocks.push(addBlockToColumn(w));
-					
 				}
 			}
 			
@@ -62,7 +61,7 @@
 				if( utils.compareDates(event.workout._date, myDate) ){
 					myDayWOs.push(event.workout);
 					columnDisplay.removeAllElements();
-					buildWorkouts();
+					buildWorkouts(null);
 				}
 				resizeMe();
 			}

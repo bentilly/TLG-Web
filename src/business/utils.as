@@ -4,9 +4,16 @@ package business
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	
+	import business.dataObjects.TlgGroup;
 
 	public class utils
 	{
+		/*** IMPORT ***/
+		[Bindable] public var myGroups_collection:ArrayCollection;
+		[Bindable] public var myActivities_collection:ArrayCollection;
+		
+		
 		public function utils()
 		{
 		}
@@ -69,9 +76,6 @@ package business
 			ar.sort = numericDataSort;
 			ar.refresh();
 		}
-		
-		
-		
 		
 		
 		

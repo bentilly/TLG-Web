@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true"
+				
+				height="100%"
+				
+				>
+	
+	<!--<s:HGroup>
+		<s:Label text="{data.activity._name}"/>
+		<s:Label text="{data.duration}"/>
+	</s:HGroup>-->
+	
+	
+	<s:Rect width="{data._duration / 2}" height="20">
+		<s:fill><s:SolidColor color="{data._activity._colour}" /></s:fill>
+	</s:Rect>
+	
+</s:ItemRenderer>

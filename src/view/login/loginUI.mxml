@@ -22,6 +22,7 @@
 			import mx.validators.Validator;
 			
 			import events.RequestEvent;
+			import events.UIEvent;
 			
 			import view.tlgContent;
 			public var controller:tlgContent;
@@ -71,6 +72,10 @@
 				}
 				
 			}
+			public function userLoggedIn(event:UIEvent):void{
+				TweenLite.delayedCall(40, clearFields, [], true); //wait for dash to reveal
+				stage.focus = null;
+			}
 			
 			// FORGOT button
 			protected function forgotButton_rollOverHandler(event:MouseEvent):void
@@ -110,6 +115,11 @@
 				currentState ="loginState";
 				
 			}
+			private function clearFields():void{
+				//emailInput.text = '';
+				passwordInput.text = '';
+				passwordInput.errorString = ''; //resets validation.
+			}
 			
 			
 			
@@ -120,6 +130,19 @@
 				requestObj.operation = 'token.createToken';
 				requestObj.email = "b@b.com";
 				requestObj.password = MD5.hash("b");
+				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
+				dispatchEvent(re);
+			}
+			
+			protected function btbHandler(event:MouseEvent):void
+			{
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'token.createToken';
+				requestObj.email = "ben.tilly@gmail.com";
+				requestObj.password = MD5.hash("bt");
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 				trace(re.requestJson);
@@ -182,6 +205,7 @@
 			
 		</s:Group>
 		<s:Label text="go b@b" click="batbHandler(event)" />
+		<s:Label text="go bt" click="btbHandler(event)" />
 	</s:VGroup>
 	
 </s:Group>

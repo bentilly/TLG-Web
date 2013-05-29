@@ -178,3 +178,29 @@ global{
 }
 
 
+/* GROUP */
+.leaderboardName{
+	fontFamily: "OS-condBold";
+	fontSize: 20px;
+	color: #0D7F12;
+	textAlign:right;
+}
+.leaderboardTotal{
+	fontFamily: "OS-condBold";
+	fontSize: 13;
+	color: #0D7F12;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

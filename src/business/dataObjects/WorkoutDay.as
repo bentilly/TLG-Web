@@ -7,7 +7,7 @@ package business.dataObjects
 		
 		[Bindable] public var _date:Date;
 		[Bindable] public var _workouts:Array;
-		[Bindable] public var _workouts_collection:ArrayCollection; 
+		[Bindable] public var _workouts_collection:ArrayCollection; //Collection of Workout objects
 		
 		public function WorkoutDay(date:Date, workouts:Array)
 		{

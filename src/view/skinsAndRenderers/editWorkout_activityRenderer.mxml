@@ -21,7 +21,7 @@
 			
 			import business.dataObjects.Activity;
 			
-			import view.popups.editTagPopup; 
+			import view.popups.editTagPopup;
 			
 			
 			protected function editLabel_clickHandler(event:MouseEvent):void
@@ -34,8 +34,10 @@
 			
 			protected function rollOverHandler(event:MouseEvent):void
 			{
-				editLabel.visible = true;
-				editLine.visible = true;
+				if(data._editable){
+					editLabel.visible = true;
+					editLine.visible = true;
+				}
 			}
 			
 			protected function rollOutHandler(event:MouseEvent):void

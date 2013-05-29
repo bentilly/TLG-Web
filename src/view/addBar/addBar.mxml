@@ -18,11 +18,14 @@
 			
 			import mx.events.FlexEvent;
 			
+			import business.dataObjects.TlgGroup;
+			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var userName:String;
 			[Bindable] public var userEmail:String;
+			[Bindable] public var currentGroup:TlgGroup;
 			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
@@ -66,6 +69,9 @@
 			public function goMyWorkouts(event:UIEvent):void{
 				currentState = "myWorkoutsState";
 			}
+			public function goGroup(event:UIEvent):void{
+				currentState = "myGroupState";
+			}
 			
 			protected function logoutBut_clickHandler(event:MouseEvent):void
 			{
@@ -83,6 +89,7 @@
 	<s:states>
 		<s:State name="homeState"/>
 		<s:State name="myWorkoutsState"/>
+		<s:State name="myGroupState"/>
 	</s:states>
 	
 	<s:Group id="container" width="100%" height="{panelHeight}" y="{panelHeight*-1 + peek}">
@@ -111,9 +118,9 @@
 		</s:BorderContainer>
 		
 		<s:Label text="TheLazyGibbon" styleName="tlgBrand" bottom="{plusDrop + 3}" left="5"/>
-		<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" includeIn="myWorkoutsState">
+		<s:HGroup id="breadcrumb" bottom="{plusDrop + 3}" left="100" excludeFrom="homeState">
 			<s:Button id="backButton" label="Home" click="backButton_clickHandler(event)"/>
-			<s:Label text="My Workouts" styleName="userName"/>
+			<s:Label text.myWorkoutsState="My Workouts" text.myGroupState="{currentGroup._name}" styleName="userName"/>
 		</s:HGroup>
 		<s:HGroup bottom="{plusDrop + 3}" right="5">
 			<s:Image id="gravatarImage"/>

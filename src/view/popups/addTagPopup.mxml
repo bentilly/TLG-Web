@@ -5,27 +5,26 @@
 			   
 			   filters="{[dsFliter]}"
 			   close="closeHandler(event)"
+			   creationComplete="creationCompleteHandler(event)"
 			   >
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
+			import mx.validators.Validator;
 			
 			import spark.events.PopUpEvent;
 			
-			import business.dataObjects.Activity;
-			
 			import events.RequestEvent;
 			
-			/*** IMPORTED  ***/
+			/*** Passed in ***/
 			public var token:String;
-			
-			
-			
-			[Bindable] public var tag:Activity;
+			public var groupKey:String;
+
 			
 			protected function closeHandler(event:PopUpEvent):void
 			{
-				trace('close editTagPopup');
+				trace('close addTagPopup');
 				PopUpManager.removePopUp(this);
 				
 			}
@@ -63,29 +62,37 @@
 			
 			protected function goButton_clickHandler(event:MouseEvent):void
 			{
-				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
-				var requestObj:Object = new Object();
-				requestObj.operation = 'activity.updateActivity';
-				requestObj.token = token;
-				requestObj.key = tag._key;
-				requestObj.name = nameInput.text;
-				requestObj.colour = colourPicker.selectedColor.toString(16);
 				
-				re.requestJson = JSON.stringify(requestObj);
-				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
-				trace(re.requestJson);
-				dispatchEvent(re);
-				
-				close();
+				var validatorErrorArray:Array = Validator.validateAll([nameValidator]);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if (isValidForm) {
+					var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					var requestObj:Object = new Object();
+					requestObj.operation = 'activity.addActivity';
+					requestObj.token = token;
+					requestObj.group = groupKey;
+					requestObj.name = nameInput.text;
+					requestObj.colour = colourPicker.selectedColor.toString(16);
+					
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+					
+					close();
+				}
 			}
 			
 			public function activityUpdated(event:Event):void{
-				tag._name = nameInput.text;
-				tag._colour = Number('0x'+colourPicker.selectedColor.toString(16));
 				close();
 			}
 			public function activityUpdateFail(event:Event):void{
 				close();
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				colourPicker.selectedColor = Math.round( Math.random()*0xFFFFFF );
 			}
 			
 		]]>
@@ -93,22 +100,23 @@
 	
 	<fx:Declarations>
 		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
+		<mx:StringValidator id="nameValidator" source="{nameInput}" property="text" required="true"/>
 	</fx:Declarations>
 	
 	<s:VGroup gap="0">
 		<s:Group>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="EDIT TAG" paddingBottom="-6" paddingLeft="2"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="ADD TAG" paddingBottom="-6" paddingLeft="2"/>
 		</s:Group>
 		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
 			
 			<s:HGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18" gap="10">
 				<s:VGroup >
 					<s:Label text="tag name:" styleName="smallLight"/>
-					<s:TextInput id="nameInput" styleName="textFieldBold" width="300" text="{tag._name}"/>
+					<s:TextInput id="nameInput" styleName="textFieldBold" width="300"/>
 				</s:VGroup>
 				<s:VGroup>
 					<s:Label text="colour:" styleName="smallLight"/>
-					<mx:ColorPicker id="colourPicker" height="42" width="42" selectedColor="{tag._colour}"/>
+					<mx:ColorPicker id="colourPicker" height="42" width="42"/>
 				</s:VGroup>
 			</s:HGroup>
 			

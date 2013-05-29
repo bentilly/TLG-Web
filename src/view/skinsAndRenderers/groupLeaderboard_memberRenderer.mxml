@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			
+			//data = GroupMember
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal"/>
+		<!--<s:State name="hovered"/>
+		<s:State name="selected"/>-->
+	</s:states>
+	
+	<s:HGroup gap="10">
+		<s:Label text="{data._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName"/>
+		
+		<s:DataGroup itemRenderer="view.skinsAndRenderers.groupLeaderboard_activityBlockRenderer" dataProvider="{data._leaderboard_collection}">
+			<s:layout>
+				<s:HorizontalLayout gap="1"/>
+			</s:layout>
+		</s:DataGroup>
+		
+		<s:HGroup gap="0" paddingTop="5">
+			<s:Label text="{Math.floor(data._totalDuration/60)}" styleName="leaderboardTotal"/>
+			<s:Label text=":" styleName="leaderboardTotal"/>
+			<s:Label text="{data._totalDuration - (Math.floor(data._totalDuration/60) * 60)}" styleName="leaderboardTotal"/>
+		</s:HGroup>
+	</s:HGroup>
+	
+	
+</s:ItemRenderer>
