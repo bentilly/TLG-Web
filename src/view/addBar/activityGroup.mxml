@@ -4,13 +4,15 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:widgets="view.widgets.*"
 		 
-		 height="300"
+		 height="300" xmlns:fxg="assets.fxg.*"
 		 
 		 >
 	
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.MD5;
+			
 			import mx.collections.ArrayCollection;
 			
 			import spark.events.IndexChangeEvent;
@@ -24,6 +26,10 @@
 			[Bindable] public var activities_collection:ArrayCollection;
 			[Bindable] public var editable:Boolean = false;
 			[Bindable] public var groupName:String;
+			
+			
+			/*** IMPORTED ***/
+			[Bindable] public var userEmail:String;
 			
 			//Flags
 			public var editWorkoutMode:Boolean = false; //activityGroup used by addBar and editWorkoutPopup. Need to use appropriate activityTag UI Element.
@@ -105,6 +111,14 @@
 			
 			
 			
+			public function setMyActivities():void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(userEmail).toString() + '?s=50';
+				gravatarImage.validateNow();
+				gravatarImage.visible = true;
+				groupHeader.removeElementAt(0);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -114,9 +128,12 @@
 	</fx:Declarations>
 	
 	
+	
+	
 	<s:VGroup paddingLeft="15">
-		<s:HGroup>
-			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
+		<s:HGroup id="groupHeader">
+			<fxg:gibbon id="gibbonIcon" width="50" height="50"/>
+			<s:Image id="gravatarImage" visible="false"/>
 			<s:Label text="{groupName}" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
 		</s:HGroup>
 		

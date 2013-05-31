@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				xmlns:widgets="view.widgets.*"
+				
+				
+				autoDrawBackground="false" xmlns:fxg="assets.fxg.*"
+				
+				rollOver="rollOverHandler(event)"
+				rollOut="rollOutHandler(event)"
+				
+				width="200"
+				
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import business.dataObjects.Activity;
+			
+			import view.popups.editTagPopup;
+			
+			
+			protected function editLabel_clickHandler(event:MouseEvent):void
+			{
+				var editTagPU:editTagPopup = new editTagPopup();
+				editTagPU.tag = data as Activity;
+				editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(editTagPU);
+			}
+			
+			protected function rollOverHandler(event:MouseEvent):void
+			{
+				if(data._editable){
+					editLabel.visible = true;
+					editLine.visible = true;
+				}
+			}
+			
+			protected function rollOutHandler(event:MouseEvent):void
+			{
+				editLabel.visible = false;
+				editLine.visible = false;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="hovered"/>
+		<s:State name="selected"/>
+	</s:states>
+	
+	<s:Group top="2" alpha="1" width="100%">
+		
+		<s:Line id="editLine" width="150" right="22" top="9" alpha="1" visible="false">
+			<s:stroke>
+				<s:SolidColorStroke id="editLineStroke" color="{data._colour}" weight="2"/>
+			</s:stroke>
+		</s:Line>
+		
+		<s:HGroup gap="-1" mouseChildren="false" mouseEnabled="false">
+			<fxg:tagHead_blue/>
+			<s:Label text="{data._name}" height="18" styleName="tagBlueText" maxWidth="150" maxDisplayedLines="1"/>
+			<s:Rect width="10" height="18" topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
+				<s:fill><s:SolidColor color="{data._colour}" /></s:fill>
+			</s:Rect>
+		</s:HGroup>
+		
+		<s:Label id="editLabel" text="edit" right="0" styleName="tagEdit" top="5" visible="false" click="editLabel_clickHandler(event)"/>
+	
+	</s:Group>
+	
+	
+</s:ItemRenderer>

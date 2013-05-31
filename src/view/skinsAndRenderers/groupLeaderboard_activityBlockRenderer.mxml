@@ -14,7 +14,7 @@
 	</s:HGroup>-->
 	
 	
-	<s:Rect width="{data._duration / 2}" height="20">
+	<s:Rect width="{data._duration / 5}" height="20">
 		<s:fill><s:SolidColor color="{data._activity._colour}" /></s:fill>
 	</s:Rect>
 	

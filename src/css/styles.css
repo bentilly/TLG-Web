@@ -36,6 +36,13 @@ global{
 	color: #ffffff;
 }
 /* TopAddBar */
+.backButton{
+	fontFamily: "OS-condBold";
+	color: #CCC;
+	fontSize: 13px;
+}
+
+
 .tlgBrand{
 	fontFamily: "OS-condBold";
 	fontSize: 13px;
@@ -189,6 +196,11 @@ global{
 	fontFamily: "OS-condBold";
 	fontSize: 13;
 	color: #0D7F12;
+}
+.newGroupMessage{
+	fontFamily: "OS-condLight";
+	fontSize: 18px;
+	color: #003300;
 }
 
 

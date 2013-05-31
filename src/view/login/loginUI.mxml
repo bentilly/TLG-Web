@@ -52,10 +52,11 @@
 			protected function goButton_clickHandler(event:MouseEvent):void
 			{
 				if(currentState == "loginState"){
-				
+					
 					var validatorErrorArray:Array = Validator.validateAll([emailValidator, pwValidator]);
 					var isValidForm:Boolean = validatorErrorArray.length == 0;
 					if (isValidForm) {
+						currentState = "disableState";
 						var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
 						var requestObj:Object = new Object();
 						requestObj.operation = 'token.createToken';
@@ -65,13 +66,18 @@
 						trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 						trace(re.requestJson);
 						dispatchEvent(re);
-						
 					} else {
 						Alert.show("The form is not valid!", "Somethings up");
 					}
 				}
 				
 			}
+			
+			protected function enter_pressHandler(event:FlexEvent):void{
+				goButton_clickHandler(new MouseEvent(MouseEvent.CLICK) );
+			}
+			
+			
 			public function userLoggedIn(event:UIEvent):void{
 				TweenLite.delayedCall(40, clearFields, [], true); //wait for dash to reveal
 				stage.focus = null;
@@ -161,12 +167,13 @@
 	<s:states>
 		<s:State name="loginState"/>
 		<s:State name="forgotState"/>
+		<s:State name="disableState"/>
 	</s:states>
 	
 	
 	<s:VGroup gap="0">
 		<s:Group>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="LOGIN" paddingBottom="-6" paddingLeft="5" includeIn="loginState"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="LOGIN" paddingBottom="-6" paddingLeft="5" excludeFrom="forgotState"/>
 			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="FORGOT" paddingBottom="-6" paddingLeft="5" includeIn="forgotState"/>
 		</s:Group>
 		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="4">
@@ -174,7 +181,7 @@
 				<s:Label text="email:" styleName="smallLight"/>
 				<s:TextInput id="emailInput" styleName="textFieldBold" width="300"/>
 				<s:Label text="password:" styleName="smallLight" excludeFrom="forgotState" paddingTop="8"/>
-				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState"/>
+				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState" enter="enter_pressHandler(event)"/>
 				<s:HGroup gap="15">
 					<!--<s:Label id="forgotButton" text="Forgot?" styleName="smallLight" paddingTop="15"
 							 useHandCursor="true" buttonMode="true"
@@ -188,7 +195,7 @@
 							 rollOver="loginButton_rollOverHandler(event)"
 							 rollOut="loginButton_rollOutHandler(event)"
 							 click="loginButton_clickHandler(event)"
-							 excludeFrom="loginState"
+							 includeIn="forgotState"
 							 />
 				</s:HGroup>
 			</s:VGroup>
@@ -204,8 +211,8 @@
 				</s:Group>
 			
 		</s:Group>
-		<s:Label text="go b@b" click="batbHandler(event)" />
-		<s:Label text="go bt" click="btbHandler(event)" />
+		<!--<s:Label text="go b@b" click="batbHandler(event)" />
+		<s:Label text="go bt" click="btbHandler(event)" />-->
 	</s:VGroup>
 	
 </s:Group>

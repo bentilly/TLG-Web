@@ -115,10 +115,23 @@
 						break;
 					}
 				}
-				
-				
-				
 			}
+			
+			public function workoutAdded(event:UIEvent):void{
+				//If this month has no workouts, the list will have no dataprovider. On workoutAdded see if there now is data for this month
+				if(!workoutsListComponent.dataProvider){
+					for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+						if( utils.compareMonths(month._date, selectedMonth) ){
+							workoutsListComponent.dataProvider = month._workoutDays_collection;
+							break;
+						}
+					}
+				}
+			}
+			
+			
+			
+			
 			
 			protected function resizeHandler(event:ResizeEvent):void
 			{

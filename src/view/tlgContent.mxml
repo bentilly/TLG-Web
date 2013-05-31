@@ -178,6 +178,7 @@
 					myGroup.visible = false;
 					hideDash();
 					uiState = 0;
+					loginWidget.currentState = "loginState"
 				}else{
 					revealDash();
 					TweenLite.delayedCall(16, logout, [null], true);
@@ -264,7 +265,7 @@
 	
 	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
 	
-	<s:Label id="iteration" text="8" styleName="tinyWhite" right="3" bottom="3" alpha=".4"/>
+	<s:Label id="iteration" text="10" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
 	
 </s:Group>

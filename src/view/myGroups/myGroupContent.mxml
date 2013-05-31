@@ -4,7 +4,7 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 
 		 width="100%" 
-		 height="100%"
+		 height="100%" xmlns:fxg="assets.fxg.*"
 		 
 		 
 		 >
@@ -42,7 +42,8 @@
 	<s:BorderContainer backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
 		<s:VGroup width="100%" height="100%">
 			<s:HGroup paddingTop="40" paddingLeft="15" gap="15">
-				<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="56" height="56"/>
+				<!--<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="56" height="56"/>-->
+				<fxg:gibbon width="56" height="56"/>
 				<s:Label text="{currentGroup._name}" styleName="h1_white" color="#123456" fontSize="40" paddingTop="10"/>
 			</s:HGroup>
 			
@@ -62,8 +63,8 @@
 					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>
 					
 					<s:VGroup paddingLeft="10">
-						<s:Label text="Group activities" styleName="leaderboardName" paddingBottom="20"/>
-						<s:List id="activitiesList" dataProvider="{currentGroup._activities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
+						<s:Label text="Group activities" styleName="leaderboardName" paddingBottom="10"/>
+						<s:List id="activitiesList" dataProvider="{currentGroup._activities_collection}" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer"
 								borderVisible="false" contentBackgroundAlpha="0"
 								>
 							<s:layout>

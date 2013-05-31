@@ -79,7 +79,8 @@
 		<s:VGroup paddingLeft="20" gap="18">
 			<addBar:workoutDateSelector id="woDateSelector"/>
 			<addBar:workoutTimeEntry id="woDurationSelector"/>
-			<s:TextArea id="commentInput" width="100%" height="110" text="comments" styleName="workoutCommentStart" 
+			<s:TextArea id="commentInput" width="100%" height="110" text="comments" styleName="workoutCommentStart"
+						
 						focusIn="commentInput_focusInHandler(event)"
 						focusOut="commentInput_focusOutHandler(event)"
 						/>

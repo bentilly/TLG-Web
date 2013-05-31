@@ -231,33 +231,6 @@
 						<addBar:workoutActivities id="woActivitiesSelector"/>
 					</s:Scroller>
 					
-					
-					
-					
-					<!--<s:Scroller width="100%" verticalScrollPolicy="off">
-						<addBar:workoutActivities id="woActivitiesSelector" editWorkoutMode="true"/>
-					</s:Scroller>-->
-					
-					<!--<s:VGroup paddingLeft="15">
-						<s:HGroup>
-							<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
-							<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
-						</s:HGroup>
-						
-						<s:List id="activitiesList" dataProvider="{myActivities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
-								borderVisible="false" contentBackgroundAlpha="0" change="activitiesList_changeHandler(event)"
-								>
-							<s:layout>
-								<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="0"/>
-							</s:layout>
-						</s:List>
-						
-						<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity" 
-									 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)"/>
-						
-					</s:VGroup>-->
-					
-					
 				</s:HGroup>
 			</s:VGroup>
 			

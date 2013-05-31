@@ -127,6 +127,7 @@
 		
 		<Injectors target="{activityGroup}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
 		</Injectors>
 		
 		<Injectors target="{calendarChartDay}">
@@ -145,6 +146,7 @@
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
 			<ListenerInjector eventType="{UIEvent.BUILD_MYWORKOUTS}" method="buildMyWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>
 		
