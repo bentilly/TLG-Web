@@ -186,6 +186,11 @@ global{
 
 
 /* GROUP */
+.leaderboardTitle{
+	fontFamily: "OS-condBold";
+	fontSize: 25px;
+	color: #2A8796;
+}
 .leaderboardName{
 	fontFamily: "OS-condBold";
 	fontSize: 20px;

@@ -15,6 +15,10 @@ package business.dataObjects
 		[Bindable] public var _totalDuration:Number //the total duration from _leaderboard_collection
 		
 		
+		public var lbEndDate:Date = new Date();
+		public var lbStartDate:Date = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30);
+		
+		
 		public function GroupMember(name:String)
 		{
 			_name = name;
@@ -56,17 +60,17 @@ package business.dataObjects
 				}
 			}
 			
-			buildLeaderboardData(new Date(2000), new Date());
-			
+			buildLeaderboardData(lbStartDate, lbEndDate);
 		}
-			
+		
+		
 		public function buildLeaderboardData(start:Date, end:Date):void{
 			 //clear data
 			_leaderboard_collection.removeAll();
 			_totalDuration = 0;
 			for each(var workoutDay:GroupMemberWorkoutDay in _workoutDays_collection){
 				//is workoutDay in the date range
-				if(workoutDay._date.time >= start.time &&  workoutDay._date.time < end.time){
+				if(workoutDay._date.time >= start.time &&  workoutDay._date.time <= end.time){
 					//add all activities from this day to leaderboardData
 					for each(var activityDay:ActivitySummary in workoutDay._activity_collection){
 						var activityAdded:Boolean = false;

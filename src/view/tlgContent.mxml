@@ -234,6 +234,8 @@
 				myWorkouts.visible = false;
 				myGroup.visible = true;
 				
+				myGroup.setLeaderboard();
+				
 				uiState = 3;
 				hideDash();
 			}
@@ -265,7 +267,7 @@
 	
 	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
 	
-	<s:Label id="iteration" text="10" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
+	<s:Label id="iteration" text="12" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
 	
 </s:Group>

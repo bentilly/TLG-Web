@@ -6,22 +6,46 @@
 		 width="100%" 
 		 height="100%" xmlns:fxg="assets.fxg.*"
 		 
-		 
 		 >
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
+			import spark.events.PopUpEvent;
+			
+			import business.utils;
 			import business.dataObjects.TlgGroup;
 			
 			import view.popups.addTagPopup;
-			import view.skinsAndRenderers.editWorkout_activityRenderer;
 			
 			/*** IMPORT ***/
 			[Bindable] public var token:String;
 			[Bindable] public var currentGroup:TlgGroup;
+			
+			/*** INTERNAL ***/
+			private var lbEndDate:Date = new Date();
+			private var lbStartDate:Date = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30);
+			private var days:Array = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+			private var months:Array = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+			private var utils:business.utils = new business.utils;
+			
+			public function setLeaderboard():void
+			{
+				if( utils.compareDates(new Date(), lbStartDate) ){
+					startDateLabel.text = 'TODAY '+lbStartDate.date+' '+months[lbStartDate.month];
+				}else{
+					startDateLabel.text = days[lbStartDate.day]+' '+lbStartDate.date+' '+months[lbStartDate.month];
+				}
+				
+				if( utils.compareDates(new Date(), lbEndDate) ){
+					endDateLabel.text = 'TODAY '+lbEndDate.date+' '+months[lbEndDate.month];
+				}else{
+					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
+				}
+			}
 			
 			protected function addActivityLabel_clickHandler(event:MouseEvent):void
 			{
@@ -32,17 +56,109 @@
 				PopUpManager.centerPopUp(addTagPU);
 			}
 			
+			protected function dateLabel_rollOverHandler(event:MouseEvent):void
+			{
+				event.target.alpha = 1;
+				
+			}
+			protected function dateLabel_rollOutHandler(event:MouseEvent):void
+			{
+				event.target.alpha = .7;
+				
+			}
+
+			
+			protected function startDateLabel_clickHandler(event:MouseEvent):void
+			{
+				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
+				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				dateChoosePU.addEventListener('close', updateStartDate);
+				PopUpManager.centerPopUp(dateChoosePU);
+				
+				dateChoosePU.popupTitle.text = "START DATE";
+				dateChoosePU.workoutDateChooser.selectedDate = lbStartDate;
+				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date+1) } ];
+			}
+			
+			protected function endDateLabel_clickHandler(event:MouseEvent):void
+			{
+				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
+				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				dateChoosePU.addEventListener('close', updateEndDate);
+				PopUpManager.centerPopUp(dateChoosePU);
+				
+				dateChoosePU.popupTitle.text = "END DATE";
+				dateChoosePU.workoutDateChooser.selectedDate = lbEndDate;
+				
+				var d:Date = new Date();
+				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(lbStartDate.fullYear, lbStartDate.month, lbStartDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
+			}
+			
+			private function updateStartDate(event:PopUpEvent):void{
+				// If commit is false, no data is returned.
+				if (!event.commit)
+					return;
+				
+				lbStartDate = event.data as Date;
+				if( utils.compareDates(new Date(), lbStartDate) ){
+					startDateLabel.text = 'TODAY '+lbStartDate.date+' '+months[lbStartDate.month];
+				}else{
+					startDateLabel.text = days[lbStartDate.day]+' '+lbStartDate.date+' '+months[lbStartDate.month];
+				}
+				
+				currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
+				
+			}
+			private function updateEndDate(event:PopUpEvent):void{
+				// If commit is false, no data is returned.
+				if (!event.commit)
+					return;
+				
+				lbEndDate = event.data as Date;
+				if( utils.compareDates(new Date(), lbEndDate) ){
+					endDateLabel.text = 'TODAY '+lbEndDate.date+' '+months[lbEndDate.month];
+				}else{
+					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
+				}
+				currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
+			}
+
+			
+			
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:Component className="dateChooserPopup">
+			<s:SkinnablePopUpContainer>
+				<fx:Script>
+					<![CDATA[
+						import mx.events.CalendarLayoutChangeEvent;
+						
+						protected function workoutDateChooser_changeHandler(event:CalendarLayoutChangeEvent):void
+						{
+							close(true, workoutDateChooser.selectedDate);
+						}
+						
+					]]>
+				</fx:Script>
+				<s:VGroup gap="0">
+					<s:Group>
+						<s:Label id="popupTitle" fontFamily="OS-condBold" color="white" fontSize="30" text="DATE" paddingBottom="-6" paddingLeft="2"/>
+					</s:Group>
+					<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
+						<s:VGroup paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+							<mx:DateChooser id="workoutDateChooser" change="workoutDateChooser_changeHandler(event)"/>
+						</s:VGroup>
+					</s:BorderContainer>
+				</s:VGroup>
+			</s:SkinnablePopUpContainer>
+		</fx:Component>
 	</fx:Declarations>
 	
 	<s:BorderContainer backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
 		<s:VGroup width="100%" height="100%">
 			<s:HGroup paddingTop="40" paddingLeft="15" gap="15">
-				<!--<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="56" height="56"/>-->
 				<fxg:gibbon width="56" height="56"/>
 				<s:Label text="{currentGroup._name}" styleName="h1_white" color="#123456" fontSize="40" paddingTop="10"/>
 			</s:HGroup>
@@ -50,7 +166,21 @@
 			<s:Scroller width="100%" height="100%">
 				<s:HGroup paddingRight="20" paddingLeft="20" paddingTop="20">
 					
-					<s:VGroup paddingRight="50">
+					<s:VGroup id="leaderboard" paddingRight="50">
+						<s:Label text="LEADER BOARD" styleName="leaderboardTitle"/>
+						
+						<s:HGroup paddingBottom="15" paddingTop="-5">
+							<s:Label id="startDateLabel" text="WED 10 MAY" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+									 buttonMode="true" useHandCursor="true"
+									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="startDateLabel_clickHandler(event)"
+									 />
+							<fxg:smallArrow alpha=".6" scaleX=".8" scaleY=".8"/>
+							<s:Label id="endDateLabel" text="TUE 16 MAY" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+									 buttonMode="true" useHandCursor="true"
+									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="endDateLabel_clickHandler(event)"
+									 />
+						</s:HGroup>
+						
 						<s:DataGroup dataProvider="{currentGroup._members_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
 							<s:layout>
 								<s:VerticalLayout/>
@@ -63,7 +193,7 @@
 					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>
 					
 					<s:VGroup paddingLeft="10">
-						<s:Label text="Group activities" styleName="leaderboardName" paddingBottom="10"/>
+						<s:Label text="GROUP ACTIVITIES" styleName="leaderboardTitle" paddingBottom="10"/>
 						<s:List id="activitiesList" dataProvider="{currentGroup._activities_collection}" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer"
 								borderVisible="false" contentBackgroundAlpha="0"
 								>

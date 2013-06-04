@@ -8,6 +8,7 @@
 			   >
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.events.PopUpEvent;
@@ -88,6 +89,11 @@
 				close();
 			}
 			
+			protected function enterHandler(event:Event):void
+			{
+				goButton_clickHandler(new MouseEvent(MouseEvent.CLICK));
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -104,7 +110,7 @@
 			<s:HGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18" gap="10">
 				<s:VGroup >
 					<s:Label text="tag name:" styleName="smallLight"/>
-					<s:TextInput id="nameInput" styleName="textFieldBold" width="300" text="{tag._name}"/>
+					<s:TextInput id="nameInput" styleName="textFieldBold" width="300" text="{tag._name}" enter="enterHandler(event)"/>
 				</s:VGroup>
 				<s:VGroup>
 					<s:Label text="colour:" styleName="smallLight"/>

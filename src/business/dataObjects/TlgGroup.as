@@ -35,5 +35,14 @@ package business.dataObjects
 			m.buildWorkoutDays(data);
 			_members_collection.addItem(m);
 		}
+		public function rebuildLeaderboardData(start:Date, end:Date):void{
+			for each(var m:GroupMember in _members_collection){
+				
+				m.lbStartDate = start;
+				m.lbEndDate = end;
+				m.buildLeaderboardData(start, end);
+				
+			}
+		}
 	}
 }

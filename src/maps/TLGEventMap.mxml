@@ -157,6 +157,7 @@
 		
 		<Injectors target="{loginUI}">
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
+			<ListenerInjector eventType="{UIEvent.LOGIN_FAIL}" method="loginFail"/>
 		</Injectors>
 		
 		

@@ -21,6 +21,8 @@
 			
 			private var workoutDates:Array;
 			
+			[Bindable] public var otherDate:Date = new Date();
+			
 			
 			public function getWODate():Date{
 				for each(var wd:workoutDate in workoutDates){
@@ -74,6 +76,9 @@
 				var targetDate:Date = new Date();
 				var datesToShow:int = 6;
 				targetDate.setDate(targetDate.date - datesToShow);
+				
+				otherDate = new Date(targetDate.fullYear, targetDate.month, targetDate.date);
+				
 				for(var i:int; i<datesToShow; i++){
 					var wd:workoutDate = makeWorkoutDateFromDate(targetDate)
 					dateList.addElement(wd);
@@ -144,13 +149,18 @@
 				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
 				dateChoosePU.addEventListener('close', updateOtherDate);
 				PopUpManager.centerPopUp(dateChoosePU);
+				
+				dateChoosePU.workoutDateChooser.selectedDate = otherDate;
+				
 			}
+			
+			
 			private function updateOtherDate(event:PopUpEvent):void{
 				// If commit is false, no data is returned.
 				if (!event.commit)
 					return;
 				
-				var otherDate:Date = event.data as Date;
+				otherDate = event.data as Date;
 				deselectAll();
 				//check for match
 				for each(var wd:workoutDate in workoutDates){

@@ -95,6 +95,11 @@
 				colourPicker.selectedColor = Math.round( Math.random()*0xFFFFFF );
 			}
 			
+			protected function enterHandler(event:Event):void
+			{
+				goButton_clickHandler(new MouseEvent(MouseEvent.CLICK));
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -112,7 +117,7 @@
 			<s:HGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18" gap="10">
 				<s:VGroup >
 					<s:Label text="tag name:" styleName="smallLight"/>
-					<s:TextInput id="nameInput" styleName="textFieldBold" width="300"/>
+					<s:TextInput id="nameInput" styleName="textFieldBold" width="300" enter="enterHandler(event)"/>
 				</s:VGroup>
 				<s:VGroup>
 					<s:Label text="colour:" styleName="smallLight"/>

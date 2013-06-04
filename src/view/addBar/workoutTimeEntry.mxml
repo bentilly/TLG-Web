@@ -39,7 +39,7 @@
 	
 	
 	<s:HGroup verticalAlign="bottom">
-		<s:TextInput id="hrInput" styleName="workoutTextFieldBold" width="80" text="1" restrict="0-9"/>
+		<s:TextInput id="hrInput" styleName="workoutTextFieldBold" width="80" text="1" restrict="0-9."/>
 		<s:Label text="hr" styleName="hrMinLabels" paddingRight="20" alpha=".5" paddingBottom="5"/>
 		<s:TextInput id="minInput" styleName="workoutTextFieldBold" width="80" text="00" restrict="0-9"/>
 		<s:Label text="min" styleName="hrMinLabels" alpha=".5" paddingBottom="5"/>

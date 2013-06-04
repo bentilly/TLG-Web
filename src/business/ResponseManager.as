@@ -116,6 +116,8 @@ package business{
 					case "activity.updateActivity":
 						activity_updateActivity_fail_handler();
 						break;
+					case "token.createToken": //login fail (wrong password). Re-enable login boxes
+						token_createToken_fail_handler();
 					default:
 						break;
 				}
@@ -173,6 +175,10 @@ package business{
 //-----TOKEN-----//
 		private function token_createToken_handler():void{
 			var uie:UIEvent = new UIEvent(UIEvent.USER_LOGGED_IN);
+			dispatcher.dispatchEvent(uie);
+		}
+		private function token_createToken_fail_handler():void{
+			var uie:UIEvent = new UIEvent(UIEvent.LOGIN_FAIL);
 			dispatcher.dispatchEvent(uie);
 		}
 		
@@ -408,7 +414,7 @@ package business{
 														activitySum._duration = activitySum._duration + workout._duration;
 														
 														//rebuild leaderboard data and return
-														member.buildLeaderboardData(new Date(2000), new Date());
+														member.buildLeaderboardData(member.lbStartDate, member.lbEndDate);
 														addedToGroup = true;
 														foundActSum = true;
 														break;
@@ -423,7 +429,7 @@ package business{
 													workoutDay._activity_collection.addItem(newActivitySummary);
 													
 													//rebuild leaderboard data and return
-													member.buildLeaderboardData(new Date(2000), new Date());
+													member.buildLeaderboardData(member.lbStartDate, member.lbEndDate);
 													addedToGroup = true;
 													break;
 												}
@@ -444,7 +450,7 @@ package business{
 											member._workoutDays_collection.addItem(newWorkoutDay);
 											
 											//rebuild leaderboard data and return
-											member.buildLeaderboardData(new Date(2000), new Date());
+											member.buildLeaderboardData(member.lbStartDate, member.lbEndDate);
 											addedToGroup = true;
 											break;
 										}

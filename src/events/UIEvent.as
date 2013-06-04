@@ -24,6 +24,7 @@ package events{
 		public static const GO_MYWORKOUTS:String = "goMyWorkouts_event";
 		public static const GO_GROUP:String = "goGroup_event";
 		
+		public static const LOGIN_FAIL:String = "loginFail_event";
 		public static const LOGOUT:String = "logout_event";
 		
 		

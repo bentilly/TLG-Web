@@ -52,7 +52,7 @@
 		</s:HGroup>
 		
 		<s:HGroup paddingTop="0" paddingBottom="3">
-			<s:List dataProvider="{data._activities_collection}" itemRenderer="view.skinsAndRenderers.workoutList_activityRenderer"
+			<s:List dataProvider="{data._activities_collection}" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer"
 					borderVisible="false" contentBackgroundAlpha="0" selectedIndex="0"
 					>
 				<s:layout>

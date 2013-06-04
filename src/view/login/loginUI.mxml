@@ -82,6 +82,9 @@
 				TweenLite.delayedCall(40, clearFields, [], true); //wait for dash to reveal
 				stage.focus = null;
 			}
+			public function loginFail(event:UIEvent):void{
+				currentState = "loginState";
+			}
 			
 			// FORGOT button
 			protected function forgotButton_rollOverHandler(event:MouseEvent):void
@@ -211,8 +214,8 @@
 				</s:Group>
 			
 		</s:Group>
-		<!--<s:Label text="go b@b" click="batbHandler(event)" />
-		<s:Label text="go bt" click="btbHandler(event)" />-->
+		<s:Label text="go b@b" click="batbHandler(event)" />
+		<s:Label text="go bt" click="btbHandler(event)" />
 	</s:VGroup>
 	
 </s:Group>
