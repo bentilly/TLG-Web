@@ -93,6 +93,9 @@ package business{
 					case "workout.updateWorkout":
 						workout_updateWorkout_handler(result, request);
 						break;
+					case "workout.deleteWorkout":
+						workout_deleteWorkout_handler(result, request);
+						break;
 				//GROUP
 					case "group.getMemberWorkouts":
 						group_getMemberWorkouts_handler(result, request);
@@ -426,6 +429,7 @@ package business{
 													newActivitySummary = new ActivitySummary();
 													newActivitySummary._activity = workoutActivity;
 													newActivitySummary._duration = workout._duration;
+													newActivitySummary._activity_name = workoutActivity._name;
 													workoutDay._activity_collection.addItem(newActivitySummary);
 													
 													//rebuild leaderboard data and return
@@ -444,6 +448,7 @@ package business{
 											newActivitySummary = new ActivitySummary();
 											newActivitySummary._activity = workoutActivity;
 											newActivitySummary._duration = workout._duration;
+											newActivitySummary._activity_name = workoutActivity._name;
 											//add activity to day
 											newWorkoutDay._activity_collection.addItem(newActivitySummary);
 											//add day to group member
@@ -570,6 +575,38 @@ package business{
 		}
 		
 		
+		private function workout_deleteWorkout_handler(result:Object, request:Object):void{
+			//delete workout from my_workouts
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				for each(var wd:WorkoutDay in wm._workoutDays_collection){
+					var wCount:int = 0;
+					for each(var w:Workout in wd._workouts_collection){
+						if(w._key == request.key){
+							
+							//removes from my workouts list
+							wd._workouts_collection.removeItemAt(wCount);
+							
+							//removes from timeline
+							var uie:UIEvent = new UIEvent(UIEvent.WORKOUT_DELETED);
+							uie.workout = w;
+							dispatcher.dispatchEvent(uie);
+							
+							//UI muast be on MyWorkouts page. Set groups to _loaded = false so they reload when user goes back. Cheating but easy.
+							for each(var tlgGroup:TlgGroup in myGroups_collection){
+								tlgGroup._loaded = false;
+								//dump all data
+								tlgGroup._members_collection.removeAll();
+							}
+							
+							trace('Workout deleted');
+						}
+						wCount++;
+					}
+				}
+			}
+			
+		}
+		
 		
 //-----GROUP-----//
 
@@ -581,6 +618,7 @@ package business{
 				}
 				group._loaded = true;
 			}
+			utils.sortArrayCollection(group._members_collection, '_totalDuration', true, 'DESC');
 		}
 		
 		
@@ -621,6 +659,18 @@ package business{
  * - Finders, getters, calculators
  * 
  * -----------------**/
+		/*public function getWorkoutByKey(key:String):Workout{
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				for each(var wd:WorkoutDay in wm._workoutDays_collection){
+					for each(var w:Workout in wd._workouts_collection){
+						if(w._key == key){
+							return w;
+						}
+					}
+				}
+			}
+			return null;
+		}*/
 		public function getGroupByKey(key:String):TlgGroup{
 			for each(var group:TlgGroup in myGroups_collection){
 				if(group._key == key){

@@ -16,6 +16,7 @@ package events{
 		
 		public static const WORKOUT_ADDED:String = "workoutAdded_event";
 		public static const WORKOUT_DATE_CHANGED:String = "workoutDateChanged_event";
+		public static const WORKOUT_DELETED:String = "workoutDeleted_event";
 		public static const GOT_ALL_WORKOUTS:String = "gotAllWorkouts_event";
 		public static const BUILD_MYWORKOUTS:String = "buildMyWorkouts_event";
 		

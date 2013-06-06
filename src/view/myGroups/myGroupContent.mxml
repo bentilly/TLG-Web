@@ -11,12 +11,12 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.core.FlexGlobals;
-			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.events.PopUpEvent;
 			
 			import business.utils;
+			import business.dataObjects.GroupMember;
 			import business.dataObjects.TlgGroup;
 			
 			import view.popups.addTagPopup;
@@ -30,6 +30,8 @@
 			private var lbStartDate:Date = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30);
 			private var days:Array = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 			private var months:Array = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+			
+			
 			private var utils:business.utils = new business.utils;
 			
 			public function setLeaderboard():void
@@ -45,6 +47,9 @@
 				}else{
 					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
 				}
+				
+				
+				
 			}
 			
 			protected function addActivityLabel_clickHandler(event:MouseEvent):void
@@ -108,6 +113,9 @@
 				
 				currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
 				
+				//sort leaderboard members
+				utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
+				
 			}
 			private function updateEndDate(event:PopUpEvent):void{
 				// If commit is false, no data is returned.
@@ -121,6 +129,10 @@
 					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
 				}
 				currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
+				
+				//sort leaderboard members
+				utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
+
 			}
 
 			

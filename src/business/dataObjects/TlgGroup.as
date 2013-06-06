@@ -36,8 +36,10 @@ package business.dataObjects
 			_members_collection.addItem(m);
 		}
 		public function rebuildLeaderboardData(start:Date, end:Date):void{
-			for each(var m:GroupMember in _members_collection){
-				
+			//Cant iterate through the collection as it will sort as it goes, missing some and getting some >1.
+			//break out the array and iterate throuh that instead
+			var temp_members_array:Array = _members_collection.toArray();
+			for each(var m:GroupMember in temp_members_array){ 
 				m.lbStartDate = start;
 				m.lbEndDate = end;
 				m.buildLeaderboardData(start, end);

@@ -132,6 +132,7 @@
 		
 		<Injectors target="{calendarChartDay}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_DELETED}" method="workoutDeleted"/>
 			<ListenerInjector eventType="{UIEvent.WORKOUT_DATE_CHANGED}" method="workoutDateChanged"/>
 			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="buildWorkouts"/>
 		</Injectors>

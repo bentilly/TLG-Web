@@ -1,6 +1,8 @@
 package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
+	
+	import business.utils;
 
 	public class GroupMember
 	{
@@ -17,6 +19,8 @@ package business.dataObjects
 		
 		public var lbEndDate:Date = new Date();
 		public var lbStartDate:Date = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30);
+		
+		public var utils:business.utils = new business.utils();
 		
 		
 		public function GroupMember(name:String)
@@ -37,6 +41,7 @@ package business.dataObjects
 							var activityDuration:ActivitySummary = new ActivitySummary();
 							activityDuration._activity = activity;
 							activityDuration._duration = ws.duration;
+							activityDuration._activity_name = activity._name;
 							//match date - find existing GroupMemberWorkoutDay
 							var dayExists:Boolean = false;
 							var dateBits:Array = ws.date.split('-');
@@ -87,12 +92,15 @@ package business.dataObjects
 							var at:ActivitySummary = new ActivitySummary();
 							at._duration = activityDay._duration;
 							at._activity = activityDay._activity;
+							at._activity_name = activityDay._activity._name;
 							_leaderboard_collection.addItem(at);
 							_totalDuration += activityDay._duration;
 						}
 					}
 				}
 			}
+			//sort _leaderboard_collection by activity
+			utils.sortArrayCollection(_leaderboard_collection, "_activity_name");
 		}
 			
 			

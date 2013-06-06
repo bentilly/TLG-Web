@@ -20,8 +20,7 @@
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
-			
-			import business.dataObjects.Activity;
+
 			import business.dataObjects.Workout;
 			
 			import events.RequestEvent;
@@ -77,26 +76,41 @@
 			
 			protected function goButton_clickHandler(event:MouseEvent):void
 			{
-				var woDate:Date = woDetails.getWODate();
-				var woDuration:int = woDetails.getWODuration();
-				var woComment:String = woDetails.getWOComment();
-				var woActivities:Array = woActivitiesSelector.getActivities();
-				var newWO:String = woActivitiesSelector.getNewActivity();
+				var re:RequestEvent;
+				var requestObj:Object
 				
-				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
-				var requestObj:Object = new Object();
-				requestObj.operation = 'workout.updateWorkout';
-				requestObj.token = token;
-				requestObj.key = workout._key;
-				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
-				requestObj.duration = woDuration;
-				requestObj.comment = woComment;
-				requestObj.activities = woActivities;
-				requestObj.newActivity = newWO;
-				re.requestJson = JSON.stringify(requestObj);
-				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
-				trace(re.requestJson);
-				dispatchEvent(re);
+				if(currentState == 'editState'){
+					var woDate:Date = woDetails.getWODate();
+					var woDuration:int = woDetails.getWODuration();
+					var woComment:String = woDetails.getWOComment();
+					var woActivities:Array = woActivitiesSelector.getActivities();
+					var newWO:String = woActivitiesSelector.getNewActivity();
+					
+					re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					requestObj = new Object();
+					requestObj.operation = 'workout.updateWorkout';
+					requestObj.token = token;
+					requestObj.key = workout._key;
+					requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
+					requestObj.duration = woDuration;
+					requestObj.comment = woComment;
+					requestObj.activities = woActivities;
+					requestObj.newActivity = newWO;
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+				}else{
+					re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					requestObj = new Object();
+					requestObj.operation = 'workout.deleteWorkout';
+					requestObj.token = token;
+					requestObj.key = workout._key;
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+				}
 				
 				try{
 					close();
@@ -107,7 +121,6 @@
 
 			public function workoutUpdated(event:UIEvent):void{
 				try{
-					
 					close();
 				}catch(e:Error){
 					
@@ -141,37 +154,34 @@
 				woActivitiesSelector.selectWorkoutActivites(workout)
 				
 				
-				
-				
-				/*var count:int = 0
-				for each(var a:Activity in myActivities_collection){
-					if(a == workout._activities[0]){
-						//activitiesList.selectedIndex = count;
-						break;
-					}
-					count++;
-				}*/
-				
-				
 			}
 
 			protected function deleteBut_rollOverHandler(event:MouseEvent):void
 			{
-				//deleteBut.alpha = 1;
+				deleteBut.alpha = 1;
 			}
 			
 			protected function deleteBut_rollOutHandler(event:MouseEvent):void
 			{
-				//deleteBut.alpha = .5;
+				deleteBut.alpha = .5;
 			}
 			
 			protected function deleteBut_clickHandler(event:MouseEvent):void
 			{
-				editWindowBG.setStyle('borderAlpha', 1);
-				woDetails.mouseChildren = false;
-				//woActivitiesSelector.mouseChildren = false;
-				//deleteBut.setStyle('color', '#AA0000');
-				goButton.text = 'DELETE'
+				if(currentState == 'editState'){
+					currentState = 'deleteState'
+					woDetails.mouseChildren = false;
+					woActivitiesSelector.mouseChildren = false;
+				}else{
+					currentState = 'editState'
+					woDetails.mouseChildren = true;
+					woActivitiesSelector.mouseChildren = true;
+				}
+				/*editWindowBG.setStyle('borderAlpha', 1);
+				deleteBut.setStyle('color', '#AA0000');
+				goButton.text = 'DELETE';
+				deleteBut.text = 'Dont delete this workout';*/
+				
 			}
 			
 			//New Activity
@@ -210,19 +220,25 @@
 		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
 	</fx:Declarations>
 	
+	<s:states>
+		<s:State name="editState"/>
+		<s:State name="deleteState"/>
+	</s:states>
+	
 	<s:VGroup gap="0" width="100%">
 		<s:Group>
 			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="EDIT WORKOUT" paddingBottom="-6" paddingLeft="2"/>
 		</s:Group>
-		<s:BorderContainer id="editWindowBG" backgroundColor="#b2d3db" borderVisible="true" cornerRadius="6"  width="100%" borderColor="#AA0000" borderWeight="3" borderAlpha="0">
+		<s:BorderContainer id="editWindowBG" backgroundColor="#b2d3db" borderVisible="true" cornerRadius="6"  width="100%" borderColor="#AA0000" borderWeight="3" borderAlpha.editState="0" borderAlpha.deleteState="1">
 			
 			<s:VGroup id="editWindowContent" width="100%" height="100%" paddingTop="20" paddingLeft="20">
 				<s:HGroup width="100%" height="340" paddingTop="20" gap="0">
 					<s:VGroup>
 						<addBar:workoutDetails id="woDetails"/>
 						<!--TODO: delete workout-->
-						<!--<s:Label id="deleteBut" text="Delete this workout" styleName="h2_white" paddingTop="10" paddingLeft="17" paddingBottom="10" alpha=".5"
-								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>-->
+						<s:Label id="deleteBut" text.editState="Delete this workout" text.deleteState="Dont delete this workout" styleName="h2_white" paddingTop="10" paddingLeft="17" paddingBottom="10" alpha=".5"
+								 color.deleteState="#AA0000" color.editState="#FFFFFF"
+								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>
 					</s:VGroup>
 					
 					
@@ -237,7 +253,7 @@
 		</s:BorderContainer>
 		<s:Group width="100%">
 			<s:HGroup right="0">
-				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
+				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text.editState="GO" text.deleteState="DELETE"
 						 useHandCursor="true" buttonMode="true"
 						 rollOver="goButton_rollOverHandler(event)" rollOut="goButton_rollOutHandler(event)"  click="goButton_clickHandler(event)"
 						 />

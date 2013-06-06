@@ -1,6 +1,8 @@
 package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
+	
+	import business.utils;
 
 	public class Workout
 	{
@@ -12,6 +14,12 @@ package business.dataObjects
 		[Bindable] public var _comment:String;
 		public var _activities:Array; //Array of Activity objects
 		[Bindable] public var _activities_collection:ArrayCollection; //Array of Activity objects
+		
+		//Sorting the timeline
+		public var firstActivityName:String;
+		
+		
+		private var utils:business.utils = new business.utils();
 		
 		
 		
@@ -33,6 +41,8 @@ package business.dataObjects
 			_comment = o.comment;
 			_activities = activities;
 			_activities_collection = new ArrayCollection(_activities);
+			//sort field for timeline
+			firstActivityName = _activities_collection[0]._name;
 		}
 		
 		private function setHrsMins(duration:Number):void{

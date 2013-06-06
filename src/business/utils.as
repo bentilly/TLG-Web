@@ -5,7 +5,6 @@ package business
 	import spark.collections.Sort;
 	import spark.collections.SortField;
 	
-	import business.dataObjects.TlgGroup;
 
 	public class utils
 	{
