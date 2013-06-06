@@ -172,7 +172,7 @@
 			
 			//logout
 			public function logout(event:Event):void{
-				if(uiState == 1){
+				if(uiState == 1){  //Dashboard
 					TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
 					myWorkouts.visible = false;
 					myGroup.visible = false;
@@ -230,17 +230,35 @@
 			
 //Go to a group
 			public function goGroup(event:UIEvent):void{
-				//assumes you are on the dashboard
-				myWorkouts.visible = false;
-				myGroup.visible = true;
-				
-				myGroup.setLeaderboard();
-				
-				uiState = 3;
-				hideDash();
+				if(uiState == 1){  //Dashboard
+					myWorkouts.visible = false;
+					myGroup.visible = true;
+					loginWidget.visible = false;
+					hideDash();
+					uiState = 3;
+				}else if(uiState != 3){
+					revealDash();
+					TweenLite.delayedCall(16, goGroup, [null], true);
+				}
 			}
 			
-			/** Event handlers **/
+			
+//Go to my workouts screen
+			public function goMyWorkouts(event:UIEvent):void{
+				if(uiState == 1){  //Dashboard
+					myWorkouts.visible = true;
+					myGroup.visible = false;
+					loginWidget.visible = false;
+					hideDash();
+					uiState = 2;
+				}else if(uiState != 2){
+					revealDash();
+					TweenLite.delayedCall(16, goMyWorkouts, [null], true);
+				}
+			}
+			
+
+/** Event handlers **/
 			private function clickMyTrainingDash_handler(event:MouseEvent):void{
 				myWorkouts.visible = true;
 				myGroup.visible = false;
@@ -267,7 +285,7 @@
 	
 	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
 	
-	<s:Label id="iteration" text="18" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
+	<s:Label id="iteration" text="19" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
 	
 </s:Group>

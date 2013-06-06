@@ -68,9 +68,13 @@
 			
 			public function goMyWorkouts(event:UIEvent):void{
 				currentState = "myWorkoutsState";
+				closePanel();
+				panelOpen = false;
 			}
 			public function goGroup(event:UIEvent):void{
 				currentState = "myGroupState";
+				closePanel();
+				panelOpen = false;
 			}
 			
 			protected function logoutBut_clickHandler(event:MouseEvent):void

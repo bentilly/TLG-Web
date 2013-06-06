@@ -54,6 +54,7 @@
 						var ag:activityGroup = new activityGroup();
 						ag.activities_collection = tlgGroup._activities_collection;
 						ag.groupName = tlgGroup._name;
+						ag.tlgGroup = tlgGroup;
 						allActivities.addElement(ag);
 						activityLists.push(ag);
 					}

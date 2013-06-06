@@ -76,6 +76,7 @@
 			<ListenerInjector eventType="{UIEvent.GOT_GROUPS}" method="gotGroups"/>
 			<ListenerInjector eventType="{UIEvent.GO_HOME}" method="goHome"/>
 			<ListenerInjector eventType="{UIEvent.GO_GROUP}" method="goGroup"/>
+			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="gotAllWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 			<!--Properties-->

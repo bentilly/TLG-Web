@@ -18,6 +18,7 @@
 			import spark.events.IndexChangeEvent;
 			
 			import business.dataObjects.Activity;
+			import business.dataObjects.TlgGroup;
 			import business.dataObjects.Workout;
 			
 			import events.UIEvent;
@@ -26,6 +27,7 @@
 			[Bindable] public var activities_collection:ArrayCollection;
 			[Bindable] public var editable:Boolean = false;
 			[Bindable] public var groupName:String;
+			[Bindable] public var tlgGroup:TlgGroup;
 			
 			
 			/*** IMPORTED ***/
@@ -119,6 +121,19 @@
 				groupHeader.removeElementAt(0);
 			}
 			
+			protected function groupHeader_clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent;
+				if(tlgGroup){
+					uie = new UIEvent(UIEvent.GO_GROUP);
+					uie.tlgGroup = tlgGroup;
+					dispatchEvent(uie);
+				}else{
+					uie = new UIEvent(UIEvent.GO_MYWORKOUTS);
+					dispatchEvent(uie);
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -131,7 +146,7 @@
 	
 	
 	<s:VGroup paddingLeft="15">
-		<s:HGroup id="groupHeader">
+		<s:HGroup id="groupHeader" click="groupHeader_clickHandler(event)" buttonMode="true" useHandCursor="true">
 			<fxg:gibbon id="gibbonIcon" width="50" height="50"/>
 			<s:Image id="gravatarImage" visible="false"/>
 			<s:Label text="{groupName}" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
