@@ -85,6 +85,9 @@ package business{
 					case "user.getAllWorkouts":
 						user_getAllWorkouts_handler(result.workouts);
 						break;
+					case "user.resetPassword":
+						Alert.show("Email sent to (email address)", "Reset Password");
+						break;
 				//WORKOUT
 					case "workout.addWorkout":
 						Alert.show("Workout added","Success");
@@ -99,6 +102,9 @@ package business{
 				//GROUP
 					case "group.getMemberWorkouts":
 						group_getMemberWorkouts_handler(result, request);
+						break;
+					case "group.addInvite":
+						Alert.show("Invite sent to "+request.email, "Invite");
 						break;
 				//ACTIVITY
 					case "activity.addActivity":

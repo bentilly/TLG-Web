@@ -16,10 +16,10 @@
 			import spark.events.PopUpEvent;
 			
 			import business.utils;
-			import business.dataObjects.GroupMember;
 			import business.dataObjects.TlgGroup;
 			
 			import view.popups.addTagPopup;
+			import view.popups.groupInvitePopup;
 			
 			/*** IMPORT ***/
 			[Bindable] public var token:String;
@@ -137,6 +137,16 @@
 
 			
 			
+			protected function inviteMemberLabel_clickHandler(event:MouseEvent):void
+			{
+				var invitePU:groupInvitePopup = new groupInvitePopup();
+				invitePU.token = token;
+				invitePU.groupKey = currentGroup._key;
+				
+				invitePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(invitePU);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -199,7 +209,10 @@
 							</s:layout>
 						</s:DataGroup>
 						
-						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" width="150" textAlign="right" paddingTop="20"/>
+						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" width="150" textAlign="right" paddingTop="20"
+								 click="inviteMemberLabel_clickHandler(event)"
+								 
+								 />
 					</s:VGroup>
 					
 					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>

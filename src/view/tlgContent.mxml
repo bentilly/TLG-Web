@@ -176,9 +176,10 @@
 					TweenLite.to(topAddBar, .5, {y:-100, onComplete:killTopBar});
 					myWorkouts.visible = false;
 					myGroup.visible = false;
+					loginWidget.visible = true;
+					loginWidget.currentState = "loginState"
 					hideDash();
 					uiState = 0;
-					loginWidget.currentState = "loginState"
 				}else{
 					revealDash();
 					TweenLite.delayedCall(16, logout, [null], true);
@@ -285,7 +286,7 @@
 	
 	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
 	
-	<s:Label id="iteration" text="19" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
+	<s:Label id="iteration" text="23" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
 	
 </s:Group>

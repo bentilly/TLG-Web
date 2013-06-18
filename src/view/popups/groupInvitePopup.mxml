@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   
+			   filters="{[dsFliter]}"
+			   >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			import mx.validators.Validator;
+			
+			import events.RequestEvent;
+			
+			/*** Passed in ***/
+			public var token:String;
+			public var groupKey:String
+			
+			protected function closeHandler(event:CloseEvent):void
+			{
+				PopUpManager.removePopUp(this);
+				
+			}
+			
+			// GO button
+			protected function goButton_rollOverHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#7be6ff");
+				
+			}
+			
+			protected function goButton_rollOutHandler(event:MouseEvent):void
+			{
+				goButton.setStyle("color", "#FFFFFF");
+				
+			}
+			protected function goButton_clickHandler(event:MouseEvent):void
+			{
+				
+				var validatorErrorArray:Array = Validator.validateAll([emailValidator]);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if (isValidForm) {
+					var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					var requestObj:Object = new Object();
+					requestObj.operation = 'group.addInvite';
+					requestObj.token = token;
+					requestObj.group = groupKey;
+					requestObj.email = emailInput.text;
+					
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+					
+					close();
+				}
+			}
+			
+			// CANCEL button
+			protected function cancelButton_rollOverHandler(event:MouseEvent):void
+			{
+				cancelButton.setStyle("color", "#7be6ff");
+				
+			}
+			
+			protected function cancelButton_rollOutHandler(event:MouseEvent):void
+			{
+				cancelButton.setStyle("color", "#FFFFFF");
+				
+			}
+			
+			protected function cancelButton_clickHandler(event:MouseEvent):void
+			{
+				close();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
+		<mx:EmailValidator id="emailValidator" source="{emailInput}" property="text" required="true"/>
+	</fx:Declarations>
+	
+	<s:VGroup gap="0">
+		<s:Group>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="INVITE" paddingBottom="-6" paddingLeft="2"/>
+		</s:Group>
+		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
+			
+			<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
+				<s:Label text="email:" styleName="smallLight"/>
+				<s:TextInput id="emailInput" styleName="textFieldBold" width="300"/>
+			</s:VGroup>
+			
+			<!--TODO: Invite as admin--> 
+			
+		</s:BorderContainer>
+		<s:Group width="100%">
+			<s:Group right="0">
+				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
+						 useHandCursor="true" buttonMode="true"
+						 rollOver="goButton_rollOverHandler(event)" rollOut="goButton_rollOutHandler(event)" click="goButton_clickHandler(event)"
+						 />
+			</s:Group>
+			<s:Group left="0">
+				<s:Label id="cancelButton" fontFamily="OS-condBold" color="white" fontSize="30" text="CANCEL"
+						 useHandCursor="true" buttonMode="true"
+						 rollOver="cancelButton_rollOverHandler(event)" rollOut="cancelButton_rollOutHandler(event)" click="cancelButton_clickHandler(event)"
+						 />
+			</s:Group>
+			
+		</s:Group>
+		
+	</s:VGroup>
+	
+	
+	
+</s:SkinnablePopUpContainer>
