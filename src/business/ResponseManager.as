@@ -1,5 +1,6 @@
 package business{
 	import flash.events.IEventDispatcher;
+	import flash.net.LocalConnection;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -27,7 +28,7 @@ package business{
 		
 		
 		/*** EXPORT ***/
-		
+		[Bindable] public var URLPrefix:String;
 		[Bindable] public var token:String;//token is used to authenticate this user on every request. Use token.creatToken to log in and get a new token.
 		[Bindable] public var userName:String; //returned when someone logs in
 		[Bindable] public var userEmail:String;
@@ -136,6 +137,13 @@ package business{
 		public function handleFault(event:RequestEvent, fault:Object, resultObject:Object):void{
 			Alert.show(String(fault), "Error");
 			
+			//Get Operation
+			var request:Object = JSON.parse(String(event.requestJson));
+			var operation:String = request.operation;
+			if(operation == "token.createToken"){
+				token_createToken_fail_handler(); //unlock the login UI on RPC fail
+			}
+			
 		}
 		
 /** -----------------
@@ -161,6 +169,9 @@ package business{
 			
 			if(currentGroup._loaded){
 				//go to group page - no server call
+				//sets leaderboard
+				var uie:UIEvent = new UIEvent(UIEvent.GROUP_READY);
+				dispatcher.dispatchEvent(uie);
 			}else{
 				//get group members and workouts
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
@@ -625,6 +636,9 @@ package business{
 				group._loaded = true;
 			}
 			utils.sortArrayCollection(group._members_collection, '_totalDuration', true, 'DESC');
+			//sets leaderboard
+			var uie:UIEvent = new UIEvent(UIEvent.GROUP_READY);
+			dispatcher.dispatchEvent(uie);
 		}
 		
 		

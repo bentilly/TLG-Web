@@ -27,7 +27,7 @@ package business.dataObjects
 			_activities_collection.addItem(a);
 		}
 		public function addMember(data:Object):void{
-			var m:GroupMember = new GroupMember(data.name);
+			var m:GroupMember = new GroupMember(data.name, data.email);
 			m._group = this;
 			if(data.currentUser == 'true'){
 				m._currentUser = true;

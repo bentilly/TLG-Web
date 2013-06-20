@@ -8,6 +8,7 @@ package business.dataObjects
 	{
 		
 		[Bindable] public var _name:String;
+		[Bindable] public var _email:String;
 		//[Bindable] public var _key:String;
 		[Bindable] public var _currentUser:Boolean = false; // set to true if this member is the current logged in user
 		[Bindable] public var _group:TlgGroup;
@@ -23,9 +24,10 @@ package business.dataObjects
 		public var utils:business.utils = new business.utils();
 		
 		
-		public function GroupMember(name:String)
+		public function GroupMember(name:String, email:String)
 		{
 			_name = name;
+			_email = email;
 			_workoutDays_collection = new ArrayCollection( [] );
 			_leaderboard_collection = new ArrayCollection( [] );
 		}

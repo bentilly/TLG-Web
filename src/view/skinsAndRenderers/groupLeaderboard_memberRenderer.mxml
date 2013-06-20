@@ -2,13 +2,26 @@
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx" 
-				autoDrawBackground="true">
+				autoDrawBackground="true"
+				
+				creationComplete="creationCompleteHandler(event)"
+				
+				>
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.MD5;
+			
+			import mx.events.FlexEvent;
 			
 			
-			//data = GroupMember
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(data._email).toString() + '?s=20';
+				gravatarImage.validateNow();
+			}
 			
 		]]>
 	</fx:Script>
@@ -19,8 +32,9 @@
 		<s:State name="selected"/>-->
 	</s:states>
 	
-	<s:HGroup gap="10">
-		<s:Label text="{data._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName"/>
+	<s:HGroup gap="1">
+		<s:Label text="{data._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName" paddingRight="10" paddingTop="2"/>
+		<s:Image id="gravatarImage" width="20" height="20"/>
 		
 		<s:DataGroup itemRenderer="view.skinsAndRenderers.groupLeaderboard_activityBlockRenderer" dataProvider="{data._leaderboard_collection}">
 			<s:layout>
@@ -28,7 +42,7 @@
 			</s:layout>
 		</s:DataGroup>
 		
-		<s:HGroup gap="0" paddingTop="5">
+		<s:HGroup gap="0" paddingTop="5" paddingLeft="7">
 			<s:Label text="{Math.floor(data._totalDuration/60)}" styleName="leaderboardTotal"/>
 			<s:Label text=":" styleName="leaderboardTotal"/>
 			<s:Label text="{data._totalDuration - (Math.floor(data._totalDuration/60) * 60)}" styleName="leaderboardTotal"/>
