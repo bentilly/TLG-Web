@@ -79,6 +79,8 @@
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="gotAllWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
+			<ListenerInjector eventType="{UIEvent.SPINNER_ON}" method="spinnerOn"/>
+			<ListenerInjector eventType="{UIEvent.SPINNER_OFF}" method="spinnerOff"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups_collection" targetKey="myGroups_collection"/>

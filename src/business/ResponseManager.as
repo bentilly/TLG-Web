@@ -48,6 +48,8 @@ package business{
 		}
 		
 		public function handleResponse(event:RequestEvent, resultObject:Object):void{
+			var uie:UIEvent;
+			
 			//Get Operation
 			var request:Object = JSON.parse(String(event.requestJson));
 			var operation:String = request.operation;
@@ -74,6 +76,12 @@ package business{
 						token_createToken_handler();
 						break;
 				//USER
+					case "user.signup": //on successful signup a login token is returned - log them in
+						token = result.token;
+						userName = result.name;
+						userEmail = request.email;
+						token_createToken_handler();
+						break;
 					case "user.getGroups":
 						user_getGroups_handler(result.groups);
 						break;
@@ -88,6 +96,9 @@ package business{
 						break;
 					case "user.resetPassword":
 						Alert.show("Email sent to (email address)", "Reset Password");
+						//turn off spinner
+						uie = new UIEvent(UIEvent.SPINNER_OFF);
+						dispatcher.dispatchEvent(uie);
 						break;
 				//WORKOUT
 					case "workout.addWorkout":
@@ -131,6 +142,9 @@ package business{
 					default:
 						break;
 				}
+				//turn off spinner
+				uie = new UIEvent(UIEvent.SPINNER_OFF);
+				dispatcher.dispatchEvent(uie);
 			}
 		}
 		
@@ -143,6 +157,10 @@ package business{
 			if(operation == "token.createToken"){
 				token_createToken_fail_handler(); //unlock the login UI on RPC fail
 			}
+			
+			//turm off spinner
+			var uie:UIEvent = new UIEvent(UIEvent.SPINNER_OFF);
+			dispatcher.dispatchEvent(uie);
 			
 		}
 		
@@ -196,9 +214,18 @@ package business{
 		private function token_createToken_handler():void{
 			var uie:UIEvent = new UIEvent(UIEvent.USER_LOGGED_IN);
 			dispatcher.dispatchEvent(uie);
+			
+			//Dont turn it off yet! Wait till all data loaded : getAllWorkouts
+			//turn off spinner
+			/*uie = new UIEvent(UIEvent.SPINNER_OFF);
+			dispatcher.dispatchEvent(uie);*/
 		}
 		private function token_createToken_fail_handler():void{
 			var uie:UIEvent = new UIEvent(UIEvent.LOGIN_FAIL);
+			dispatcher.dispatchEvent(uie);
+			
+			//turn off spinner
+			uie = new UIEvent(UIEvent.SPINNER_OFF);
 			dispatcher.dispatchEvent(uie);
 		}
 		
@@ -301,6 +328,10 @@ package business{
 			
 			//Changes screen in UI
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_ALL_WORKOUTS);
+			dispatcher.dispatchEvent(uie);
+			
+			//turn off spinner
+			uie = new UIEvent(UIEvent.SPINNER_OFF);
 			dispatcher.dispatchEvent(uie);
 		}
 		

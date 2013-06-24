@@ -29,6 +29,9 @@ package events{
 		public static const LOGIN_FAIL:String = "loginFail_event";
 		public static const LOGOUT:String = "logout_event";
 		
+		public static const SPINNER_ON:String = "spinnerOn_event";
+		public static const SPINNER_OFF:String = "spinnerOff_event";
+		
 		
 		public var workout:Workout;
 		public var tlgGroup:TlgGroup;

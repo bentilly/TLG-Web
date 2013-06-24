@@ -42,7 +42,9 @@ package business.dataObjects
 			_activities = activities;
 			_activities_collection = new ArrayCollection(_activities);
 			//sort field for timeline
-			firstActivityName = _activities_collection[0]._name;
+			if(_activities_collection.length > 1){ // workout can have no activity
+				firstActivityName = _activities_collection[0]._name;
+			}
 		}
 		
 		private function setHrsMins(duration:Number):void{

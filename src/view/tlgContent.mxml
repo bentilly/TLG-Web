@@ -13,7 +13,7 @@
 		 
 		 
 		 width="100%"
-		 height="100%"
+		 height="100%" xmlns:widgets="view.widgets.*" xmlns:spinner="view.widgets.spinner.*"
 		 >
 	
 	<fx:Script>
@@ -36,7 +36,8 @@
 			
 			/*** INTERNAL ***/
 			private var myTrainingSize:Number;
-			[Bindable] private var versionNumber:String = '0.0.26';
+			//First three = app.yaml version. Last = UI iteration
+			[Bindable] private var versionNumber:String = '0-0-26-1';
 			
 			//Flags
 			private var uiState:int = 0; //0 = login, 1 = dashboard, 2 = Workouts, 3 = Groups
@@ -56,7 +57,7 @@
 			//core
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
-
+				globalSpinner_group.visible = false;
 			}
 			protected function resizeHandler(event:ResizeEvent):void
 			{
@@ -259,6 +260,16 @@
 				}
 			}
 			
+			//Spinner
+			public function spinnerOn(event:UIEvent):void{
+				globalSpinner_group.visible = true;
+				globalSpinner.play();
+			}
+			public function spinnerOff(event:UIEvent):void{
+				globalSpinner_group.visible = false;
+				globalSpinner.stop();
+			}
+			
 
 /** Event handlers **/
 			private function clickMyTrainingDash_handler(event:MouseEvent):void{
@@ -286,6 +297,18 @@
 	<myGroups:myGroupContent id="myGroup" visible="false"/>
 	
 	<s:Group id="dashGroup" width="100%" height="100%" filters="{outerShadowFilter}" clipAndEnableScrolling="true"/>
+	
+	<!--Group covers everything to block mouse input.-->
+	<s:Group id="globalSpinner_group" width="100%" height="100%">
+		<s:Rect width="100%" height="100%" alpha=".3">
+			<s:fill>
+				<s:SolidColor id="globalSpinner_bg" color="#000000"/>
+			</s:fill>
+		</s:Rect>
+		<spinner:Spinner id="globalSpinner" horizontalCenter="0" verticalCenter="0"
+						 size="60" numTicks="25" tickWidth="5" speed="2000" fadeSpeed="1300" tickColor="#003300" autoPlay="false"
+						 />
+	</s:Group>
 	
 	<s:Label id="iteration" text="{versionNumber}" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
