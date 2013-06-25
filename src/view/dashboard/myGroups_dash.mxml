@@ -46,7 +46,7 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:BorderContainer backgroundColor="#26bc3b" width="100%" height="100%" borderVisible="false">
+	<s:BorderContainer backgroundColor="#0d9f22" width="100%" height="100%" borderVisible="false">
 		<s:Line height="100%" alpha=".2">
 			<s:stroke>
 				<s:SolidColorStroke color="0xffffff" weight="1"/>

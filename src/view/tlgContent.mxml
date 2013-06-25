@@ -37,7 +37,7 @@
 			/*** INTERNAL ***/
 			private var myTrainingSize:Number;
 			//First three = app.yaml version. Last = UI iteration
-			[Bindable] private var versionNumber:String = '0-0-26-1';
+			[Bindable] private var versionNumber:String = '0-0-26-2';
 			
 			//Flags
 			private var uiState:int = 0; //0 = login, 1 = dashboard, 2 = Workouts, 3 = Groups
@@ -309,6 +309,8 @@
 						 size="60" numTicks="25" tickWidth="5" speed="2000" fadeSpeed="1300" tickColor="#003300" autoPlay="false"
 						 />
 	</s:Group>
+	
+	<widgets:uservoiceTab bottom="-5" right="20"/>
 	
 	<s:Label id="iteration" text="{versionNumber}" styleName="tinyWhite" left="3" bottom="3" alpha=".4"/>
 	
