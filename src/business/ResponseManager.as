@@ -1,18 +1,24 @@
 package business{
 	import flash.events.IEventDispatcher;
-	import flash.net.LocalConnection;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.IViewCursor;
 	import mx.controls.Alert;
 	
-	import business.dataObjects.Activity;
 	import business.dataObjects.ActivitySummary;
-	import business.dataObjects.GroupMember;
+	import business.dataObjects.Activity_Data;
 	import business.dataObjects.GroupMemberWorkoutDay;
-	import business.dataObjects.TlgGroup;
-	import business.dataObjects.Workout;
+	import business.dataObjects.GroupMember_Data;
+	import business.dataObjects.Group_Data;
 	import business.dataObjects.WorkoutDay;
 	import business.dataObjects.WorkoutMonth;
+	import business.dataObjects.raw.Activity;
+	import business.dataObjects.raw.GroupMember;
+	import business.dataObjects.raw.TLGGroup;
+	import business.dataObjects.raw.TLGUser;
+	import business.dataObjects.raw.Workout;
+	import business.dataObjects.raw.WorkoutDay2;
+	import business.dataObjects.raw.WorkoutMonth2;
 	
 	import events.RequestEvent;
 	import events.UIEvent;
@@ -28,6 +34,18 @@ package business{
 		
 		
 		/*** EXPORT ***/
+		//Master collections of DB objects
+		private var user_collection:ArrayCollection;
+		private var group_collection:ArrayCollection;
+		private var groupMember_collection:ArrayCollection;
+		private var activity_collection:ArrayCollection;
+		private var workout_collection:ArrayCollection;
+		private var groupMemberActivityDay_collection:ArrayCollection;
+		//Collections specifically used for display
+		[Bindable] public var workoutDay_collection:ArrayCollection; //a collection of WorkoutDay2
+		[Bindable] public var workoutMonth_collection:ArrayCollection; //a collection of WorkoutMonth2
+		
+		
 		[Bindable] public var URLPrefix:String;
 		[Bindable] public var token:String;//token is used to authenticate this user on every request. Use token.creatToken to log in and get a new token.
 		[Bindable] public var userName:String; //returned when someone logs in
@@ -35,7 +53,7 @@ package business{
 		[Bindable] public var myGroups_collection:ArrayCollection; //array of TlgGroup objects - groups I am a member or admin of
 		[Bindable] public var myActivities:Array; //array of personal activities
 		[Bindable] public var myActivities_collection:ArrayCollection; //array of personal activities
-		[Bindable] public var currentGroup:TlgGroup = null; //the current group (if looking at a group).
+		[Bindable] public var currentGroup:Group_Data = null; //the current group (if looking at a group).
 		
 		//organising workouts
 		public var workoutsByDay:Array;  //Array of WorkoutGroup objects containind a days worth of workouts. Organises workouts by day.
@@ -44,7 +62,22 @@ package business{
 		
 		public function ResponseManager(dispatcher:IEventDispatcher){
 			this.dispatcher = dispatcher; //creates a dispatcher so this class can send events. Initiated in TLGEventMap.mxml
+			resetDataStorage();
+			
 			trace("ResponseManager Initialised");
+		}
+		
+		private function resetDataStorage():void{
+			//create empty arraycollections for master data
+			user_collection = new ArrayCollection();
+			group_collection = new ArrayCollection();
+			groupMember_collection = new ArrayCollection();
+			activity_collection = new ArrayCollection();
+			workout_collection = new ArrayCollection();
+			groupMemberActivityDay_collection = new ArrayCollection();
+			
+			//set the sort order for workouts
+			utils.sortArrayCollection(workout_collection, '_date', true, "DESC");
 		}
 		
 		public function handleResponse(event:RequestEvent, resultObject:Object):void{
@@ -73,14 +106,16 @@ package business{
 						token = result.token;
 						userName = result.name;
 						userEmail = request.email;
-						token_createToken_handler();
+						
+						token_createToken_handler(result);
 						break;
 				//USER
 					case "user.signup": //on successful signup a login token is returned - log them in
 						token = result.token;
 						userName = result.name;
 						userEmail = request.email;
-						token_createToken_handler();
+						
+						token_createToken_handler(result);
 						break;
 					case "user.getGroups":
 						user_getGroups_handler(result.groups);
@@ -211,14 +246,19 @@ package business{
  * -----------------**/
 		
 //-----TOKEN-----//
-		private function token_createToken_handler():void{
+		private function token_createToken_handler(result:Object):void{
+			//master data
+			var me:TLGUser = new TLGUser();
+			me._name = result.name;
+			me._email = result.email;
+			user_collection.addItem(me);
+			//END master data
+			
+			//trigger further action
 			var uie:UIEvent = new UIEvent(UIEvent.USER_LOGGED_IN);
 			dispatcher.dispatchEvent(uie);
 			
-			//Dont turn it off yet! Wait till all data loaded : getAllWorkouts
-			//turn off spinner
-			/*uie = new UIEvent(UIEvent.SPINNER_OFF);
-			dispatcher.dispatchEvent(uie);*/
+			//Wait until all data loaded before turning off spinner: getAllWorkouts
 		}
 		private function token_createToken_fail_handler():void{
 			var uie:UIEvent = new UIEvent(UIEvent.LOGIN_FAIL);
@@ -231,9 +271,22 @@ package business{
 		
 //-----USER-----//
 		private function user_getGroups_handler(groups:Array):void{
+			//master data storage
+			for each(var g:Object in groups){
+				var tlggroup:TLGGroup = new TLGGroup();
+				tlggroup._key = g.key;
+				tlggroup._name = g.name;
+				if(g.admin == 'true'){
+					tlggroup._admin = true;
+				}
+				group_collection.addItem(tlggroup);
+			}
+			//END master data
+			
+			//in use
 			myGroups_collection = new ArrayCollection();
 			for each(var o:Object in groups){
-				var group:TlgGroup = new TlgGroup(o.name, o.key);
+				var group:Group_Data = new Group_Data(o.name, o.key);
 				if(o.admin == 'true'){
 					group._admin = true;
 				}
@@ -248,11 +301,35 @@ package business{
 		}
 		
 		private function user_getActivities_handler(result:Object):void{
+			//master data storage
+			//my activities
+			for each(var ao:Object in result.activities){
+				var act:Activity = new Activity();
+				act._key = ao.key;
+				act._name = ao.name;
+				act._colour = Number('0x'+ao.colour);
+				activity_collection.addItem(act);
+			}
+			
+			//group activities
+			for each(var go:Object in result.groupActivities){
+				var tlggroup:TLGGroup = getGroupObjectByKey(go.key);
+				for each(var gao:Object in go.activities){
+					var gact:Activity = new Activity();
+					gact._key = gao.key;
+					gact._name = gao.name;
+					gact._colour = Number('0x'+gao.colour);
+					gact._group = tlggroup;
+					activity_collection.addItem(gact);
+				}
+			}
+			//END master data
+			
 			//My personal activities
 			var activities:Array = result.activities;
 			myActivities = new Array();
 			for each(var o:Object in activities){
-				var a:Activity = new Activity(o);
+				var a:Activity_Data = new Activity_Data(o);
 				a._editable = true;
 				myActivities.push(a);
 			}
@@ -265,10 +342,10 @@ package business{
 			var groups:Array = result.groupActivities
 			for each(var g:Object in groups){
 				//find Group object
-				var tlgGroup:TlgGroup = getGroupByKey(g.key);
+				var tlgGroup:Group_Data = getGroupByKey(g.key);
 				if(tlgGroup){
 					for each(var ga:Object in g.activities){
-						var activity:Activity = new Activity(ga);
+						var activity:Activity_Data = new Activity_Data(ga);
 						activity._editable = tlgGroup._admin;
 						activity._group = tlgGroup;
 						tlgGroup.addActivity(activity);
@@ -295,36 +372,44 @@ package business{
 		}
 		
 		
-		
-		private function user_getAllWorkouts_handler(workouts:Array):void{
+		private function user_getAllWorkouts_handler(workouts:Array):void{		
 			//make empty collection
-			workoutDaysByMonth_collection = new ArrayCollection([]);
-			
+			workoutDaysByMonth_collection = new ArrayCollection([]);			
 			for each(var o:Object in workouts){
+				//Master data - an array to store Activities
+				var mdActivities:Array = new Array();
 				//match activities
 				var activities:Array = [];
 				for each(var i:Object in o.activities){
 					//check for 'my activity'
-					for each(var a:Activity in myActivities){
+					for each(var a:Activity_Data in myActivities){
 						if(a._key == i.key){
 							activities.push(a);
+							//Add to master data
+							mdActivities.push( getActivityObjectByKey(a._key) );
 						}
 					}
 					//check for 'group activities'
-					for each(var g:TlgGroup in myGroups_collection){
-						for each(var ga:Activity in g._activities_collection){
+					for each(var g:Group_Data in myGroups_collection){
+						for each(var ga:Activity_Data in g._activities_collection){
 							if(ga._key == i.key){
 								activities.push(ga);
+								//Add to master data
+								mdActivities.push( getActivityObjectByKey(ga._key) );
 							}
 						}
 					}
 				}
 				//create workout
 				var w:Workout = new Workout(o, activities);
-				
 				addWorkoutToCollection(w);
+				
+				
+				//Master data - create and add workout
+				workout_collection.addItem( new Workout(o, mdActivities) );
 
 			}
+			build_workoutDay_collection();
 			
 			//Changes screen in UI
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_ALL_WORKOUTS);
@@ -340,12 +425,14 @@ package business{
 //-----WORKOUT-----//
 		private function workout_addWorkout_handler(result:Object, request:Object):void{
 			var uie:UIEvent;
+			//Master data - an array to store Activities
+			var mdActivities:Array = new Array();
 			var activities:Array = [];
-			var newActivity:Activity;
+			var newActivity:Activity_Data;
 			//new personal activity
 			if(result.activityKey){
 				var o:Object = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
-				newActivity = new Activity(o);
+				newActivity = new Activity_Data(o);
 				newActivity._editable = true;
 				//add to collection
 				myActivities_collection.addItem(newActivity);
@@ -353,12 +440,22 @@ package business{
 				utils.sortArrayCollection(myActivities_collection, '_name');
 				//add to workout activities array
 				activities.push(newActivity);
+				
+				//Add to master data
+				var act:Activity = new Activity();
+				act._key = o.key;
+				act._name = o.name;
+				act._colour = Number('0x'+o.colour);
+				activity_collection.addItem(act);
+				mdActivities.push( act );
 			}
 			//all other activities
 			for each(var ak:String in request.activities){
-				var activity:Activity = getActivityByKey(ak);
+				var activity:Activity_Data = getActivityByKey(ak);
 				if(activity){
 					activities.push(activity);
+					//Add to master data
+					mdActivities.push( getActivityObjectByKey(activity._key) );
 				}
 			}
 			
@@ -369,6 +466,10 @@ package business{
 			wo.comment = request.comment;
 			
 			var w:Workout = new Workout(wo, activities);
+			
+			//Master data - create and add workout
+			workout_collection.addItem( new Workout(wo, mdActivities) );
+			//sortAndFilterWorkouts();
 
 			//add to workoutDaysByMonth_collection which should update UI
 			addWorkoutToCollection(w);
@@ -382,6 +483,262 @@ package business{
 			
 		}
 		
+		private function workout_updateWorkout_handler(result:Object, request:Object):void{
+			var o:Object;
+			
+			//Workout Object
+			var wo:Object = new Object();
+			wo.key = result.key;
+			wo.date = request.date;
+			wo.duration = request.duration;
+			wo.comment = request.comment;
+			
+			
+			//Master data update
+			var mdActivities:Array = new Array();
+			//Delete workout
+			deleteWorkoutObjectByKey(request.key);
+			//Activities
+			if(result.activityKey){ //new personal activity
+				o = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
+				var act:Activity = new Activity();
+				act._key = o.key;
+				act._name = o.name;
+				act._colour = Number('0x'+o.colour);
+				activity_collection.addItem(act);
+				mdActivities.push( act );
+			}
+			//Group activities
+			for each(var ga:String in request.activities){
+				var activityObject:Activity = getActivityObjectByKey(ga);
+				if(activityObject){
+					activity_collection.addItem(activityObject);
+				}
+			}
+			workout_collection.addItem( new Workout(wo, mdActivities) );
+			//sortAndFilterWorkouts();
+			//END Master data update
+			
+			
+			var uie:UIEvent;
+			var activities:Array = [];
+			var activity:Activity_Data;
+			
+			//Activities
+			var newActivity:Activity_Data;
+			//New Activity
+			if(result.activityKey){
+				o = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
+				newActivity = new Activity_Data(o);
+				newActivity._editable = true;
+				//add to collection
+				myActivities_collection.addItem(newActivity);
+				//sort by _name
+				utils.sortArrayCollection(myActivities_collection, '_name');
+				//add to workout activities array
+				activities.push(newActivity);
+			}
+			
+			//Compile all Activities for this workout
+			for each(var ak:String in request.activities){
+				activity = getActivityByKey(ak);
+				if(activity){
+					activities.push(activity);
+				}
+			}
+			
+			var workoutDateChanged:Boolean = false;
+			var workoutToShift:Workout;
+			
+			//find and remove local workout
+			//TODO: This is shit - do it again
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				var dayCount:int = 0;
+				for each(var wd:WorkoutDay in wm._workoutDays_collection){
+					
+					for(var i:int = 0; i<wd._workouts_collection.length; i++){
+						if(result.key == wd._workouts_collection.getItemAt(i)._key){
+							wd._workouts_collection.getItemAt(i).updateWorkout(wo, activities);
+							if( !utils.compareDates(wd._workouts_collection.getItemAt(i)._date, wd._date) ){
+								trace('-'+wd._workouts_collection.length);
+								
+								//some wierd thing where it wont remove the first item. Probably doing something wrong somewhere.
+								if(wd._workouts_collection.length > 1 && i == 0){
+									workoutToShift = wd._workouts_collection.getItemAt(i) as Workout;
+									
+									var newWorkoutArray:Array = [];
+									for each(var tw:Workout in wd._workouts_collection){
+										if(tw._key != wd._workouts_collection.getItemAt(i)._key){
+											newWorkoutArray.push(tw);
+										}
+									}
+									wd._workouts = newWorkoutArray;
+									wd._workouts_collection = new ArrayCollection(newWorkoutArray);
+									
+								}else{
+									workoutToShift = wd._workouts_collection.removeItemAt(i) as Workout;
+								}
+								trace('--'+wd._workouts_collection.length);
+								addWorkoutToCollection(	workoutToShift );
+								workoutDateChanged = true;
+								//remove empty days
+								if(wd._workouts_collection.length == 0){
+									wm._workoutDays_collection.removeItemAt(dayCount);
+								}
+							}
+							break;
+						}
+					}
+					
+					dayCount++;
+				}
+			}
+			
+			//tell calendar chart to move a workout block
+			if(workoutDateChanged){
+				uie = new UIEvent(UIEvent.WORKOUT_DATE_CHANGED);
+				uie.workout = workoutToShift;
+				dispatcher.dispatchEvent(uie);
+			}
+			
+			
+			//UI muast be on MyWorkouts page. Set groups to _loaded = false so they reload when user goes back. Cheating but easy.
+			for each(var tlgGroup:Group_Data in myGroups_collection){
+				tlgGroup._loaded = false;
+				//dump all data
+				tlgGroup._members_collection.removeAll();
+			}
+			
+		}
+		
+		private function workout_deleteWorkout_handler(result:Object, request:Object):void{
+			//Master data
+			deleteWorkoutObjectByKey(request.key);
+			
+			//delete workout from my_workouts
+			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
+				for each(var wd:WorkoutDay in wm._workoutDays_collection){
+					var wCount:int = 0;
+					for each(var w:Workout in wd._workouts_collection){
+						if(w._key == request.key){
+							
+							//removes from my workouts list
+							wd._workouts_collection.removeItemAt(wCount);
+							
+							//removes from timeline
+							var uie:UIEvent = new UIEvent(UIEvent.WORKOUT_DELETED);
+							uie.workout = w;
+							dispatcher.dispatchEvent(uie);
+							
+							//UI muast be on MyWorkouts page. Set groups to _loaded = false so they reload when user goes back. Cheating but easy.
+							for each(var tlgGroup:Group_Data in myGroups_collection){
+								tlgGroup._loaded = false;
+								//dump all data
+								tlgGroup._members_collection.removeAll();
+							}
+							
+							trace('Workout deleted');
+						}
+						wCount++;
+					}
+				}
+			}
+			
+		}
+		
+		
+//-----GROUP-----//
+
+		private function group_getMemberWorkouts_handler(result:Object, request:Object):void{
+			var m:Object;
+			
+			//Master data
+			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
+			if(!groupObject._loaded){
+				for each(m in result.members){
+					//Add user
+					var tlguser:TLGUser = new TLGUser();
+					tlguser._name = m.name;
+					tlguser._email = m.email;
+					user_collection.addItem(tlguser);
+					//Add group member
+					var groupMember:GroupMember = new GroupMember();
+					groupMember._user = tlguser;
+					groupMember._group = groupObject;
+					groupMember_collection.addItem(groupMember);
+				}
+				group._loaded = true;
+			}
+			//END Master data
+			
+			var group:Group_Data = getGroupByKey(request.group);
+			if(!group._loaded){
+				for each(m in result.members){
+					group.addMember(m);
+				}
+				group._loaded = true;
+			}
+			utils.sortArrayCollection(group._members_collection, '_totalDuration', true, 'DESC');
+			//sets leaderboard
+			var uie:UIEvent = new UIEvent(UIEvent.GROUP_READY);
+			dispatcher.dispatchEvent(uie);
+		}
+		
+		
+		
+//-----ACTIVITY-----//
+		private function activity_addActivity_handler(result:Object, request:Object):void{
+			if(request.group){
+				//Master data
+				var groupObject:TLGGroup = getGroupObjectByKey(request.group);
+				var act:Activity = new Activity();
+				act._key = result.key;
+				act._name = request.name;
+				act._colour = Number('0x'+request.colour);
+				activity_collection.addItem(act);
+				//END Master data
+				
+				//group activity added
+				var tlgGroup:Group_Data = getGroupByKey(request.group);
+				//New Activity
+				var o:Object = {'name':request.name, 'key':result.key, 'colour':request.colour};
+				var newActivity:Activity_Data = new Activity_Data(o);
+				newActivity._editable = tlgGroup._admin;
+				newActivity._group = tlgGroup;
+				tlgGroup.addActivity(newActivity);
+				utils.sortArrayCollection(tlgGroup._activities_collection, '_name');
+			}
+			
+		}
+		private function activity_updateActivity_handler(result:Object, request:Object):void{
+			//Master data
+			var act:Activity = getActivityObjectByKey(request.key);
+			if(act){
+				act._colour = Number('0x'+request.colour);
+				act._name = request.name;
+			}
+			//END Master data
+			
+			var activity:Activity_Data = getActivityByKey(request.key);
+			if(activity){
+				activity._colour = Number('0x'+request.colour);
+				activity._name = request.name;
+			}
+			
+		}
+		private function activity_updateActivity_fail_handler():void{
+			var uie:UIEvent = new UIEvent(UIEvent.ACTIVITY_UPDATE_FAIL);
+			dispatcher.dispatchEvent(uie);
+		}
+		
+		
+		
+/** -----------------
+ * 
+ * TOOLS
+ * - Finders, getters, calculators
+ * 
+ * -----------------**/
 		private function addWorkoutToCollection(w:Workout):void{
 			var newDay:WorkoutDay;
 			var newMonth:WorkoutMonth;
@@ -435,17 +792,17 @@ package business{
 			
 			
 			//for all the groups
-			for each(var tlgGroup:TlgGroup in myGroups_collection){
+			for each(var tlgGroup:Group_Data in myGroups_collection){
 				trace('check group '+tlgGroup._name);
 				//is the group loaded and in need of update
 				if(tlgGroup._loaded){
-					for each(var member:GroupMember in tlgGroup._members_collection){
+					for each(var member:GroupMember_Data in tlgGroup._members_collection){
 						//am I a member of this group
 						if(member._currentUser && tlgGroup._member){
 							trace('I am a member of this group');
 							//is there an activity in this workout for this group
-							for each(var workoutActivity:Activity in workout._activities_collection){
-								for each(var groupActivity:Activity in tlgGroup._activities_collection){
+							for each(var workoutActivity:Activity_Data in workout._activities_collection){
+								for each(var groupActivity:Activity_Data in tlgGroup._activities_collection){
 									if(workoutActivity == groupActivity){
 										//activity match - update or add workout
 										trace('activity match: '+workoutActivity._name+' : '+groupActivity._name);
@@ -511,7 +868,7 @@ package business{
 									//no group activity in this workout
 								}
 							}
-
+							
 						}
 						//current user is not a member of this group
 					}
@@ -521,209 +878,10 @@ package business{
 		}
 		
 		
+/** GETTERS **/
 		
-		
-		private function workout_updateWorkout_handler(result:Object, request:Object):void{
-			var uie:UIEvent;
-			var activities:Array = [];
-			var activity:Activity;
-			
-			//Activities
-			var newActivity:Activity;
-			//New Activity
-			if(result.activityKey){
-				var o:Object = {'name':result.activityName, 'key':result.activityKey, 'colour':result.activityColour};
-				newActivity = new Activity(o);
-				newActivity._editable = true;
-				//add to collection
-				myActivities_collection.addItem(newActivity);
-				//sort by _name
-				utils.sortArrayCollection(myActivities_collection, '_name');
-				//add to workout activities array
-				activities.push(newActivity);
-			}
-			
-			//Compile all Activities for this workout
-			for each(var ak:String in request.activities){
-				activity = getActivityByKey(ak);
-				if(activity){
-					activities.push(activity);
-				}
-			}
-			
-			//Workout Object
-			var wo:Object = new Object();
-			wo.key = result.key;
-			wo.date = request.date;
-			wo.duration = request.duration;
-			wo.comment = request.comment;
-			
-			var workoutDateChanged:Boolean = false;
-			var workoutToShift:Workout;
-			
-			//find and remove local workout
-			//TODO: This is shit - do it again
-			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
-				var dayCount:int = 0;
-				for each(var wd:WorkoutDay in wm._workoutDays_collection){
-					
-					for(var i:int = 0; i<wd._workouts_collection.length; i++){
-						if(result.key == wd._workouts_collection.getItemAt(i)._key){
-							wd._workouts_collection.getItemAt(i).updateWorkout(wo, activities);
-							if( !utils.compareDates(wd._workouts_collection.getItemAt(i)._date, wd._date) ){
-								trace('-'+wd._workouts_collection.length);
-								
-								//some wierd thing where it wont remove the first item. Probably doing something wrong somewhere.
-								if(wd._workouts_collection.length > 1 && i == 0){
-									workoutToShift = wd._workouts_collection.getItemAt(i) as Workout;
-									
-									var newWorkoutArray:Array = [];
-									for each(var tw:Workout in wd._workouts_collection){
-										if(tw._key != wd._workouts_collection.getItemAt(i)._key){
-											newWorkoutArray.push(tw);
-										}
-									}
-									wd._workouts = newWorkoutArray;
-									wd._workouts_collection = new ArrayCollection(newWorkoutArray);
-									
-								}else{
-									workoutToShift = wd._workouts_collection.removeItemAt(i) as Workout;
-								}
-								trace('--'+wd._workouts_collection.length);
-								addWorkoutToCollection(	workoutToShift );
-								workoutDateChanged = true;
-								//remove empty days
-								if(wd._workouts_collection.length == 0){
-									wm._workoutDays_collection.removeItemAt(dayCount);
-								}
-							}
-							break;
-						}
-					}
-					
-					dayCount++;
-				}
-			}
-			
-			//tell calendar chart to move a workout block
-			if(workoutDateChanged){
-				uie = new UIEvent(UIEvent.WORKOUT_DATE_CHANGED);
-				uie.workout = workoutToShift;
-				dispatcher.dispatchEvent(uie);
-			}
-			
-			
-			//UI muast be on MyWorkouts page. Set groups to _loaded = false so they reload when user goes back. Cheating but easy.
-			for each(var tlgGroup:TlgGroup in myGroups_collection){
-				tlgGroup._loaded = false;
-				//dump all data
-				tlgGroup._members_collection.removeAll();
-			}
-			
-		}
-		
-		
-		private function workout_deleteWorkout_handler(result:Object, request:Object):void{
-			//delete workout from my_workouts
-			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
-				for each(var wd:WorkoutDay in wm._workoutDays_collection){
-					var wCount:int = 0;
-					for each(var w:Workout in wd._workouts_collection){
-						if(w._key == request.key){
-							
-							//removes from my workouts list
-							wd._workouts_collection.removeItemAt(wCount);
-							
-							//removes from timeline
-							var uie:UIEvent = new UIEvent(UIEvent.WORKOUT_DELETED);
-							uie.workout = w;
-							dispatcher.dispatchEvent(uie);
-							
-							//UI muast be on MyWorkouts page. Set groups to _loaded = false so they reload when user goes back. Cheating but easy.
-							for each(var tlgGroup:TlgGroup in myGroups_collection){
-								tlgGroup._loaded = false;
-								//dump all data
-								tlgGroup._members_collection.removeAll();
-							}
-							
-							trace('Workout deleted');
-						}
-						wCount++;
-					}
-				}
-			}
-			
-		}
-		
-		
-//-----GROUP-----//
-
-		private function group_getMemberWorkouts_handler(result:Object, request:Object):void{
-			var group:TlgGroup = getGroupByKey(request.group);
-			if(!group._loaded){
-				for each(var m:Object in result.members){
-					group.addMember(m);
-				}
-				group._loaded = true;
-			}
-			utils.sortArrayCollection(group._members_collection, '_totalDuration', true, 'DESC');
-			//sets leaderboard
-			var uie:UIEvent = new UIEvent(UIEvent.GROUP_READY);
-			dispatcher.dispatchEvent(uie);
-		}
-		
-		
-		
-//-----ACTIVITY-----//
-		private function activity_addActivity_handler(result:Object, request:Object):void{
-			if(request.group){
-				//group activity added
-				var tlgGroup:TlgGroup = getGroupByKey(request.group);
-				//New Activity
-				var o:Object = {'name':request.name, 'key':result.key, 'colour':request.colour};
-				var newActivity:Activity = new Activity(o);
-				newActivity._editable = tlgGroup._admin;
-				newActivity._group = tlgGroup;
-				tlgGroup.addActivity(newActivity);
-				utils.sortArrayCollection(tlgGroup._activities_collection, '_name');
-			}
-			
-		}
-		private function activity_updateActivity_handler(result:Object, request:Object):void{
-			var activity:Activity = getActivityByKey(request.key);
-			if(activity){
-				activity._colour = Number('0x'+request.colour);
-				activity._name = request.name;
-			}
-			
-		}
-		private function activity_updateActivity_fail_handler():void{
-			var uie:UIEvent = new UIEvent(UIEvent.ACTIVITY_UPDATE_FAIL);
-			dispatcher.dispatchEvent(uie);
-		}
-		
-		
-		
-/** -----------------
- * 
- * TOOLS
- * - Finders, getters, calculators
- * 
- * -----------------**/
-		/*public function getWorkoutByKey(key:String):Workout{
-			for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
-				for each(var wd:WorkoutDay in wm._workoutDays_collection){
-					for each(var w:Workout in wd._workouts_collection){
-						if(w._key == key){
-							return w;
-						}
-					}
-				}
-			}
-			return null;
-		}*/
-		public function getGroupByKey(key:String):TlgGroup{
-			for each(var group:TlgGroup in myGroups_collection){
+		public function getGroupByKey(key:String):Group_Data{
+			for each(var group:Group_Data in myGroups_collection){
 				if(group._key == key){
 					return group;
 				}
@@ -731,14 +889,14 @@ package business{
 			return null;
 		}
 		
-		private function getActivityByKey(key:String):Activity{
-			for each(var activity:Activity in myActivities_collection){
+		private function getActivityByKey(key:String):Activity_Data{
+			for each(var activity:Activity_Data in myActivities_collection){
 				if(activity._key == key){
 					return activity;
 				}
 			}
-			for each(var tlgGroup:TlgGroup in myGroups_collection){
-				for each(var groupActivity:Activity in tlgGroup._activities_collection){
+			for each(var tlgGroup:Group_Data in myGroups_collection){
+				for each(var groupActivity:Activity_Data in tlgGroup._activities_collection){
 					if(groupActivity._key == key){
 						return groupActivity;
 					}
@@ -746,9 +904,9 @@ package business{
 			}
 			return null;
 		}
-		private function getActivityGroupByKey(key:String):TlgGroup{
-			for each(var tlgGroup:TlgGroup in myGroups_collection){
-				for each(var groupActivity:Activity in tlgGroup._activities_collection){
+		private function getActivityGroupByKey(key:String):Group_Data{
+			for each(var tlgGroup:Group_Data in myGroups_collection){
+				for each(var groupActivity:Activity_Data in tlgGroup._activities_collection){
 					if(groupActivity._key == key){
 						return tlgGroup;
 					}
@@ -756,7 +914,7 @@ package business{
 			}
 			return null;
 		}
-		private function getGroupMemberWorkoutDay_byGroupMemberAndDate(member:GroupMember, date:Date):GroupMemberWorkoutDay{
+		private function getGroupMemberWorkoutDay_byGroupMemberAndDate(member:GroupMember_Data, date:Date):GroupMemberWorkoutDay{
 			for each(var day:GroupMemberWorkoutDay in member._workoutDays_collection){
 				if( utils.compareDates(day._date, date) ){
 					return day;
@@ -764,13 +922,128 @@ package business{
 			}
 			return null;
 		}
-		private function getActivitySummary_byGroupMemberWorkoutDayAndActivity(groupDay:GroupMemberWorkoutDay, activity:Activity):ActivitySummary{
+		private function getActivitySummary_byGroupMemberWorkoutDayAndActivity(groupDay:GroupMemberWorkoutDay, activity:Activity_Data):ActivitySummary{
 			for each(var actsum:ActivitySummary in groupDay._activity_collection){
 				if(actsum._activity == activity){
 					return actsum;
 				}
 			}
 			return null;
+		}
+		
+		
+/** MASTER DATA tools **/
+		//Get TLGGroup from group_collection
+		public function getGroupObjectByKey(key:String):TLGGroup{
+			for each(var group:TLGGroup in group_collection){
+				if(group._key == key){
+					return group;
+				}
+			}
+			return null;
+		}
+		public function getActivityObjectByKey(key:String):Activity{
+			for each(var activity:Activity in activity_collection){
+				if(activity._key == key){
+					return activity;
+				}
+			}
+			return null;
+		}
+		public function deleteWorkoutObjectByKey(key:String):Boolean{
+			var count:int = 0;
+			for each(var wo:Workout in workout_collection){
+				if(wo._key == key){
+					workout_collection.removeItemAt(count);
+					return true;
+				}
+				count++;
+			}
+			return false;
+		}
+		
+		private function build_workoutDay_collection():void{
+			//empty collection
+			workoutDay_collection = new ArrayCollection([]);
+			//work through workout_collection
+			var cursor:IViewCursor = workout_collection.createCursor();
+			var wd:WorkoutDay2 = new WorkoutDay2();
+			var w:Workout = cursor.current as Workout;
+			wd._date = new Date(w._date.fullYear, w._date.month, w._date.date);
+			wd._workouts.addItem(w);
+			cursor.moveNext();
+			while (! cursor.afterLast) {
+				w = cursor.current as Workout;
+				if(w._date.time == wd._date.time){
+					wd._workouts.addItem(w);
+				}else{
+					workoutDay_collection.addItem(wd);
+					wd = new WorkoutDay2();
+					wd._date = new Date(w._date.fullYear, w._date.month, w._date.date);
+					wd._workouts.addItem(w);
+				}
+				cursor.moveNext();
+			}
+			
+			utils.sortArrayCollection(workoutDay_collection, '_date', true, "DESC");
+			
+			build_workoutMonth_collection()
+			
+			workoutDay_collection.filterFunction = filterFunction_WorkoutByMonth;
+			workoutDay_collection.refresh();
+		}
+		
+		private function build_workoutMonth_collection():void{
+			//empty collection
+			workoutMonth_collection = new ArrayCollection([]);
+			//work through workoutDay_collection
+			var cursor:IViewCursor = workoutDay_collection.createCursor();
+			var wm:WorkoutMonth2 = new WorkoutMonth2();
+			var wd:WorkoutDay2 = cursor.current as WorkoutDay2;
+			wm._date = new Date(wd._date.fullYear, wd._date.month);
+			wm._workoutDays.addItem(wd);
+			cursor.moveNext();
+			
+			while (! cursor.afterLast) {
+				wd = cursor.current as WorkoutDay2;
+				if( utils.compareMonths(wd._date, wm._date) ){
+					wm._workoutDays.addItem(wd);
+				}else{
+					workoutMonth_collection.addItem(wm);
+					wm = new WorkoutMonth2();
+					wm._date = new Date(wd._date.fullYear, wd._date.month);
+					wm._workoutDays.addItem(wd);
+				}
+				cursor.moveNext();
+			}
+			//add last
+			workoutMonth_collection.addItem(wm);
+			//sort
+			utils.sortArrayCollection(workoutMonth_collection, '_date', true, "DESC");
+			workoutMonth_collection.refresh();
+		}
+		
+		
+		
+/** Filtering and sorting **/
+		//Filter workout_collection by month
+		private var nowDate:Date = new Date();
+		[Bindable] private var selectedMonth:Date = new Date(nowDate.fullYear, nowDate.month);
+		
+		public function setWorkoutMonth(event:UIEvent):void{
+			selectedMonth = event.date;
+			workoutDay_collection.refresh();
+		}
+		
+		//Filter functions
+		private function filterFunction_WorkoutByMonth(w:WorkoutDay2):Boolean{
+			if(w._date.time >= selectedMonth.time){
+				var endDate:Date = new Date(selectedMonth.fullYear, selectedMonth.month+1);
+				if(w._date.time < endDate.time){
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

@@ -17,18 +17,19 @@
 			import com.greensock.TweenLite;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.IViewCursor;
 			import mx.events.FlexEvent;
 			import mx.events.ResizeEvent;
 			
 			import business.utils;
-			import business.dataObjects.WorkoutMonth;
+			import business.dataObjects.raw.WorkoutMonth2;
 			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
-			[Bindable] public var myWorkouts:Array;
-			[Bindable] public var workoutDaysByMonth_collection:ArrayCollection;
+			[Bindable] public var workoutDay_collection:ArrayCollection; //workouts by day : used for list
+			[Bindable] public var workoutMonth_collection:ArrayCollection; //workout days by month : used for calendar
 			
 			
 			
@@ -46,17 +47,7 @@
 				var now:Date = new Date();
 				selectedMonth = new Date(now.fullYear, now.month);
 			}
-			
-			private function getMonthData(d:Date):WorkoutMonth{
-				for each(var wm:WorkoutMonth in workoutDaysByMonth_collection){
-					if( utils.compareMonths(d, wm._date) ){
-						return wm;
-					}
-				}
-				
-				return null;
-			}
-//Logout
+
 			public function logout(event:UIEvent):void{
 				TweenLite.delayedCall(18, clearCalendar, [], true); //delay while dash closes
 			}
@@ -68,6 +59,15 @@
 			
 			public function buildMyWorkouts(event:Event):void{
 				goMyWorkouts(new UIEvent(UIEvent.GO_MYWORKOUTS));
+			}
+			
+			private function getMonthData(d:Date):WorkoutMonth2{
+				for each(var wm:WorkoutMonth2 in workoutMonth_collection){
+					if(d.time == wm._date.time){
+						return wm;
+					}
+				}
+				return null;
 			}
 			
 			public function goMyWorkouts(event:UIEvent):void
@@ -94,9 +94,7 @@
 						if(i<2){
 							cm.monthLabel.x = monthWidth - edgeMonthWidth + 20;
 						}
-						
-						
-						
+
 					}
 					addMonthEventListeners();
 					resizeMonths();
@@ -107,17 +105,17 @@
 				/* -------- LIST --------*/
 				
 				//clear list
-				workoutsListComponent.dataProvider = null;
+				//workoutsListComponent.dataProvider = null;
 				//Find this WorkoutMonth and set as dataprovider
-				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+				/*for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
 					if( utils.compareMonths(month._date, selectedMonth) ){
 						workoutsListComponent.dataProvider = month._workoutDays_collection;
 						break;
 					}
-				}
+				}*/
 			}
 			
-			public function workoutAdded(event:UIEvent):void{
+			/*public function workoutAdded(event:UIEvent):void{
 				//If this month has no workouts, the list will have no dataprovider. On workoutAdded see if there now is data for this month
 				if(!workoutsListComponent.dataProvider){
 					for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
@@ -127,7 +125,7 @@
 						}
 					}
 				}
-			}
+			}*/
 			
 			
 			
@@ -152,7 +150,7 @@
 				}
 			}
 			
-			//Event handlers ::::::::::
+	//Event handlers ::::::::::
 			
 			private function goPrevMonth(event:MouseEvent):void{
 				removeMonthEventListeners();
@@ -191,10 +189,10 @@
 				newMonth.monthLabel.y = 7;
 				newMonth.monthLabel.x = monthWidth - edgeMonthWidth + 20;
 				//set selected month and title
-				selectedMonth = calMonthsArray[2].myMonth;
+				selectedMonth = calMonthsArray[2].myMonth; //<<<< is not actual month (wtf?)
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month-3);
 				//pass in workouts
-				newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				//newMonth.myMonthData = getMonthData(newMonth.myMonth);
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.unshift(newMonth);
@@ -206,7 +204,7 @@
 			/* -------- LIST --------*/
 				
 				//clear list
-				workoutsListComponent.dataProvider = null;
+				/*workoutsListComponent.dataProvider = null;
 				//Find this WorkoutMonth and set as dataprovider
 				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
 				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
@@ -214,7 +212,13 @@
 						workoutsListComponent.dataProvider = month._workoutDays_collection;
 						break;
 					}
-				}
+				}*/
+				
+				//broadcast current month
+				var uie:UIEvent = new UIEvent(UIEvent.SET_WORKOUT_MONTH);
+				uie.date = new Date(selectedMonth.fullYear, selectedMonth.month-1);
+				dispatchEvent(uie);
+				
 			}
 			
 			
@@ -258,10 +262,10 @@
 				newMonth.monthLabel.scaleX = newMonth.monthLabel.scaleY = .7;
 				newMonth.monthLabel.y = 7;
 				//set selected month and title
-				selectedMonth = calMonthsArray[2].myMonth;
+				selectedMonth = calMonthsArray[2].myMonth; //<<<
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month+2);
 				//pass in workouts
-				newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				//newMonth.myMonthData = getMonthData(newMonth.myMonth);
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.push(newMonth);
@@ -274,15 +278,21 @@
 				/* -------- LIST --------*/
 				
 				//clear list
-				workoutsListComponent.dataProvider = null;
+				//workoutsListComponent.dataProvider = null;
 				//Find this WorkoutMonth and set as dataprovider
 				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
-				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
+				/*for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
 					if( utils.compareMonths(month._date, cm.myMonth) ){
 						workoutsListComponent.dataProvider = month._workoutDays_collection;
 						break;
 					}
-				}
+				}*/
+				
+				
+				//broadcast current month
+				var uie:UIEvent = new UIEvent(UIEvent.SET_WORKOUT_MONTH);
+				uie.date = selectedMonth;
+				dispatchEvent(uie);
 				
 			}
 			
@@ -315,6 +325,14 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
+	<!--Background-->
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="#ffffff"/>
+		</s:fill>
+	</s:Rect>
+	
+	
 	<s:VGroup width="100%" height="100%" gap="0">
 		<s:Group width="100%" height="280">
 			<s:BorderContainer backgroundColor="#D6E8EA" width="100%" height="100%" borderVisible="false">
@@ -326,13 +344,13 @@
 				<!--Stats and activities go here
 				<s:BorderContainer height="100%" width="400"/>
 				-->
-				<s:List id="workoutsListComponent" width="100%" height="100%" itemRenderer="view.skinsAndRenderers.workoutList_dayRenderer"
-						borderVisible="false" horizontalScrollPolicy="off"
-						>
+				<s:DataGroup id="workoutsList" width="100%" height="100%" itemRenderer="view.skinsAndRenderers.workoutList_dayRenderer" dataProvider="{workoutDay_collection}">
 					<s:layout>
-						<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1"/>
+						<s:VerticalLayout/>
 					</s:layout>
-				</s:List>
+				</s:DataGroup>
+				
+				
 			</s:HGroup>
 		</s:Group>
 	</s:VGroup>

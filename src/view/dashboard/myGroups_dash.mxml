@@ -14,7 +14,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.TlgGroup;
+			import business.dataObjects.Group_Data;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var myGroups_collection:ArrayCollection;
@@ -27,7 +27,7 @@
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
 				
-				for each(var g:TlgGroup in myGroups_collection){
+				for each(var g:Group_Data in myGroups_collection){
 					var gd:group_dash = new group_dash();
 					gd.tlgGroup = g;
 					groupList.addElement(gd);

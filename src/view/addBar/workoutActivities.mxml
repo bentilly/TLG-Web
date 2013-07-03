@@ -13,8 +13,8 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.TlgGroup;
-			import business.dataObjects.Workout;
+			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
@@ -49,7 +49,7 @@
 				
 				myActivitiesGroup.editWorkoutMode = editWorkoutMode;
 				
-				for each(var tlgGroup:TlgGroup in myGroups_collection){
+				for each(var tlgGroup:Group_Data in myGroups_collection){
 					if(tlgGroup._member){
 						var ag:activityGroup = new activityGroup();
 						ag.activities_collection = tlgGroup._activities_collection;

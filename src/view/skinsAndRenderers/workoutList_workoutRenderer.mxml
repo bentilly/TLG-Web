@@ -13,7 +13,7 @@
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
-			import business.dataObjects.Workout;
+			import business.dataObjects.raw.Workout;
 			
 			import view.popups.editWorkoutPopup;
 			

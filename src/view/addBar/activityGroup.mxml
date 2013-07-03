@@ -17,9 +17,9 @@
 			
 			import spark.events.IndexChangeEvent;
 			
-			import business.dataObjects.Activity;
-			import business.dataObjects.TlgGroup;
-			import business.dataObjects.Workout;
+			import business.dataObjects.Activity_Data;
+			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
@@ -27,7 +27,7 @@
 			[Bindable] public var activities_collection:ArrayCollection;
 			[Bindable] public var editable:Boolean = false;
 			[Bindable] public var groupName:String;
-			[Bindable] public var tlgGroup:TlgGroup;
+			[Bindable] public var tlgGroup:Group_Data;
 			
 			
 			/*** IMPORTED ***/
@@ -53,9 +53,9 @@
 			
 			
 			
-			public function selectActivity(activity:Activity):void{
+			public function selectActivity(activity:Activity_Data):void{
 				var count:int = 0;
-				for each(var a:Activity in activities_collection){
+				for each(var a:Activity_Data in activities_collection){
 					if(a == activity){
 						activitiesList.selectedIndex = count;
 						break;
@@ -99,9 +99,9 @@
 			
 			
 			public function selectActivities(w:Workout):void{
-				for each(var wa:Activity in w._activities_collection){
+				for each(var wa:Activity_Data in w._activities_collection){
 					var count:int = 0;
-					for each(var la:Activity in activities_collection){
+					for each(var la:Activity_Data in activities_collection){
 						if(wa == la){
 							activitiesList.selectedIndex = count;
 							break;

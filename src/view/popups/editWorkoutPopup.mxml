@@ -21,7 +21,7 @@
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 
-			import business.dataObjects.Workout;
+			import business.dataObjects.raw.Workout;
 			
 			import events.RequestEvent;
 			import events.UIEvent;

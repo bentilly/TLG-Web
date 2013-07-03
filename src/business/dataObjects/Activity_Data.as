@@ -1,17 +1,17 @@
 package business.dataObjects
 {
 
-	public class Activity
+	public class Activity_Data
 	{
 		
 		public var _key:String;
 		[Bindable] public var _name:String;
 		[Bindable] public var _colour:Number;
 		[Bindable] public var _editable:Boolean = false;
-		public var _group:TlgGroup = null; //reference to the parent group of this activity. Stays null if its a personal activity
+		public var _group:Group_Data = null; //reference to the parent group of this activity. Stays null if its a personal activity
 		
 		
-		public function Activity(o:Object)
+		public function Activity_Data(o:Object)
 		{
 			_key = o.key;
 			_name = o.name;

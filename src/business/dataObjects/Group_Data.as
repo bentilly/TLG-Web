@@ -2,7 +2,7 @@ package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
 
-	public class TlgGroup
+	public class Group_Data
 	{
 		
 		[Bindable] public var _name:String;
@@ -15,7 +15,7 @@ package business.dataObjects
 		//flags
 		public var _loaded:Boolean = false; //set to true when all data is loaded. Doesnt request data on second look
 		
-		public function TlgGroup(name:String, key:String)
+		public function Group_Data(name:String, key:String)
 		{
 			_name = name;
 			_key = key;
@@ -23,11 +23,11 @@ package business.dataObjects
 			_members_collection = new ArrayCollection( [] );
 		}
 		
-		public function addActivity(a:Activity):void{
+		public function addActivity(a:Activity_Data):void{
 			_activities_collection.addItem(a);
 		}
 		public function addMember(data:Object):void{
-			var m:GroupMember = new GroupMember(data.name, data.email);
+			var m:GroupMember_Data = new GroupMember_Data(data.name, data.email);
 			m._group = this;
 			if(data.currentUser == 'true'){
 				m._currentUser = true;
@@ -39,7 +39,7 @@ package business.dataObjects
 			//Cant iterate through the collection as it will sort as it goes, missing some and getting some >1.
 			//break out the array and iterate throuh that instead
 			var temp_members_array:Array = _members_collection.toArray();
-			for each(var m:GroupMember in temp_members_array){ 
+			for each(var m:GroupMember_Data in temp_members_array){ 
 				m.lbStartDate = start;
 				m.lbEndDate = end;
 				m.buildLeaderboardData(start, end);

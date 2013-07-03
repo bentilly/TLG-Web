@@ -29,6 +29,7 @@
 			import view.myGroups.myGroupContent;
 			import view.myWorkouts.calendarChartDay;
 			import view.myWorkouts.myWorkoutsContent;
+			import view.myWorkouts.workoutList;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
 			
@@ -67,6 +68,10 @@
 		
 		<EventHandlers type="{UIEvent.GO_GROUP}">
 			<MethodInvoker generator="{ResponseManager}" method="goGroup" arguments="{event}"/>
+		</EventHandlers>
+		
+		<EventHandlers type="{UIEvent.SET_WORKOUT_MONTH}">
+			<MethodInvoker generator="{ResponseManager}" method="setWorkoutMonth" arguments="{event}"/>
 		</EventHandlers>
 		
 		
@@ -148,7 +153,8 @@
 		
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDay_collection" targetKey="workoutDay_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workoutMonth_collection" targetKey="workoutMonth_collection"/>
 			<ListenerInjector eventType="{UIEvent.BUILD_MYWORKOUTS}" method="buildMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
@@ -163,6 +169,10 @@
 		<Injectors target="{loginUI}">
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
 			<ListenerInjector eventType="{UIEvent.LOGIN_FAIL}" method="loginFail"/>
+		</Injectors>
+		
+		<Injectors target="{workoutList}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="workout_collection" targetKey="workout_collection"/>
 		</Injectors>
 		
 		

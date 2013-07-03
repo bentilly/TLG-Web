@@ -15,7 +15,7 @@
 			import spark.events.PopUpEvent;
 			
 			import business.utils;
-			import business.dataObjects.TlgGroup;
+			import business.dataObjects.Group_Data;
 			
 			import events.UIEvent;
 			
@@ -24,7 +24,7 @@
 			
 			/*** IMPORT ***/
 			[Bindable] public var token:String;
-			[Bindable] public var currentGroup:TlgGroup;
+			[Bindable] public var currentGroup:Group_Data;
 			
 			/*** INTERNAL ***/
 			private var lbEndDate:Date = new Date();

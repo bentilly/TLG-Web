@@ -18,14 +18,14 @@
 			
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.TlgGroup;
+			import business.dataObjects.Group_Data;
 			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var userName:String;
 			[Bindable] public var userEmail:String;
-			[Bindable] public var currentGroup:TlgGroup;
+			[Bindable] public var currentGroup:Group_Data;
 			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void

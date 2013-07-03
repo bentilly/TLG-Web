@@ -1,8 +1,8 @@
 package events{
 	import flash.events.Event;
 	
-	import business.dataObjects.TlgGroup;
-	import business.dataObjects.Workout;
+	import business.dataObjects.Group_Data;
+	import business.dataObjects.raw.Workout;
 	
 	public class UIEvent extends Event{
 
@@ -19,6 +19,7 @@ package events{
 		public static const WORKOUT_DELETED:String = "workoutDeleted_event";
 		public static const GOT_ALL_WORKOUTS:String = "gotAllWorkouts_event";
 		public static const BUILD_MYWORKOUTS:String = "buildMyWorkouts_event";
+		public static const SET_WORKOUT_MONTH:String = "setWorkoutMonth_event";
 		
 		
 		public static const GO_HOME:String = "goHome_event";
@@ -34,7 +35,8 @@ package events{
 		
 		
 		public var workout:Workout;
-		public var tlgGroup:TlgGroup;
+		public var tlgGroup:Group_Data;
+		public var date:Date;
 		
 		
 		public function UIEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false){

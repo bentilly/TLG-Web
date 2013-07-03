@@ -4,14 +4,14 @@ package business.dataObjects
 	
 	import business.utils;
 
-	public class GroupMember
+	public class GroupMember_Data
 	{
 		
 		[Bindable] public var _name:String;
 		[Bindable] public var _email:String;
 		//[Bindable] public var _key:String;
 		[Bindable] public var _currentUser:Boolean = false; // set to true if this member is the current logged in user
-		[Bindable] public var _group:TlgGroup;
+		[Bindable] public var _group:Group_Data;
 		[Bindable] public var _workoutDays_collection:ArrayCollection; //Collection of GroupMemberWorkoutDay objects
 		//leaderboard
 		[Bindable] public var _leaderboard_collection:ArrayCollection; //collection of {activity:Activity, duration:Number}. Calculated from _workoutDays_collection and a date range
@@ -24,7 +24,7 @@ package business.dataObjects
 		public var utils:business.utils = new business.utils();
 		
 		
-		public function GroupMember(name:String, email:String)
+		public function GroupMember_Data(name:String, email:String)
 		{
 			_name = name;
 			_email = email;
@@ -35,7 +35,7 @@ package business.dataObjects
 		public function buildWorkoutDays(m:Object):void{
 			for each(var a:Object in m.activities){
 				//find activity
-				for each(var activity:Activity in _group._activities_collection){
+				for each(var activity:Activity_Data in _group._activities_collection){
 					if(a.activity == activity._key){
 						//store workoutSummaries
 						for each(var ws:Object in a.workoutSummaries){

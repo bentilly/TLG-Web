@@ -13,11 +13,11 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import business.dataObjects.TlgGroup;
+			import business.dataObjects.Group_Data;
 			
 			import events.UIEvent;
 			
-			[Bindable] public var tlgGroup:TlgGroup;
+			[Bindable] public var tlgGroup:Group_Data;
 			
 			protected function clickHandler(event:MouseEvent):void
 			{

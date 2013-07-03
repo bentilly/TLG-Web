@@ -1,6 +1,7 @@
 package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
+	import business.dataObjects.raw.Workout;
 
 	public class WorkoutDay
 	{

@@ -13,7 +13,7 @@
 			
 			import spark.events.PopUpEvent;
 			
-			import business.dataObjects.Activity;
+			import business.dataObjects.Activity_Data;
 			
 			import events.RequestEvent;
 			
@@ -22,7 +22,7 @@
 			
 			
 			
-			[Bindable] public var tag:Activity;
+			[Bindable] public var tag:Activity_Data;
 			
 			protected function closeHandler(event:PopUpEvent):void
 			{
