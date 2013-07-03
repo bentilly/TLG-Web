@@ -1,6 +1,8 @@
 package business.dataObjects
 {
 	import mx.collections.ArrayCollection;
+	
+	import business.dataObjects.raw.Activity;
 
 	public class Group_Data
 	{
@@ -23,7 +25,7 @@ package business.dataObjects
 			_members_collection = new ArrayCollection( [] );
 		}
 		
-		public function addActivity(a:Activity_Data):void{
+		public function addActivity(a:Activity):void{
 			_activities_collection.addItem(a);
 		}
 		public function addMember(data:Object):void{

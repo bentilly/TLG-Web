@@ -38,7 +38,7 @@
 	
 	<s:Rect id="theBackgroundObject" top="0" bottom="0" left="0" right="0">
 		<s:fill>
-			<s:SolidColor color="#FFFFFF" color.hovered="#EEEEEE"/>
+			<s:SolidColor color="#FFFFFF" color.hovered="#EEEEEE" color.selected="#ff0000"/>
 		</s:fill>
 	</s:Rect>
 	<!--END Draw backgrounds-->
@@ -63,7 +63,7 @@
 		
 		<s:Label id="commentText" text="{data._comment}" styleName="woComment" paddingTop="8" paddingBottom="5" paddingLeft="10" width="100%"/>
 		
-		<s:Label id="editLabel" text="edit" styleName="tagEdit" paddingTop="8" paddingLeft="20" paddingRight="10" visible="false" visible.hovered="true" visible.selected="true" click="editLabel_clickHandler(event)"/>
+		<s:Label id="editLabel" text="edit" styleName="tagEdit" paddingTop="8" paddingLeft="20" paddingRight="10" visible="false" visible.hovered="true" mouseDown="editLabel_clickHandler(event)"/>
 		
 	</s:HGroup>
 	

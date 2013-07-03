@@ -3,6 +3,7 @@ package business.dataObjects
 	import mx.collections.ArrayCollection;
 	
 	import business.utils;
+	import business.dataObjects.raw.Activity;
 
 	public class GroupMember_Data
 	{
@@ -35,7 +36,7 @@ package business.dataObjects
 		public function buildWorkoutDays(m:Object):void{
 			for each(var a:Object in m.activities){
 				//find activity
-				for each(var activity:Activity_Data in _group._activities_collection){
+				for each(var activity:Activity in _group._activities_collection){
 					if(a.activity == activity._key){
 						//store workoutSummaries
 						for each(var ws:Object in a.workoutSummaries){

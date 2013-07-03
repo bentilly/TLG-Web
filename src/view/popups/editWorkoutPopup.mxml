@@ -235,7 +235,6 @@
 				<s:HGroup width="100%" height="340" paddingTop="20" gap="0">
 					<s:VGroup>
 						<addBar:workoutDetails id="woDetails"/>
-						<!--TODO: delete workout-->
 						<s:Label id="deleteBut" text.editState="Delete this workout" text.deleteState="Dont delete this workout" styleName="h2_white" paddingTop="10" paddingLeft="17" paddingBottom="10" alpha=".5"
 								 color.deleteState="#AA0000" color.editState="#FFFFFF"
 								 rollOver="deleteBut_rollOverHandler(event)" rollOut="deleteBut_rollOutHandler(event)" click="deleteBut_clickHandler(event)"/>

@@ -44,7 +44,7 @@ package business.dataObjects.raw
 			_comment = o.comment;
 			_activities_collection = new ArrayCollection(activities);
 			//sort field for timeline
-			if(_activities_collection.length > 1){ // workout can have no activity
+			if(_activities_collection.length > 0){ // workout can have no activity
 				firstActivityName = _activities_collection[0]._name;
 			}
 		}

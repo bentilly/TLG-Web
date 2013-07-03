@@ -29,7 +29,6 @@
 			import view.myGroups.myGroupContent;
 			import view.myWorkouts.calendarChartDay;
 			import view.myWorkouts.myWorkoutsContent;
-			import view.myWorkouts.workoutList;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
 			
@@ -169,10 +168,6 @@
 		<Injectors target="{loginUI}">
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
 			<ListenerInjector eventType="{UIEvent.LOGIN_FAIL}" method="loginFail"/>
-		</Injectors>
-		
-		<Injectors target="{workoutList}">
-			<PropertyInjector source="{ResponseManager}" sourceKey="workout_collection" targetKey="workout_collection"/>
 		</Injectors>
 		
 		

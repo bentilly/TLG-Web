@@ -19,7 +19,7 @@
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
-			import business.dataObjects.Activity_Data;
+			import business.dataObjects.raw.Activity;
 			
 			import view.popups.editTagPopup;
 			
@@ -27,7 +27,7 @@
 			protected function editLabel_clickHandler(event:MouseEvent):void
 			{
 				var editTagPU:editTagPopup = new editTagPopup();
-				editTagPU.tag = data as Activity_Data;
+				editTagPU.tag = data as Activity;
 				editTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
 				PopUpManager.centerPopUp(editTagPU);
 			}
