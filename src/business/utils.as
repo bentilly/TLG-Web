@@ -75,7 +75,25 @@ package business
 			ar.sort = numericDataSort;
 			ar.refresh();
 		}
-		
+		public function sortGroupMemberActivityDayCollection(ar:ArrayCollection):void{			
+			var groupSort:SortField = new SortField();
+			groupSort.name = '_groupKey';
+			
+			var memberSort:SortField = new SortField();
+			memberSort.name = '_email';
+			
+			var activitySort:SortField = new SortField();
+			activitySort.name = '_activityKey';
+			
+			var dateSort:SortField = new SortField();
+			dateSort.name = '_date';
+			dateSort.numeric = true;
+			
+			var dataSort:Sort = new Sort();
+			dataSort.fields = [groupSort, memberSort, activitySort, dateSort];
+			ar.sort = dataSort;
+			ar.refresh();
+		}
 		
 		
 		

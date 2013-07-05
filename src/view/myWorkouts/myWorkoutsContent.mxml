@@ -22,7 +22,7 @@
 			import mx.events.ResizeEvent;
 			
 			import business.utils;
-			import business.dataObjects.raw.WorkoutMonth2;
+			import business.dataObjects.raw.WorkoutMonth;
 			
 			import events.UIEvent;
 			
@@ -61,8 +61,8 @@
 				goMyWorkouts(new UIEvent(UIEvent.GO_MYWORKOUTS));
 			}
 			
-			private function getMonthData(d:Date):WorkoutMonth2{
-				for each(var wm:WorkoutMonth2 in workoutMonth_collection){
+			private function getMonthData(d:Date):WorkoutMonth{
+				for each(var wm:WorkoutMonth in workoutMonth_collection){
 					if(d.time == wm._date.time){
 						return wm;
 					}

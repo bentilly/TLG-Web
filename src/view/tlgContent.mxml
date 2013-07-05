@@ -51,7 +51,7 @@
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
-			[Bindable] public var myGroups_collection:ArrayCollection;
+			[Bindable] public var group_collection:ArrayCollection;
 			
 			
 			//core
@@ -87,7 +87,7 @@
 				
 			}
 			public function gotGroups(event:UIEvent):void{
-				switch(myGroups_collection.length){
+				switch(group_collection.length){
 					case 0:
 						myTrainingSize = 0.6666;
 						trace("0 groups");
@@ -218,6 +218,7 @@
 			}
 			private function revealDash():void{
 				uiState = 1;
+				dispatchEvent( new UIEvent(UIEvent.CLEAR_GROUP) ); //clears the currentGroup if on a group page
 				TweenLite.to(myTrainingDash, 15, {x:0, useFrames:true});
 				TweenLite.to(myGroupsDash, 15, {right:0, useFrames:true});
 				

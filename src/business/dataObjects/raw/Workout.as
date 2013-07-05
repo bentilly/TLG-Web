@@ -49,7 +49,7 @@ package business.dataObjects.raw
 			}
 		}
 		
-		private function setHrsMins(duration:Number):void{
+		public function setHrsMins(duration:Number):void{
 			_hrs = String(  Math.floor(_duration/60)  );
 			_mins = String(  _duration - ( Math.floor(_duration/60)*60 )  );
 		}

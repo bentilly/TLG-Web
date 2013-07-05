@@ -14,12 +14,12 @@
 			
 			import business.utils;
 			import business.dataObjects.raw.Workout;
-			import business.dataObjects.raw.WorkoutDay2;
-			import business.dataObjects.raw.WorkoutMonth2;
+			import business.dataObjects.raw.WorkoutDay;
+			import business.dataObjects.raw.WorkoutMonth;
 			
 			[Bindable] public var monthName:String;
 			public var myMonth:Date;
-			public var myMonthData:WorkoutMonth2;
+			public var myMonthData:WorkoutMonth;
 			
 			private var utils:business.utils = new business.utils();
 			
@@ -47,7 +47,7 @@
 					//WOs for this day
 					var dayWOs:Array = [];
 					if(myMonthData){
-						for each(var wd:WorkoutDay2 in myMonthData._workoutDays){
+						for each(var wd:WorkoutDay in myMonthData._workoutDays){
 							if( utils.compareDates(day.myDate, wd._date) ){
 								for each(var w:Workout in wd._workouts){
 									dayWOs.push(w);

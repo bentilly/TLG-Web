@@ -16,9 +16,9 @@
 			import mx.collections.ArrayCollection;
 			
 			import spark.events.IndexChangeEvent;
-
-			import business.dataObjects.Group_Data;
+			
 			import business.dataObjects.raw.Activity;
+			import business.dataObjects.raw.TLGGroup;
 			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
@@ -27,7 +27,7 @@
 			[Bindable] public var activities_collection:ArrayCollection;
 			[Bindable] public var editable:Boolean = false;
 			[Bindable] public var groupName:String;
-			[Bindable] public var tlgGroup:Group_Data;
+			[Bindable] public var tlgGroup:TLGGroup;
 			
 			
 			/*** IMPORTED ***/
@@ -97,12 +97,12 @@
 				newActivityInput.styleName = "textFieldNewActivityBlank";
 			}
 			
-			
+			//TODO: Currently running two sets of activities. need to merge. (activities_collection contains different objects to w._activities_collection)
 			public function selectActivities(w:Workout):void{
 				for each(var wa:Activity in w._activities_collection){
 					var count:int = 0;
 					for each(var la:Activity in activities_collection){
-						if(wa == la){
+						if(wa._key == la._key){
 							activitiesList.selectedIndex = count;
 							break;
 						}

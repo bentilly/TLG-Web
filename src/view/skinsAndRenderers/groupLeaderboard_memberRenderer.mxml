@@ -19,7 +19,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
-				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(data._email).toString() + '?s=20';
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(data._user._email).toString() + '?s=20';
 				gravatarImage.validateNow();
 			}
 			
@@ -28,24 +28,22 @@
 	
 	<s:states>
 		<s:State name="normal"/>
-		<!--<s:State name="hovered"/>
-		<s:State name="selected"/>-->
 	</s:states>
 	
 	<s:HGroup gap="1">
-		<s:Label text="{data._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName" paddingRight="10" paddingTop="2"/>
+		<s:Label text="{data._user._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName" paddingRight="10" paddingTop="2"/>
 		<s:Image id="gravatarImage" width="20" height="20"/>
 		
-		<s:DataGroup itemRenderer="view.skinsAndRenderers.groupLeaderboard_activityBlockRenderer" dataProvider="{data._leaderboard_collection}">
+		<s:DataGroup itemRenderer="view.skinsAndRenderers.groupLeaderboard_activityBlockRenderer" dataProvider="{data._activitySummaries_collection}">
 			<s:layout>
 				<s:HorizontalLayout gap="1"/>
 			</s:layout>
 		</s:DataGroup>
 		
 		<s:HGroup gap="0" paddingTop="5" paddingLeft="7">
-			<s:Label text="{Math.floor(data._totalDuration/60)}" styleName="leaderboardTotal"/>
+			<s:Label text="{Math.floor(data._total/60)}" styleName="leaderboardTotal"/>
 			<s:Label text=":" styleName="leaderboardTotal"/>
-			<s:Label text="{data._totalDuration - (Math.floor(data._totalDuration/60) * 60)}" styleName="leaderboardTotal"/>
+			<s:Label text="{data._total - (Math.floor(data._total/60) * 60)}" styleName="leaderboardTotal"/>
 		</s:HGroup>
 	</s:HGroup>
 	

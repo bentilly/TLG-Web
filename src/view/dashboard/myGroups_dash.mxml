@@ -14,10 +14,10 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.TLGGroup;
 			
 			/*** IMPORTED ***/
-			[Bindable] public var myGroups_collection:ArrayCollection;
+			[Bindable] public var group_collection:ArrayCollection;
 			public var myTrainingSize:Number;
 			
 			/*** INTERNAL ***/
@@ -27,7 +27,7 @@
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
 				
-				for each(var g:Group_Data in myGroups_collection){
+				for each(var g:TLGGroup in group_collection){
 					var gd:group_dash = new group_dash();
 					gd.tlgGroup = g;
 					groupList.addElement(gd);
@@ -35,7 +35,7 @@
 				var ag:addGroup = new addGroup();
 				groupList.addElement(ag);
 				
-				numGroups = myGroups_collection.length + 1;
+				numGroups = group_collection.length + 1;
 
 				
 			}

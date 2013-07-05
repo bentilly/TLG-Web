@@ -9,13 +9,14 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
 			import spark.events.PopUpEvent;
 			
 			import business.utils;
-			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.TLGGroup;
 			
 			import events.UIEvent;
 			
@@ -24,7 +25,8 @@
 			
 			/*** IMPORT ***/
 			[Bindable] public var token:String;
-			[Bindable] public var currentGroup:Group_Data;
+			[Bindable] public var currentGroup:TLGGroup;
+			[Bindable] public var leaderboard_collection:ArrayCollection; //used to build group leaderboard.
 			
 			/*** INTERNAL ***/
 			private var lbEndDate:Date = new Date();
@@ -117,9 +119,9 @@
 					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
 				}
 				//rebuild
-				currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
+				//currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
 				//sort leaderboard members
-				utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
+				//utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
 			}
 
 			
@@ -244,7 +246,7 @@
 							<s:Label text="Last 30 days" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('last30')"/>
 						</s:HGroup>
 						
-						<s:DataGroup dataProvider="{currentGroup._members_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
+						<s:DataGroup dataProvider="{leaderboard_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
 							<s:layout>
 								<s:VerticalLayout/>
 							</s:layout>
@@ -260,13 +262,11 @@
 					
 					<s:VGroup paddingLeft="10">
 						<s:Label text="GROUP ACTIVITIES" styleName="leaderboardTitle" paddingBottom="10"/>
-						<s:List id="activitiesList" dataProvider="{currentGroup._activities_collection}" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer"
-								borderVisible="false" contentBackgroundAlpha="0"
-								>
+						<s:DataGroup id="activitiesList" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer" dataProvider="{currentGroup._activities}" >
 							<s:layout>
 								<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="3"/>
 							</s:layout>
-						</s:List>
+						</s:DataGroup>
 						<s:Label id="addActivityLabel" text="+ add activity" styleName="durationlabel" click="addActivityLabel_clickHandler(event)" visible="{currentGroup._admin}"
 								 paddingTop="20"/>
 					</s:VGroup>

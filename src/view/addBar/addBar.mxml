@@ -18,14 +18,14 @@
 			
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.TLGGroup;
 			
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var userName:String;
 			[Bindable] public var userEmail:String;
-			[Bindable] public var currentGroup:Group_Data;
+			[Bindable] public var currentGroup:TLGGroup;
 			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
@@ -99,12 +99,12 @@
 	<s:Group id="container" width="100%" height="{panelHeight}" y="{panelHeight*-1 + peek}">
 		
 		<!--Black bg-->
-		<s:BorderContainer backgroundColor="black" borderVisible="false" width="100%" height="{panelHeight - plusDrop}">
+		<s:BorderContainer backgroundColor="black" borderVisible="false" width="100%" height="{peek - plusDrop + 2}" bottom="{plusDrop}">
 		</s:BorderContainer>
 		<!--Coloured Bg-->
-		<s:BorderContainer backgroundColor="#b2d3db" borderVisible="false" width="100%" height="{panelHeight - peek - 2}">
+		<s:BorderContainer backgroundColor="#a2c3df" borderVisible="false" width="100%" height="{panelHeight - peek - 2}" backgroundAlpha=".92">
 		</s:BorderContainer>
-		
+		<!--b2d3db-->
 	
 		<s:BorderContainer id="plusButton" backgroundColor="black" borderVisible="false" width="40" height="40" cornerRadius="4" horizontalCenter="0" useHandCursor="true" buttonMode="true" bottom="0" click="plusButton_clickHandler(event)">
 			<s:Graphic id="plusGraphic" horizontalCenter="0" verticalCenter="0">

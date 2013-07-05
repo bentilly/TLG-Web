@@ -42,6 +42,8 @@
 	
 	<fx:Declarations>
 		
+		<Debugger level="{Debugger.ALL}" />
+		
 		<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
 		<!--Initializes event dispatchers in Managers so they can send events-->
 		<EventHandlers type="{FlexEvent.PREINITIALIZE}">
@@ -49,8 +51,8 @@
 		</EventHandlers>
 		
 		<!--Main API request-->
-		<EventHandlers type="{RequestEvent.TLG_API_REQUEST}" debug="true">
-			<HTTPServiceInvoker instance="{services.tlgApiRequest}" debug="true">
+		<EventHandlers type="{RequestEvent.TLG_API_REQUEST}" debug="false">
+			<HTTPServiceInvoker instance="{services.tlgApiRequest}" debug="false">
 				<Request data="{event.requestJson}"/>
 				<resultHandlers>
 					<MethodInvoker generator="{ResponseManager}" method="handleResponse" arguments="{[event, resultObject]}"/>
@@ -87,7 +89,7 @@
 			<ListenerInjector eventType="{UIEvent.SPINNER_OFF}" method="spinnerOff"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups_collection" targetKey="myGroups_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
 		</Injectors>
 		
 		<Injectors target="{addBar}">
@@ -104,7 +106,7 @@
 		</Injectors>
 		
 		<Injectors target="{myGroups_dash}">
-			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups_collection" targetKey="myGroups_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
 		</Injectors>
 		
 		<Injectors target="{workoutActivities}">
@@ -112,8 +114,8 @@
 			<ListenerInjector eventType="{UIEvent.GOT_MY_ACTIVITES}" method="buildMyActivities"/>
 			<ListenerInjector eventType="{UIEvent.ACTIVITIES_UPDATED}" method="updateMyActivities"/>
 			<!--Properties-->
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups_collection" targetKey="myGroups_collection"/>
 		</Injectors>
 		
 		<Injectors target="{addWorkout}">
@@ -162,6 +164,7 @@
 		<Injectors target="{myGroupContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="currentGroup" targetKey="currentGroup"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboard_collection" targetKey="leaderboard_collection"/>
 			<ListenerInjector eventType="{UIEvent.GROUP_READY}" method="groupReady"/>
 		</Injectors>
 		

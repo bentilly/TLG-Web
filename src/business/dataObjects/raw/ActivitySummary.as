@@ -1,6 +1,5 @@
-package business.dataObjects
+package business.dataObjects.raw
 {
-	import business.dataObjects.raw.Activity;
 
 	public class ActivitySummary
 	{

@@ -13,14 +13,14 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			import business.dataObjects.Group_Data;
+			import business.dataObjects.raw.TLGGroup;
 			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
 			
 			/*** IMPORTED ***/
-			[Bindable] public var myGroups_collection:ArrayCollection;
+			[Bindable] public var group_collection:ArrayCollection;
 			[Bindable] public var myActivities_collection:ArrayCollection;
 			
 			private var activityLists:Array;
@@ -49,10 +49,10 @@
 				
 				myActivitiesGroup.editWorkoutMode = editWorkoutMode;
 				
-				for each(var tlgGroup:Group_Data in myGroups_collection){
+				for each(var tlgGroup:TLGGroup in group_collection){
 					if(tlgGroup._member){
 						var ag:activityGroup = new activityGroup();
-						ag.activities_collection = tlgGroup._activities_collection;
+						ag.activities_collection = tlgGroup._activities;
 						ag.groupName = tlgGroup._name;
 						ag.tlgGroup = tlgGroup;
 						allActivities.addElement(ag);

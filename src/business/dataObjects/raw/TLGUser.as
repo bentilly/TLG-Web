@@ -2,8 +2,8 @@ package business.dataObjects.raw
 {
 	public class TLGUser
 	{
-		public var _name:String;
-		public var _email:String; //uid
+		[Bindable] public var _name:String;
+		[Bindable] public var _email:String; //uid
 		
 		public function TLGUser()
 		{

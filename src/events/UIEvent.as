@@ -1,7 +1,8 @@
 package events{
 	import flash.events.Event;
 	
-	import business.dataObjects.Group_Data;
+
+	import business.dataObjects.raw.TLGGroup;
 	import business.dataObjects.raw.Workout;
 	
 	public class UIEvent extends Event{
@@ -26,6 +27,7 @@ package events{
 		public static const GO_MYWORKOUTS:String = "goMyWorkouts_event";
 		public static const GO_GROUP:String = "goGroup_event";
 		public static const GROUP_READY:String = "groupReady_event";
+		public static const CLEAR_GROUP:String = "clearGroup_event";
 		
 		public static const LOGIN_FAIL:String = "loginFail_event";
 		public static const LOGOUT:String = "logout_event";
@@ -35,7 +37,7 @@ package events{
 		
 		
 		public var workout:Workout;
-		public var tlgGroup:Group_Data;
+		public var tlgGroup:TLGGroup;
 		public var date:Date;
 		
 		
