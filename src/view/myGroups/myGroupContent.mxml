@@ -27,12 +27,12 @@
 			[Bindable] public var token:String;
 			[Bindable] public var currentGroup:TLGGroup;
 			[Bindable] public var leaderboard_collection:ArrayCollection; //used to build group leaderboard.
+			[Bindable] public var leaderboardStartDate:Date;
+			[Bindable] public var leaderboardEndDate:Date;
 			
 			/*** INTERNAL ***/
-			private var lbEndDate:Date = new Date();
-			private var lbStartDate:Date = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30);
-			private var days:Array = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-			private var months:Array = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+			[Bindable] private var days:ArrayCollection = new ArrayCollection( ['SUN','MON','TUE','WED','THU','FRI','SAT'] );
+			[Bindable] private var months:ArrayCollection = new ArrayCollection( ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'] );
 			private var lbPreset:String = 'thisMonth'; //tracks the users last view of the leaderboard (except custom...)
 			
 			private var utils:business.utils = new business.utils;
@@ -70,8 +70,8 @@
 				PopUpManager.centerPopUp(dateChoosePU);
 				
 				dateChoosePU.popupTitle.text = "START DATE";
-				dateChoosePU.workoutDateChooser.selectedDate = lbStartDate;
-				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date+1) } ];
+				//dateChoosePU.workoutDateChooser.selectedDate = lbStartDate;
+				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date+1) } ];
 			}
 			
 			protected function endDateLabel_clickHandler(event:MouseEvent):void
@@ -82,10 +82,10 @@
 				PopUpManager.centerPopUp(dateChoosePU);
 				
 				dateChoosePU.popupTitle.text = "END DATE";
-				dateChoosePU.workoutDateChooser.selectedDate = lbEndDate;
+				//dateChoosePU.workoutDateChooser.selectedDate = lbEndDate;
 				
 				var d:Date = new Date();
-				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(lbStartDate.fullYear, lbStartDate.month, lbStartDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
+				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(lbStartDate.fullYear, lbStartDate.month, lbStartDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
 			}
 			
 			private function updateStartDate(event:PopUpEvent):void{
@@ -93,7 +93,7 @@
 				if (!event.commit)
 					return;
 				
-				lbStartDate = event.data as Date;
+				//lbStartDate = event.data as Date;
 				updateLeaderboardRange();
 			}
 			private function updateEndDate(event:PopUpEvent):void{
@@ -101,23 +101,23 @@
 				if (!event.commit)
 					return;
 				
-				lbEndDate = event.data as Date;
+				//lbEndDate = event.data as Date;
 				updateLeaderboardRange();
 			}
 			
 			private function updateLeaderboardRange():void{
 				//start date text
-				if( utils.compareDates(new Date(), lbStartDate) ){
+				/*if( utils.compareDates(new Date(), lbStartDate) ){
 					startDateLabel.text = 'TODAY '+lbStartDate.date+' '+months[lbStartDate.month];
 				}else{
 					startDateLabel.text = days[lbStartDate.day]+' '+lbStartDate.date+' '+months[lbStartDate.month];
-				}
+				}*/
 				//end date text
-				if( utils.compareDates(new Date(), lbEndDate) ){
+				/*if( utils.compareDates(new Date(), lbEndDate) ){
 					endDateLabel.text = 'TODAY '+lbEndDate.date+' '+months[lbEndDate.month];
 				}else{
 					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
-				}
+				}*/
 				//rebuild
 				//currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
 				//sort leaderboard members
@@ -147,6 +147,8 @@
 			private function presetClick(range:String):void{
 				var today:Date;
 				lbPreset = range;
+				var lbStartDate:Date;
+				var lbEndDate:Date;
 				switch(range){
 					case "thisMonth":
 						lbEndDate = new Date();//end on today
@@ -176,7 +178,13 @@
 						break;
 				}
 				
-				updateLeaderboardRange();
+				//updateLeaderboardRange();
+				
+				var uie:UIEvent = new UIEvent(UIEvent.UPDATE_LEADERBOARD_RANGE);
+				uie.lbEndDate = lbEndDate;
+				uie.lbStartDate = lbStartDate;
+				dispatchEvent(uie);
+				
 			}
 			
 			
@@ -225,12 +233,13 @@
 						<s:Label text="LEADER BOARD" styleName="leaderboardTitle"/>
 						
 						<s:HGroup paddingBottom="0" paddingTop="-5">
-							<s:Label id="startDateLabel" text="Start Date" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+							<s:Label id="startDateLabel" text="{days.getItemAt( leaderboardStartDate.getDay() )+' '+leaderboardStartDate.getDate()+' '+months.getItemAt( leaderboardStartDate.getMonth() )}" 
+									 styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
 									 buttonMode="true" useHandCursor="true"
 									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="startDateLabel_clickHandler(event)"
 									 />
 							<fxg:smallArrow alpha=".6" scaleX=".8" scaleY=".8"/>
-							<s:Label id="endDateLabel" text="End Date" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+							<s:Label id="endDateLabel" text="{days.getItemAt( leaderboardEndDate.getDay() )+' '+leaderboardEndDate.getDate()+' '+months.getItemAt( leaderboardEndDate.getMonth() )}" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
 									 buttonMode="true" useHandCursor="true"
 									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="endDateLabel_clickHandler(event)"
 									 />

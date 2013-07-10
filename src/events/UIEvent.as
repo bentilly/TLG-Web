@@ -29,6 +29,8 @@ package events{
 		public static const GROUP_READY:String = "groupReady_event";
 		public static const CLEAR_GROUP:String = "clearGroup_event";
 		
+		public static const UPDATE_LEADERBOARD_RANGE:String = "updateLeaderboardRange_event"; 
+		
 		public static const LOGIN_FAIL:String = "loginFail_event";
 		public static const LOGOUT:String = "logout_event";
 		
@@ -40,6 +42,9 @@ package events{
 		public var tlgGroup:TLGGroup;
 		public var date:Date;
 		
+		//leaderboard
+		public var lbStartDate:Date;
+		public var lbEndDate:Date; 
 		
 		public function UIEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false){
 			super(type, bubbles, cancelable);

@@ -75,6 +75,10 @@
 			<MethodInvoker generator="{ResponseManager}" method="setWorkoutMonth" arguments="{event}"/>
 		</EventHandlers>
 		
+		<EventHandlers type="{UIEvent.UPDATE_LEADERBOARD_RANGE}">
+			<MethodInvoker generator="{ResponseManager}" method="updateLeaderboardRange" arguments="{event}"/>
+		</EventHandlers>
+		
 		
 		<Injectors target="{tlgContent}">
 			<!--Events-->
@@ -165,6 +169,8 @@
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="currentGroup" targetKey="currentGroup"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboard_collection" targetKey="leaderboard_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboardStartDate" targetKey="leaderboardStartDate"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboardEndDate" targetKey="leaderboardEndDate"/>
 			<ListenerInjector eventType="{UIEvent.GROUP_READY}" method="groupReady"/>
 		</Injectors>
 		
