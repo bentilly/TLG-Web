@@ -66,32 +66,6 @@ package business{
 			trace("ResponseManager Initialised");
 		}
 		
-		private function resetDataStorage():void{
-			//create empty arraycollections for master data
-			user_collection = new ArrayCollection([]);
-			activity_collection = new ArrayCollection([]);
-			myActivities_collection = new ArrayCollection( [] );
-			workout_collection = new ArrayCollection([]);
-			group_collection = new ArrayCollection([]);
-			groupMember_collection = new ArrayCollection([]);
-			groupMemberActivityDay_collection = new ArrayCollection([]);
-			leaderboard_collection = new ArrayCollection( [] );
-			
-			//set the sort order for workouts, leaderboard, group member workouts
-			utils.sortArrayCollection(workout_collection, '_date', true, "DESC");
-			utils.sortArrayCollection(myActivities_collection, '_name');
-			utils.sortArrayCollection(leaderboard_collection, "_total", true, "DESC");
-			utils.sortGroupMemberActivityDayCollection(groupMemberActivityDay_collection);
-			//sort
-			
-			//assign filter for groupMemberActivityDays
-			groupMemberActivityDay_collection.filterFunction = leaderboard_filter;
-			
-			//reset leaderboard date range
-			leaderboardEndDate = new Date();
-			leaderboardStartDate = new Date(leaderboardEndDate.fullYear, leaderboardEndDate.month, 1); //defaults to 'this month'
-		}
-		
 		public function handleResponse(event:RequestEvent, resultObject:Object):void{
 			var uie:UIEvent;
 			
@@ -233,6 +207,33 @@ package business{
 			groupMemberActivityDay_collection.removeAll();
 			leaderboard_collection.removeAll();
 		}
+		
+		private function resetDataStorage():void{
+			//create empty arraycollections for master data
+			user_collection = new ArrayCollection([]);
+			activity_collection = new ArrayCollection([]);
+			myActivities_collection = new ArrayCollection( [] );
+			workout_collection = new ArrayCollection([]);
+			group_collection = new ArrayCollection([]);
+			groupMember_collection = new ArrayCollection([]);
+			groupMemberActivityDay_collection = new ArrayCollection([]);
+			leaderboard_collection = new ArrayCollection( [] );
+			
+			//set the sort order for workouts, leaderboard, group member workouts
+			utils.sortArrayCollection(workout_collection, '_date', true, "DESC");
+			utils.sortArrayCollection(myActivities_collection, '_name');
+			utils.sortArrayCollection(leaderboard_collection, "_total", true, "DESC");
+			utils.sortGroupMemberActivityDayCollection(groupMemberActivityDay_collection);
+			//sort
+			
+			//assign filter for groupMemberActivityDays
+			groupMemberActivityDay_collection.filterFunction = leaderboard_filter;
+			
+			//reset leaderboard date range
+			leaderboardEndDate = new Date();
+			leaderboardStartDate = new Date(leaderboardEndDate.fullYear, leaderboardEndDate.month, 1); //defaults to 'this month'
+		}
+		
 		
 //-----GROUP------//
 		public function goGroup(event:UIEvent):void{
@@ -512,76 +513,82 @@ package business{
 		
 /** GET MEMBER WORKOUTS **/
 		private function group_getMemberWorkouts_handler(result:Object, request:Object):void{
+			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
 			var m:Object;
 			
-			//Master data
-			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
-			if(!groupObject._loaded){
-				for each(m in result.members){
-					trace('-----' + m.name);
-					var tlguser:TLGUser;
-					var groupMember:GroupMember;
-					//Add (new) users
-					tlguser = getTLGUserByEmail(m.email);
-					if(tlguser){ //existing user
-						groupMember = getGroupMemberByUserAndGroup(tlguser, groupObject);
-						if(groupMember){
-							//existing user, existing member: do nothing
-						}else{ //existing user, new member
-							groupMember = new GroupMember();
-							groupMember._user = tlguser;
-							groupMember._group = groupObject;
-							groupMember_collection.addItem(groupMember);
-						}
-					}else{ //new user, new member
-						tlguser = new TLGUser();
-						tlguser._name = m.name;
-						tlguser._email = m.email;
-						user_collection.addItem(tlguser);
-						//Add group member
+			//if(!groupObject._loaded){ // should not request if loaded
+				
+				
+			//show all...
+			groupMemberActivityDay_collection.filterFunction = null;
+			groupMemberActivityDay_collection.refresh();
+			
+			//strip old group data
+			var gmad:GroupMemberActivityDay;
+			var cursor:IViewCursor = groupMemberActivityDay_collection.createCursor();
+			while(!cursor.afterLast){
+				gmad = cursor.current as GroupMemberActivityDay;
+				if(gmad._group == groupObject){
+					cursor.remove();
+				}
+				cursor.moveNext();
+			}
+		
+			for each(m in result.members){
+				var tlguser:TLGUser;
+				var groupMember:GroupMember;
+				//Add (new) users
+				tlguser = getTLGUserByEmail(m.email);
+				if(tlguser){ //existing user
+					groupMember = getGroupMemberByUserAndGroup(tlguser, groupObject);
+					if(groupMember){
+						//existing user, existing member: do nothing
+					}else{ //existing user, new member
 						groupMember = new GroupMember();
 						groupMember._user = tlguser;
 						groupMember._group = groupObject;
 						groupMember_collection.addItem(groupMember);
 					}
-					
-					
-					var gmad:GroupMemberActivityDay;
-					
-					//strip old group data
-					var cursor:IViewCursor = groupMemberActivityDay_collection.createCursor();
-					while(!cursor.afterLast){
-						gmad = cursor.current as GroupMemberActivityDay;
-						if(gmad._group == groupObject){
-							cursor.remove();
-						}
-						cursor.moveNext();
-					}
-					
-					//add new group data
-					for each(var a:Object in m.activities){
-						//get activity
-						var activity:Activity = getActivityObjectByKey(a.activity);
-						for each(var sum:Object in a.workoutSummaries){
-							//get date and duration
-							gmad = new GroupMemberActivityDay();
-							gmad._activity = activity;
-							var dateBits:Array = sum.date.split('-');
-							gmad._date = new Date(dateBits[0], dateBits[1]-1, dateBits[2]);
-							gmad._duration = sum.duration;
-							gmad._group = groupObject;
-							gmad._user = tlguser;
-							//sorting
-							gmad._email = tlguser._email; 
-							gmad._groupKey = groupObject._key; 
-							gmad._activityKey = activity._key; 
-							groupMemberActivityDay_collection.addItem(gmad);
-						}
+				}else{ //new user, new member
+					tlguser = new TLGUser();
+					tlguser._name = m.name;
+					tlguser._email = m.email;
+					user_collection.addItem(tlguser);
+					//Add group member
+					groupMember = new GroupMember();
+					groupMember._user = tlguser;
+					groupMember._group = groupObject;
+					groupMember_collection.addItem(groupMember);
+				}
+				
+				
+				
+				
+				//add new group data
+				for each(var a:Object in m.activities){
+					//get activity
+					var activity:Activity = getActivityObjectByKey(a.activity);
+					for each(var sum:Object in a.workoutSummaries){
+						//get date and duration
+						gmad = new GroupMemberActivityDay();
+						gmad._activity = activity;
+						var dateBits:Array = sum.date.split('-');
+						gmad._date = new Date(dateBits[0], dateBits[1]-1, dateBits[2]);
+						gmad._duration = sum.duration;
+						gmad._group = groupObject;
+						gmad._user = tlguser;
+						//sorting
+						gmad._email = tlguser._email; 
+						gmad._groupKey = groupObject._key; 
+						gmad._activityKey = activity._key; 
+						groupMemberActivityDay_collection.addItem(gmad);
 					}
 				}
-				groupObject._loaded = true;
 			}
+			groupObject._loaded = true;
 			
+			groupMemberActivityDay_collection.filterFunction = leaderboard_filter;
+			groupMemberActivityDay_collection.refresh();
 			
 			buildLeaderboardData();
 			
@@ -738,6 +745,7 @@ package business{
 				var li:LeaderboardItem = new LeaderboardItem();
 				li._user = currentItem._user;
 				li._total = currentItem._duration;
+				utils.sortArrayCollection(li._activitySummaries_collection, '_activity_name');
 				var actSum:ActivitySummary = new ActivitySummary();
 				actSum._activity = currentItem._activity;
 				actSum._activity_name = currentItem._activity._name;
@@ -770,6 +778,7 @@ package business{
 						li = new LeaderboardItem();
 						li._user = currentItem._user;
 						li._total = currentItem._duration;
+						utils.sortArrayCollection(li._activitySummaries_collection, '_activity_name');
 						actSum = new ActivitySummary();
 						actSum._activity = currentItem._activity;
 						actSum._activity_name = currentItem._activity._name;
