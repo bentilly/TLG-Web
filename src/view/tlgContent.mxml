@@ -37,7 +37,7 @@
 			/*** INTERNAL ***/
 			private var myTrainingSize:Number;
 			//First three = app.yaml version. Last = UI iteration
-			[Bindable] private var versionNumber:String = '0-0-32-4';
+			[Bindable] private var versionNumber:String = '0-0-33-1';
 			
 			//Flags
 			private var uiState:int = 0; //0 = login, 1 = dashboard, 2 = Workouts, 3 = Groups

@@ -1,0 +1,223 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+global{
+	modalTransparencyColor: black;	
+}
+
+.smallLight{
+	fontFamily: "OS-condLight";
+	fontSize: 14px;
+	color: #333333;
+}
+.tinyWhite{
+	fontFamily: "OS-condLight";
+	fontSize: 12px;
+	color: #ffffff;
+}
+.textFieldBold{
+	fontFamily: "OS-condBold";
+	fontSize: 22px;
+	color: #666666;
+	paddingLeft:10px;
+	paddingRight:10px;
+	paddingTop:10px;
+	paddingBottom:7px;
+}
+.h1_white{
+	fontFamily: "OS-condBold";
+	fontSize: 32px;
+	color: #ffffff;
+}
+.h2_white{
+	fontFamily: "OS-condBold";
+	fontSize: 20px;
+	color: #ffffff;
+}
+/* TopAddBar */
+.backButton{
+	fontFamily: "OS-condBold";
+	color: #CCC;
+	fontSize: 13px;
+}
+
+
+.tlgBrand{
+	fontFamily: "OS-condBold";
+	fontSize: 13px;
+	color: #888;
+}
+.userName{
+	fontFamily: "OS-condBold";
+	fontSize: 13px;
+	color: #FFF;
+}
+.smallDateText{
+	fontFamily: "OS-condBold";
+	fontSize: 12px;
+	color: #FFF;
+	textAlign:center;
+}
+.bigDateText{
+	fontFamily: "OS-condBold";
+	fontSize: 30px;
+	color: #FFF;
+	textAlign:center;
+}
+.workoutTextFieldBold{
+	fontFamily: "OS-condBold";
+	textAlign:right;
+	fontSize: 50px;
+	color: #2a8796;
+	paddingLeft:8px;
+	paddingRight:8px;
+	paddingTop:8px;
+	paddingBottom:0px;
+	borderVisible: false;
+}
+.hrMinLabels{
+	fontFamily: "OS-condBold";
+	fontSize: 28px;
+	color: #FFF;
+}
+.workoutCommentStart{
+	fontFamily: "OS-condLight";
+	fontSize: 15px;
+	color: #AAA;
+	paddingLeft:8px;
+	paddingRight:8px;
+	paddingTop:8px;
+	paddingBottom:0px;
+	borderVisible: false;
+}
+.workoutCommentContent{
+	fontFamily: "OS-reg";
+	fontSize: 15px;
+	color: #2a8796;
+	paddingLeft:8px;
+	paddingRight:8px;
+	paddingTop:8px;
+	paddingBottom:0px;
+	borderVisible: false;
+}
+.textFieldNewActivityBlank{
+	fontFamily: "OS-condBold";
+	fontSize: 16px;
+	color: #AAA;
+	paddingLeft:5px;
+	paddingRight:5px;
+	paddingTop:5px;
+	paddingBottom:3px;
+	borderVisible: false;
+}
+.textFieldNewActivityContent{
+	fontFamily: "OS-condBold";
+	fontSize: 16px;
+	color: #2a8796;
+	paddingLeft:5px;
+	paddingRight:5px;
+	paddingTop:5px;
+	paddingBottom:3px;
+	borderVisible: false;
+}
+
+/* CHARTS */
+.smallWhiteColChart{
+	tickPlacement: none;
+	minorTickPlacement: none;
+	columnWidthRatio: 0.8;
+}
+/* TAGS */
+.tagWhiteText{
+	fontFamily: "OS-condBold";
+	fontSize: 14px;
+	color: #44bcd8;
+	paddingLeft:3px;
+	paddingRight:8px;
+	paddingTop:3px;
+	backgroundColor:white;
+}
+.tagBlueText{
+	fontFamily: "OS-condBold";
+	fontSize: 14px;
+	color: #FFF;
+	paddingLeft:3px;
+	paddingRight:8px;
+	paddingTop:3px;
+	backgroundColor:#2a8796;
+}
+.tagEdit{
+	fontFamily: "OS-reg";
+	fontSize: 10px;
+	color: #2a8796;
+}
+/* My Workouts */
+.monthTitle{
+	fontFamily: "OS-condBold";
+	fontSize: 30px;
+	color: #44BCD8;
+}
+.calDayLabel{
+	fontFamily: "OS-condBold";
+	fontSize: 11px;
+	color: #2a8796;
+}
+.calDayWELabel{
+	fontFamily: "OS-condBold";
+	fontSize: 11px;
+	color: #44BCD8;
+}
+.durationNumbers{
+	fontFamily: "OS-condBold";
+	fontSize: 32px;
+	color: #2A8796;
+}
+.durationlabel{
+	fontFamily: "OS-condBold";
+	fontSize: 16px;
+	color: #2A8796;
+}
+.woComment{
+	fontFamily: "OS-reg";
+	fontSize: 13px;
+	color: #2a8796;
+}
+
+
+/* GROUP */
+.leaderboardTitle{
+	fontFamily: "OS-condBold";
+	fontSize: 25px;
+	color: #2A8796;
+}
+.leaderboardName{
+	fontFamily: "OS-condBold";
+	fontSize: 20px;
+	color: #0D7F12;
+	textAlign:right;
+}
+.leaderboardTotal{
+	fontFamily: "OS-condBold";
+	fontSize: 13;
+	color: #0D7F12;
+}
+.newGroupMessage{
+	fontFamily: "OS-condLight";
+	fontSize: 18px;
+	color: #003300;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -229,7 +229,7 @@
 			<s:Scroller width="100%" height="100%">
 				<s:HGroup paddingRight="20" paddingLeft="20" paddingTop="20">
 					
-					<s:VGroup id="leaderboard" paddingRight="50">
+					<s:VGroup id="leaderboard" paddingRight="50" paddingBottom="50">
 						<s:Label text="LEADER BOARD" styleName="leaderboardTitle"/>
 						
 						<s:HGroup paddingBottom="0" paddingTop="-5">
@@ -255,16 +255,29 @@
 							<s:Label text="Last 30 days" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('last30')"/>
 						</s:HGroup>
 						
-						<s:DataGroup dataProvider="{leaderboard_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
+						<s:VGroup paddingBottom="20">
+							<s:DataGroup dataProvider="{leaderboard_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff">
+								<s:layout>
+									<s:VerticalLayout/>
+								</s:layout>
+							</s:DataGroup>
+						</s:VGroup>
+						
+						<s:Line width="100%">
+							<s:stroke>
+								<s:SolidColorStroke color="#CCCCCC" weight="1"/>
+							</s:stroke>
+						</s:Line>
+						
+						<s:Label text="GROUP INVITES" styleName="leaderboardTitle" paddingTop="20" paddingBottom="10"/>
+						
+						<s:DataGroup dataProvider="{currentGroup._invites}" itemRenderer="view.skinsAndRenderers.groupInvite_renderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
 							<s:layout>
 								<s:VerticalLayout/>
 							</s:layout>
 						</s:DataGroup>
 						
-						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" width="150" textAlign="right" paddingTop="20"
-								 click="inviteMemberLabel_clickHandler(event)"
-								 
-								 />
+						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" click="inviteMemberLabel_clickHandler(event)" paddingTop="20"/>
 					</s:VGroup>
 					
 					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>

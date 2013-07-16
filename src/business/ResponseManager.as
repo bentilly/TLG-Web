@@ -10,6 +10,7 @@ package business{
 	
 	import business.dataObjects.raw.Activity;
 	import business.dataObjects.raw.ActivitySummary;
+	import business.dataObjects.raw.GroupInvite;
 	import business.dataObjects.raw.GroupMember;
 	import business.dataObjects.raw.GroupMemberActivityDay;
 	import business.dataObjects.raw.LeaderboardItem;
@@ -134,8 +135,15 @@ package business{
 					case "group.getMemberWorkouts":
 						group_getMemberWorkouts_handler(result, request);
 						break;
+					case "group.getGroupInvites":
+						group_getGroupInvites_handler(result, request);
+						break;
 					case "group.addInvite":
 						Alert.show("Invite sent to "+request.email, "Invite");
+						group_addInvite_handler(result, request);
+						break;
+					case "group.deleteInvite":
+						group_deleteInvite_handler(result, request);
 						break;
 				//ACTIVITY
 					case "activity.addActivity":
@@ -212,8 +220,9 @@ package business{
 			//create empty arraycollections for master data
 			user_collection = new ArrayCollection([]);
 			activity_collection = new ArrayCollection([]);
-			myActivities_collection = new ArrayCollection( [] );
+			myActivities_collection = new ArrayCollection([]);
 			workout_collection = new ArrayCollection([]);
+			workoutDay_collection = new ArrayCollection([])
 			group_collection = new ArrayCollection([]);
 			groupMember_collection = new ArrayCollection([]);
 			groupMemberActivityDay_collection = new ArrayCollection([]);
@@ -253,6 +262,21 @@ package business{
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 				trace(re.requestJson);
 				dispatcher.dispatchEvent(re);
+				
+				
+				//get group invites
+				if(currentGroup._admin){
+					re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					requestObj = new Object();
+					requestObj.operation = 'group.getGroupInvites';
+					requestObj.token = token;
+					requestObj.group = currentGroup._key;
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatcher.dispatchEvent(re);
+				}
+				
 			}
 		}
 		
@@ -560,10 +584,6 @@ package business{
 					groupMember._group = groupObject;
 					groupMember_collection.addItem(groupMember);
 				}
-				
-				
-				
-				
 				//add new group data
 				for each(var a:Object in m.activities){
 					//get activity
@@ -596,9 +616,44 @@ package business{
 			var uie:UIEvent = new UIEvent(UIEvent.GROUP_READY);
 			dispatcher.dispatchEvent(uie);
 		}
+
+/** GET GROUP INVITES **/
+		private function group_getGroupInvites_handler(result:Object, request:Object):void{
+			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
+			if(groupObject){
+				groupObject._invites.removeAll();
+				for each(var i:Object in result.invites){
+					var gi:GroupInvite = new GroupInvite();
+					gi._email = i.email;
+					gi._key = i.key;
+					groupObject._invites.addItem(gi);
+				}
+			}
+		}
+/** ADD GROUP INVITE **/		
+		private function group_addInvite_handler(result:Object, request:Object):void{
+			var group:TLGGroup = getGroupObjectByKey(request.group);
+			var gi:GroupInvite = new GroupInvite();
+			gi._email = request.email;
+			gi._key = result.key;
+			group._invites.addItem(gi);
+			group._invites.refresh();
+		}
 		
 		
-		
+/** DELETE GROUP INVITE **/
+		private function group_deleteInvite_handler(result:Object, request:Object):void{
+			for each(var group:TLGGroup in group_collection){
+				var cursor:IViewCursor = group._invites.createCursor();
+				while(!cursor.afterLast){
+					if(cursor.current._key == request.key){
+						cursor.remove();
+						return;
+					}
+					cursor.moveNext();
+				}
+			}
+		}
 
 		
 //-----ACTIVITY-----//

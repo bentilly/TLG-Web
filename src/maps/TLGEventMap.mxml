@@ -31,6 +31,7 @@
 			import view.myWorkouts.myWorkoutsContent;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
+			import view.skinsAndRenderers.groupInvite_renderer;
 			
 			
 			//[Bindable] private var services:Services = new Services();
@@ -177,6 +178,10 @@
 		<Injectors target="{loginUI}">
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
 			<ListenerInjector eventType="{UIEvent.LOGIN_FAIL}" method="loginFail"/>
+		</Injectors>
+		
+		<Injectors target="{groupInvite_renderer}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 		</Injectors>
 		
 		
