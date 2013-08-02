@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="30"
+		 
+		 rollOut="rollOutHandler(event)"
+		 rollOver="rollOverHandler(event)"
+		 click="clickHandler(event)"
+		 
+		 alpha=".7"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			protected function rollOutHandler(event:MouseEvent):void
+			{
+				this.alpha = 0.7;
+			}
+			
+			protected function rollOverHandler(event:MouseEvent):void
+			{
+				this.alpha = 1;
+			}
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				var urlRequest:URLRequest = new URLRequest("http://thelazygibbon.uservoice.com");
+				navigateToURL(urlRequest, "_blank");
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:BorderContainer width="100%" height="100%" dropShadowVisible="true" borderColor="white" backgroundColor="#123456" cornerRadius="4">
+		<s:Label text="Feedback" styleName="h2_white" fontSize="16" verticalCenter="0" horizontalCenter="0"/>
+	</s:BorderContainer>
+	
+	
+</s:Group>

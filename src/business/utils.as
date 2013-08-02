@@ -4,9 +4,15 @@ package business
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	
 
 	public class utils
 	{
+		/*** IMPORT ***/
+		[Bindable] public var myGroups_collection:ArrayCollection;
+		[Bindable] public var myActivities_collection:ArrayCollection;
+		
+		
 		public function utils()
 		{
 		}
@@ -69,12 +75,36 @@ package business
 			ar.sort = numericDataSort;
 			ar.refresh();
 		}
+		public function sortGroupMemberActivityDayCollection(ar:ArrayCollection):void{			
+			var groupSort:SortField = new SortField();
+			groupSort.name = '_groupKey';
+			
+			var memberSort:SortField = new SortField();
+			memberSort.name = '_email';
+			
+			var activitySort:SortField = new SortField();
+			activitySort.name = '_activityKey';
+			
+			var dateSort:SortField = new SortField();
+			dateSort.name = '_date';
+			dateSort.numeric = true;
+			
+			var dataSort:Sort = new Sort();
+			dataSort.fields = [groupSort, memberSort, activitySort, dateSort];
+			ar.sort = dataSort;
+			ar.refresh();
+		}
 		
-		
-		
-		
-		
-		
+		public function formatDurationForDisplay(duration:Number):String{
+			var totalString:String = String(Math.floor(duration/60));
+			totalString = totalString + ':';
+			var mins:String = String(duration - (Math.floor(duration/60) * 60));
+			if(mins.length < 2){
+				mins = '0' + mins;
+			}
+			totalString = totalString + mins;
+			return totalString;
+		}
 		
 		
 		

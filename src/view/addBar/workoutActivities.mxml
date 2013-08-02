@@ -10,34 +10,58 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
+			
+			import business.dataObjects.raw.TLGGroup;
+			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
-			[Bindable] public var myActivities:Array = [];
+			
+			/*** IMPORTED ***/
+			[Bindable] public var group_collection:ArrayCollection;
+			[Bindable] public var myActivities_collection:ArrayCollection;
+			
+			private var activityLists:Array;
 			
 			//Flags
 			public var editWorkoutMode:Boolean = false;
 			
-			public function getActivities():String{ //TODO: build and return an array
-				return myActivitiesGroup.getActivity();
+			public function getActivities():Array{
+				var activities:Array = [];
+				for each(var ag:activityGroup in activityLists){
+					activities.push(ag.getActivity());
+					ag.activitiesList.selectedIndex = -1;
+				}
+				return activities;
 			}
 			public function setActivities(activities:Array):void{
 				buildMyActivities(new UIEvent(UIEvent.ACTIVITIES_UPDATED));
-				myActivitiesGroup.selectActivity(activities[0]); //only one until GROUPS
+				myActivitiesGroup.selectActivity(activities[0]);
 			}
 			public function getNewActivity():String{
 				return myActivitiesGroup.getNewActivity();
 			}
 			
 			public function buildMyActivities(event:UIEvent):void{
-				//myActivitiesGroup.myActivities = myActivities;
+				activityLists = [myActivitiesGroup];
+				
 				myActivitiesGroup.editWorkoutMode = editWorkoutMode;
-				//myActivitiesGroup.buildTags();
-			}
-			public function updateMyActivities(event:UIEvent):void{
-				//myActivitiesGroup.myActivities = myActivities;
-				//myActivitiesGroup.updateTags();
+				
+				for each(var tlgGroup:TLGGroup in group_collection){
+					if(tlgGroup._member){
+						var ag:activityGroup = new activityGroup();
+						ag.activities_collection = tlgGroup._activities;
+						ag.groupName = tlgGroup._name;
+						ag.tlgGroup = tlgGroup;
+						allActivities.addElement(ag);
+						activityLists.push(ag);
+					}
+				}
+				
+				myActivitiesGroup.setMyActivities();
+				
 			}
 			
 			
@@ -50,6 +74,13 @@
 				myActivitiesGroup.activitiesList.selectedIndex = -1;
 			}
 			
+			
+			public function selectWorkoutActivites(w:Workout):void{
+				for each(var ag:activityGroup in activityLists){
+					ag.selectActivities(w);
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -59,8 +90,8 @@
 	</fx:Declarations>
 	
 	
-	<s:HGroup paddingLeft="20" paddingRight="20">
-		<addBar:activityGroup id="myActivitiesGroup"/>
+	<s:HGroup id="allActivities" paddingLeft="20" paddingRight="20">
+		<addBar:activityGroup id="myActivitiesGroup" activities_collection="{myActivities_collection}" editable="true" groupName="My activities"/>
 	</s:HGroup>
 	
 	

@@ -55,20 +55,18 @@
 		<s:State name="selected"/>
 	</s:states>
 	
-	<s:Group top="2" alpha=".6" alpha.hovered="1" alpha.selected="1" width="100%">
+	<s:Group top="2" alpha="1" width="100%">
 		
-		<s:Line id="editLine" width="150" right="22" top="9" alpha=".2" visible="false">
+		<s:Line id="editLine" width="150" right="22" top="9" alpha="1" visible="false">
 			<s:stroke>
-				<s:SolidColorStroke id="editLineStroke" color="white" weight="1"/>
+				<s:SolidColorStroke id="editLineStroke" color="{data._colour}" weight="2"/>
 			</s:stroke>
 		</s:Line>
 		
 		<s:HGroup gap="-1" mouseChildren="false" mouseEnabled="false">
-			<fxg:tagHead_white excludeFrom="selected"/>
-			<fxg:tagHead_blue includeIn="selected"/>
-			<s:Label text="{data._name}" height="18" styleName="tagWhiteText" styleName.selected="tagBlueText" maxWidth="150" maxDisplayedLines="1"/>
-			<s:Rect width="10" height="18"
-					topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
+			<fxg:tagHead_blue/>
+			<s:Label text="{data._name}" height="18" styleName="tagBlueText" maxWidth="150" maxDisplayedLines="1"/>
+			<s:Rect width="10" height="18" topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
 				<s:fill><s:SolidColor color="{data._colour}" /></s:fill>
 			</s:Rect>
 		</s:HGroup>

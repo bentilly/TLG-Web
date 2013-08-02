@@ -9,6 +9,13 @@
 		<![CDATA[
 			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
+			import mx.validators.Validator;
+			
+			import events.RequestEvent;
+			
+			/*** Passed in ***/
+			public var token:String;
+			public var groupKey:String
 			
 			protected function closeHandler(event:CloseEvent):void
 			{
@@ -19,14 +26,35 @@
 			// GO button
 			protected function goButton_rollOverHandler(event:MouseEvent):void
 			{
-				//goButton.setStyle("color", "#7be6ff");
+				goButton.setStyle("color", "#7be6ff");
 				
 			}
 			
 			protected function goButton_rollOutHandler(event:MouseEvent):void
 			{
-				//goButton.setStyle("color", "#FFFFFF");
+				goButton.setStyle("color", "#FFFFFF");
 				
+			}
+			protected function goButton_clickHandler(event:MouseEvent):void
+			{
+				
+				var validatorErrorArray:Array = Validator.validateAll([emailValidator]);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if (isValidForm) {
+					var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					var requestObj:Object = new Object();
+					requestObj.operation = 'group.addInvite';
+					requestObj.token = token;
+					requestObj.group = groupKey;
+					requestObj.email = emailInput.text;
+					
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+					
+					close();
+				}
 			}
 			
 			// CANCEL button
@@ -52,29 +80,29 @@
 	
 	<fx:Declarations>
 		<s:DropShadowFilter id="dsFliter" alpha=".3"/>
+		<mx:EmailValidator id="emailValidator" source="{emailInput}" property="text" required="true"/>
 	</fx:Declarations>
 	
 	<s:VGroup gap="0">
 		<s:Group>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="CREATE A GROUP" paddingBottom="-6" paddingLeft="2"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="INVITE" paddingBottom="-6" paddingLeft="2"/>
 		</s:Group>
 		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
 			
-			<!--<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
-				<s:Label text="group name:" styleName="smallLight"/>
-				<s:TextInput id="nameInput" styleName="textFieldBold" width="300"/>
-			</s:VGroup>-->
+			<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
+				<s:Label text="email:" styleName="smallLight"/>
+				<s:TextInput id="emailInput" styleName="textFieldBold" width="300"/>
+			</s:VGroup>
 			
-			<s:Label text="Currently you cant make a group yourself, but if you send us an email we can make one for you!" styleName="newGroupMessage" width="320"
-					 paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="20"/>
+			<!--TODO: Invite as admin--> 
 			
 		</s:BorderContainer>
 		<s:Group width="100%">
 			<s:Group right="0">
-				<!--<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
+				<s:Label id="goButton" fontFamily="OS-condBold" color="white" fontSize="30" text="GO"
 						 useHandCursor="true" buttonMode="true"
-						 rollOver="goButton_rollOverHandler(event)" rollOut="goButton_rollOutHandler(event)"
-						 />-->
+						 rollOver="goButton_rollOverHandler(event)" rollOut="goButton_rollOutHandler(event)" click="goButton_clickHandler(event)"
+						 />
 			</s:Group>
 			<s:Group left="0">
 				<s:Label id="cancelButton" fontFamily="OS-condBold" color="white" fontSize="30" text="CANCEL"

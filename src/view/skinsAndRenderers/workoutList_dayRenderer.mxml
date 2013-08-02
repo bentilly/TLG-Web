@@ -33,13 +33,11 @@
 			</s:stroke>
 		</s:Line>
 		
-		<s:List dataProvider="{data._workouts_collection}" itemRenderer="view.skinsAndRenderers.workoutList_workoutRenderer"
-				width="100%" borderVisible="false" horizontalScrollPolicy="off"
-				>
+		<s:DataGroup dataProvider="{data._workouts}" itemRenderer="view.skinsAndRenderers.workoutList_workoutRenderer" width="100%">
 			<s:layout>
-				<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="0"/>
+				<s:VerticalLayout gap="0"/>
 			</s:layout>
-		</s:List>
+		</s:DataGroup>
 		
 	</s:HGroup>
 	

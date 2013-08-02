@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 height="100%"
+		 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import business.dataObjects.MonthBreakdownData;
+			
+			[Bindable] public var selectedMonth:Date;
+			[Bindable] public var monthBreakdownData:MonthBreakdownData;
+			
+			[Bindable] private var months:ArrayCollection = new ArrayCollection( ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] );
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="#123456"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:VGroup paddingLeft="30" paddingTop="30" paddingBottom="30" paddingRight="30" gap="10">
+		
+		<s:HGroup gap="15">
+			<s:VGroup gap="3" width="110">
+				<s:Line width="100%" alpha=".2"><s:stroke><s:SolidColorStroke color="#ffffff" weight="2"/></s:stroke></s:Line>
+				<s:Spacer height="5"/>
+				<s:Label text="total" styleName="statTitle" alpha=".7"/>
+				<s:Label text="{monthBreakdownData._totalDuration_display}" styleName="statBigNumber"/>
+			</s:VGroup>
+			
+			<s:VGroup gap="3" width="110">
+				<s:Line width="100%" alpha=".2"><s:stroke><s:SolidColorStroke color="#ffffff" weight="2"/></s:stroke></s:Line>
+				<s:Spacer height="2"/>
+				<s:Label text="avg. per day" styleName="statTitle" alpha=".7"/>
+				<s:Label text="{monthBreakdownData._avgPerDay_display}" styleName="statBigNumber"/>
+			</s:VGroup>
+		</s:HGroup>
+		
+		
+	</s:VGroup>
+	
+	
+	
+</s:Group>

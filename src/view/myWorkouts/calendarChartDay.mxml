@@ -14,7 +14,7 @@
 			import spark.components.Group;
 			
 			import business.utils;
-			import business.dataObjects.Workout;
+			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
@@ -34,16 +34,16 @@
 				dayLabel.styleName = "calDayWELabel";
 			}
 			
-			public function buildWorkouts():void{
+			public function buildWorkouts(event:Event):void{
 				woBlocks = [];
+				//sort workouts by activity name
+				myDayWOs.sortOn("firstActivityName");
 				for each(var w:Workout in myDayWOs){
 					woBlocks.push(addBlockToColumn(w));
-					
 				}
 			}
 			
 			private function addBlockToColumn(workout:Workout):UIComponent{
-				
 				var block:calendarWorkoutBlock = new calendarWorkoutBlock();
 				block.workout = workout;
 				columnDisplay.addElement(block);
@@ -62,10 +62,29 @@
 				if( utils.compareDates(event.workout._date, myDate) ){
 					myDayWOs.push(event.workout);
 					columnDisplay.removeAllElements();
-					buildWorkouts();
+					buildWorkouts(null);
 				}
 				resizeMe();
 			}
+			
+			
+			public function workoutDeleted(event:UIEvent):void{
+				if( utils.compareDates(event.workout._date, myDate) ){
+					for(var w:int = 0; w < myDayWOs.length; w++){
+						var wo:Workout = myDayWOs[w];
+						if(wo == event.workout){
+							//remove from array
+							myDayWOs.splice(w, 1);
+							break;
+						}
+					}
+					
+					columnDisplay.removeAllElements();
+					buildWorkouts(null);
+				}
+				resizeMe();
+			}
+			
 			
 			public function workoutDateChanged(event:UIEvent):void{
 				//is the changed workout in this day

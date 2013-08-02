@@ -4,41 +4,37 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:widgets="view.widgets.*"
 		 
-		 height="300"
+		 height="300" xmlns:fxg="assets.fxg.*"
 		 
 		 >
 	
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.MD5;
+			
 			import mx.collections.ArrayCollection;
 			
 			import spark.events.IndexChangeEvent;
 			
-			import business.dataObjects.Activity;
+			import business.dataObjects.raw.Activity;
+			import business.dataObjects.raw.TLGGroup;
+			import business.dataObjects.raw.Workout;
 			
 			import events.UIEvent;
 			
+			/*** Passed in ***/
+			[Bindable] public var activities_collection:ArrayCollection;
+			[Bindable] public var editable:Boolean = false;
+			[Bindable] public var groupName:String;
+			[Bindable] public var tlgGroup:TLGGroup;
+			
+			
 			/*** IMPORTED ***/
-			[Bindable] public var myActivities_collection:ArrayCollection;
+			[Bindable] public var userEmail:String;
 			
 			//Flags
 			public var editWorkoutMode:Boolean = false; //activityGroup used by addBar and editWorkoutPopup. Need to use appropriate activityTag UI Element.
-
-			
-			/*public function getActivity():String{				
-				for each(var a:Activity in myActivities){
-					//get tag
-					var tag:activityTag = a.get_addBarActivityTag();
-					//check for selected
-					if(tag.selected){
-						return tag.activity._key;
-					}
-				}
-				return null;
-			}*/
-			
-			
 			
 			public function getActivity():String{
 				if(activitiesList.selectedIndex > -1){
@@ -55,86 +51,19 @@
 				}
 			}
 			
-			/*public function buildTags():void{
-				tagsHGroup.removeAllElements();
-				var tagCount:int = 0;
-				//split tags into columns if more than 10
-				var cols:int = Math.ceil(myActivities.length/10);
-				for(var i:int = 0; i<cols; i++){
-					//VGroup for tag column
-					var vg:VGroup = new VGroup();
-					vg.gap = 2;
-					
-					//add tags to column
-					for(var j:int = 0; j<10; j++){
-						//get tag from Activity
-						var activity:Activity = myActivities[j] as Activity;
-						var tag:activityTag;
-						//check which UI Element to use
-						if(editWorkoutMode){
-							tag = activity.get_editWorkoutActivityTag();
-						}else{
-							tag = activity.get_addBarActivityTag();
-						}
-						//set interaction
-						tag.alpha = .6;
-						tag.addEventListener(MouseEvent.CLICK, tag_clickHandler);
-						tag.addEventListener(MouseEvent.ROLL_OVER, tag_overHandler);
-						tag.addEventListener(MouseEvent.ROLL_OUT, tag_outHandler);
-						//add tag to column
-						vg.addElement(tag);
-						//counting
-						tagCount++;
-						if(tagCount == myActivities.length){
-							break;
-						}
-					}
-					//add column to screen
-					tagsHGroup.addElement(vg);
-				}
-			}*/
 			
-			/*public function updateTags():void{
-				buildTags();
-			}*/
 			
 			public function selectActivity(activity:Activity):void{
-				//get tag from Activity
-				/*var tag:activityTag;
-				if(editWorkoutMode){
-					tag = activity.get_editWorkoutActivityTag();
-				}else{
-					tag = activity.get_addBarActivityTag();
-				}*/
-				
 				var count:int = 0;
-				for each(var a:Activity in myActivities_collection){
+				for each(var a:Activity in activities_collection){
 					if(a == activity){
 						activitiesList.selectedIndex = count;
 						break;
 					}
 					count++;
 				}
-				
-/*				
-				//select it
-				tag.selectMe();*/
 			}
-			
-			/*protected function tag_clickHandler(event:MouseEvent):void
-			{				
-				if(event.target is activityTag){
-					var tag:activityTag = event.target as activityTag;
-					deselectAllTags();
-					tag.selectMe();
-					tag.alpha = 1;
-					newActivityInput.text = "new activity";
-					newActivityInput.styleName = "textFieldNewActivityBlank";
-					stage.focus = null;
-				}
-				
-			}*/
-			
+
 			protected function activitiesList_changeHandler(event:IndexChangeEvent):void
 			{
 				if(activitiesList.selectedIndex > -1){
@@ -142,35 +71,6 @@
 					newActivityInput.styleName = "textFieldNewActivityBlank";
 				}
 			}
-			
-			
-			/*protected function tag_overHandler(event:MouseEvent):void
-			{				
-				var tag:activityTag = event.target as activityTag;
-				tag.alpha = 1;
-			}
-			protected function tag_outHandler(event:MouseEvent):void
-			{				
-				var tag:activityTag = event.target as activityTag;
-				if(!tag.selected){
-					tag.alpha = .6;
-				}
-			}
-			
-			private function deselectAllTags():void{
-				for each(var a:Activity in myActivities){
-					//get tag
-					var tag:activityTag;
-					if(editWorkoutMode){
-						tag = a.get_editWorkoutActivityTag();
-					}else{
-						tag = a.get_addBarActivityTag();
-					}
-					//deselect
-					tag.deselectMe();
-					tag.alpha = .6;
-				}
-			}*/
 			
 			protected function newActivityInput_focusInHandler(event:FocusEvent):void
 			{
@@ -193,11 +93,46 @@
 			
 			/*triggered on successful creation of the workout in DB*/
 			public function workoutAdded(event:UIEvent):void{
-				//deselectAllTags();
 				newActivityInput.text = "new activity";
 				newActivityInput.styleName = "textFieldNewActivityBlank";
 			}
 			
+			//TODO: Currently running two sets of activities. need to merge. (activities_collection contains different objects to w._activities_collection)
+			public function selectActivities(w:Workout):void{
+				for each(var wa:Activity in w._activities_collection){
+					var count:int = 0;
+					for each(var la:Activity in activities_collection){
+						if(wa._key == la._key){
+							activitiesList.selectedIndex = count;
+							break;
+						}
+						count++;
+					}
+				}
+			}
+			
+			
+			
+			public function setMyActivities():void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(userEmail).toString() + '?s=50';
+				gravatarImage.validateNow();
+				gravatarImage.visible = true;
+				groupHeader.removeElementAt(0);
+			}
+			
+			protected function groupHeader_clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent;
+				if(tlgGroup){
+					uie = new UIEvent(UIEvent.GO_GROUP);
+					uie.tlgGroup = tlgGroup;
+					dispatchEvent(uie);
+				}else{
+					uie = new UIEvent(UIEvent.GO_MYWORKOUTS);
+					dispatchEvent(uie);
+				}
+			}
 			
 		]]>
 	</fx:Script>
@@ -208,32 +143,16 @@
 	</fx:Declarations>
 	
 	
-	<!--<s:VGroup>
-		
-		<s:HGroup>
-			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
-			<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
-		</s:HGroup>
-		
-		<s:HGroup id="tagsHGroup"/>
-
-			
-		<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity"
-					 focusIn="newActivityInput_focusInHandler(event)"
-					 focusOut="newActivityInput_focusOutHandler(event)"
-					 />
-	
-		
-	</s:VGroup>-->
 	
 	
 	<s:VGroup paddingLeft="15">
-		<s:HGroup>
-			<s:Image source="@Embed(source='../../assets/angrymonkey.png')" width="50" height="50"/>
-			<s:Label text="My activities" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
+		<s:HGroup id="groupHeader" click="groupHeader_clickHandler(event)" buttonMode="true" useHandCursor="true">
+			<fxg:gibbon id="gibbonIcon" width="50" height="50"/>
+			<s:Image id="gravatarImage" visible="false"/>
+			<s:Label text="{groupName}" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
 		</s:HGroup>
 		
-		<s:List id="activitiesList" dataProvider="{myActivities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
+		<s:List id="activitiesList" dataProvider="{activities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"
 				borderVisible="false" contentBackgroundAlpha="0" change="activitiesList_changeHandler(event)"
 				>
 			<s:layout>
@@ -242,7 +161,7 @@
 		</s:List>
 		
 		<s:TextInput id="newActivityInput" styleName="textFieldNewActivityBlank" width="200" text="new activity" 
-					 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)"/>
+					 focusIn="newActivityInput_focusInHandler(event)" focusOut="newActivityInput_focusOutHandler(event)" visible="{editable}"/>
 		
 	</s:VGroup>
 	

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true"
+				
+				creationComplete="creationCompleteHandler(event)"
+				
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.crypto.MD5;
+			
+			import mx.events.FlexEvent;
+			
+			[Bindable] private var totalString:String;
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(data._user._email).toString() + '?s=20';
+				gravatarImage.validateNow();
+				
+				
+				totalString = String(Math.floor(data._total/60));
+				totalString = totalString + ':';
+				var mins:String = String(data._total - (Math.floor(data._total/60) * 60));
+				if(mins.length < 2){
+					mins = '0' + mins;
+				}
+				totalString = totalString + mins;
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal"/>
+	</s:states>
+	
+	<s:HGroup gap="1">
+		<s:Label text="{data._user._name}" width="150" maxDisplayedLines="1" styleName="leaderboardName" paddingRight="10" paddingTop="2"/>
+		<s:Image id="gravatarImage" width="20" height="20"/>
+		
+		<s:DataGroup itemRenderer="view.skinsAndRenderers.groupLeaderboard_activityBlockRenderer" dataProvider="{data._activitySummaries_collection}">
+			<s:layout>
+				<s:HorizontalLayout gap="1"/>
+			</s:layout>
+		</s:DataGroup>
+		
+		<s:HGroup gap="0" paddingTop="5" paddingLeft="7">
+			<s:Label text="{totalString}" styleName="leaderboardTotal"/>
+		</s:HGroup>
+	</s:HGroup>
+	
+	
+</s:ItemRenderer>

@@ -1,7 +1,9 @@
 package events{
 	import flash.events.Event;
 	
-	import business.dataObjects.Workout;
+
+	import business.dataObjects.raw.TLGGroup;
+	import business.dataObjects.raw.Workout;
 	
 	public class UIEvent extends Event{
 
@@ -15,17 +17,34 @@ package events{
 		
 		public static const WORKOUT_ADDED:String = "workoutAdded_event";
 		public static const WORKOUT_DATE_CHANGED:String = "workoutDateChanged_event";
+		public static const WORKOUT_DELETED:String = "workoutDeleted_event";
 		public static const GOT_ALL_WORKOUTS:String = "gotAllWorkouts_event";
+		public static const BUILD_MYWORKOUTS:String = "buildMyWorkouts_event";
+		public static const SET_WORKOUT_MONTH:String = "setWorkoutMonth_event";
 		
 		
 		public static const GO_HOME:String = "goHome_event";
 		public static const GO_MYWORKOUTS:String = "goMyWorkouts_event";
+		public static const GO_GROUP:String = "goGroup_event";
+		public static const GROUP_READY:String = "groupReady_event";
+		public static const CLEAR_GROUP:String = "clearGroup_event";
 		
+		public static const UPDATE_LEADERBOARD_RANGE:String = "updateLeaderboardRange_event"; 
+		
+		public static const LOGIN_FAIL:String = "loginFail_event";
 		public static const LOGOUT:String = "logout_event";
+		
+		public static const SPINNER_ON:String = "spinnerOn_event";
+		public static const SPINNER_OFF:String = "spinnerOff_event";
 		
 		
 		public var workout:Workout;
+		public var tlgGroup:TLGGroup;
+		public var date:Date;
 		
+		//leaderboard
+		public var lbStartDate:Date;
+		public var lbEndDate:Date; 
 		
 		public function UIEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false){
 			super(type, bubbles, cancelable);

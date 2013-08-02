@@ -6,13 +6,31 @@
 		 
 		 height="100%"
 		 
+		 creationComplete="creationCompleteHandler(event)"
+		 
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.MD5;
+			
+			import mx.events.FlexEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var userName:String;
+			[Bindable] public var userEmail:String;
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				gravatarImage.source = 'http://www.gravatar.com/avatar/' + MD5.hash(userEmail).toString() + '?s=200';
+				gravatarImage.validateNow();				
+			}
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				
+			}
 			
 		]]>
 	</fx:Script>
@@ -22,18 +40,18 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:BorderContainer backgroundAlpha="0.1" backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
+	<s:BorderContainer backgroundColor="#108c21" width="100%" height="100%" borderVisible="false">
 		<s:Line height="100%" right="0" alpha=".2">
 			<s:stroke>
 				<s:SolidColorStroke color="0xffffff" weight="1"/>
 			</s:stroke>
 		</s:Line>
 		
-		<s:VGroup horizontalCenter="0" verticalCenter="0" height="450">
-			<s:Label id="myTrainingLabel" text="My Workouts" styleName="h1_white" paddingBottom="20"/>
-			<s:Image source="@Embed(source='../../assets/angrymonkey.png')"/>
+		<s:VGroup horizontalCenter="0" verticalCenter="0" height="100%" click="clickHandler(event)">
+			<s:Label id="dashLabel" text="My Workouts" styleName="h1_white" paddingBottom="20"/>
+			<s:Image id="gravatarImage"/>
 			<s:Label text="{userName}" styleName="h2_white" width="200" height="50"/>
-			<dataViz:smallDailyCol/>
+			<!--<dataViz:smallDailyCol/>-->
 		</s:VGroup>
 		
 	</s:BorderContainer>

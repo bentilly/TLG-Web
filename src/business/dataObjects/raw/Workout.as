@@ -1,17 +1,28 @@
-package business.dataObjects
+package business.dataObjects.raw
 {
 	import mx.collections.ArrayCollection;
+	
+	import business.utils;
 
 	public class Workout
 	{
 		public var _key:String;
-		public var _date:Date;
+		[Bindable] public var _date:Date;
 		[Bindable] public var _duration:Number;
 		[Bindable] public var _hrs:String;
 		[Bindable] public var _mins:String;
 		[Bindable] public var _comment:String;
-		public var _activities:Array; //Array of Activity objects
 		[Bindable] public var _activities_collection:ArrayCollection; //Array of Activity objects
+		
+		//Sorting the timeline
+		public var firstActivityName:String;
+		
+		//Grouping like dates
+		[Bindable] public var _first:Boolean = false;
+		[Bindable] public var _last:int = 0;
+		
+		
+		private var utils:business.utils = new business.utils();
 		
 		
 		
@@ -31,11 +42,14 @@ package business.dataObjects
 			_duration = Number(o.duration);
 			setHrsMins(_duration);
 			_comment = o.comment;
-			_activities = activities;
-			_activities_collection = new ArrayCollection(_activities);
+			_activities_collection = new ArrayCollection(activities);
+			//sort field for timeline
+			if(_activities_collection.length > 0){ // workout can have no activity
+				firstActivityName = _activities_collection[0]._name;
+			}
 		}
 		
-		private function setHrsMins(duration:Number):void{
+		public function setHrsMins(duration:Number):void{
 			_hrs = String(  Math.floor(_duration/60)  );
 			_mins = String(  _duration - ( Math.floor(_duration/60)*60 )  );
 		}

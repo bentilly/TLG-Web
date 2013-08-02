@@ -13,6 +13,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
+			
 			import events.RequestEvent;
 				
 			/*** IMPORTED ***/
@@ -21,25 +23,29 @@
 			
 			
 			public function addWorkoutData():void{
-				var woDate:Date = woDetails.getWODate();
 				var woDuration:int = woDetails.getWODuration();
-				var woComment:String = woDetails.getWOComment();
-				var woActivity:String = woActivitiesSelector.getActivities(); //TODO: make list of activities
-				var newWO:String = woActivitiesSelector.getNewActivity();
-
-				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
-				var requestObj:Object = new Object();
-				requestObj.operation = 'workout.addWorkout';
-				requestObj.token = token;
-				requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
-				requestObj.duration = woDuration;
-				requestObj.comment = woComment;
-				requestObj.activity = woActivity; //TODO: this will be a list of activities - one for user and one per group
-				requestObj.newActivity = newWO;
-				re.requestJson = JSON.stringify(requestObj);
-				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
-				trace(re.requestJson);
-				dispatchEvent(re);
+				if(woDuration<1){
+					Alert.show("How long did you work out for?", "Please enter a workout duration");
+				}else{
+					var woDate:Date = woDetails.getWODate();
+					var woComment:String = woDetails.getWOComment();
+					var woActivities:Array = woActivitiesSelector.getActivities();
+					var newWO:String = woActivitiesSelector.getNewActivity();
+	
+					var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+					var requestObj:Object = new Object();
+					requestObj.operation = 'workout.addWorkout';
+					requestObj.token = token;
+					requestObj.date = woDate.getFullYear() + '-' + (woDate.getMonth()+1) + '-' + woDate.getDate();
+					requestObj.duration = woDuration;
+					requestObj.comment = woComment;
+					requestObj.activities = woActivities;
+					requestObj.newActivity = newWO;
+					re.requestJson = JSON.stringify(requestObj);
+					trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+					trace(re.requestJson);
+					dispatchEvent(re);
+				}
 				
 				
 			}

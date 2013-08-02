@@ -8,13 +8,34 @@
 		 height="400"
 		 width="200"
 		 
-		 
+		 click="clickHandler(event)" xmlns:fxg="assets.fxg.*"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
+			import business.dataObjects.raw.TLGGroup;
 			
-			[Bindable] public var data:Object;
+			import events.UIEvent;
+			
+			[Bindable] public var tlgGroup:TLGGroup;
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				var uie:UIEvent = new UIEvent(UIEvent.GO_GROUP);
+				uie.tlgGroup = tlgGroup;
+				dispatchEvent(uie);
+			}
+			
+			protected function gibbon1_rollOverHandler(event:MouseEvent):void
+			{
+				gibbonIcon.alpha = 1;
+			}
+			
+			protected function gibbon1_rollOutHandler(event:MouseEvent):void
+			{
+				gibbonIcon.alpha = .9;
+				
+			}
 			
 		]]>
 	</fx:Script>
@@ -27,9 +48,10 @@
 	
 	
 		<s:VGroup>
-			<s:Image source="@Embed(source='../../assets/angrymonkey.png')"/>
-			<s:Label text="{data.name}" styleName="h2_white" width="200" height="50"/>
-			<dataViz:smallLeaderboard/>
+			<!--<s:Image source="@Embed(source='../../assets/angrymonkey.png')"/>-->
+			<fxg:gibbon id="gibbonIcon" width="200" height="200"  alpha=".9" rollOver="gibbon1_rollOverHandler(event)" rollOut="gibbon1_rollOutHandler(event)"/>
+			<s:Label text="{tlgGroup._name}" styleName="h2_white" width="200" height="50"/>
+			<!--<dataViz:smallLeaderboard/>-->
 		</s:VGroup>
 
 	

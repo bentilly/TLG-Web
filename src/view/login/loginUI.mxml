@@ -22,9 +22,12 @@
 			import mx.validators.Validator;
 			
 			import events.RequestEvent;
+			import events.UIEvent;
 			
 			import view.tlgContent;
 			public var controller:tlgContent;
+			
+			
 			
 			
 			
@@ -50,13 +53,22 @@
 			
 			protected function goButton_clickHandler(event:MouseEvent):void
 			{
-				if(currentState == "loginState"){
+				var validatorErrorArray:Array
+				var isValidForm:Boolean
+				var re:RequestEvent
+				var requestObj:Object
+				var uie:UIEvent;
 				
-					var validatorErrorArray:Array = Validator.validateAll([emailValidator, pwValidator]);
-					var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if(currentState == "loginState"){
+					validatorErrorArray = Validator.validateAll([emailValidator, pwValidator]);
+					isValidForm = validatorErrorArray.length == 0;
 					if (isValidForm) {
-						var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
-						var requestObj:Object = new Object();
+						//turn on the spinner / block UI
+						uie = new UIEvent(UIEvent.SPINNER_ON);
+						dispatchEvent(uie);
+						//make the request
+						re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+						requestObj = new Object();
 						requestObj.operation = 'token.createToken';
 						requestObj.email = emailInput.text;
 						requestObj.password = MD5.hash(passwordInput.text);
@@ -64,51 +76,108 @@
 						trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
 						trace(re.requestJson);
 						dispatchEvent(re);
-						
-					} else {
+					}else {
+						Alert.show("The form is not valid!", "Somethings up");
+					}
+				}else if(currentState == "forgotState"){
+					validatorErrorArray = Validator.validateAll([emailValidator]);
+					isValidForm = validatorErrorArray.length == 0;
+					if (isValidForm) {
+						//turn on the spinner / block UI
+						uie = new UIEvent(UIEvent.SPINNER_ON);
+						dispatchEvent(uie);
+						//make the request
+						re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+						requestObj = new Object();
+						requestObj.operation = 'user.resetPassword';
+						requestObj.email = emailInput.text;
+						re.requestJson = JSON.stringify(requestObj);
+						trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+						trace(re.requestJson);
+						dispatchEvent(re);
+					}else{
+						Alert.show("The form is not valid!", "Somethings up");
+					}
+				}
+				else if(currentState == "signupState"){
+					validatorErrorArray = Validator.validateAll([emailValidator, pwValidator, confirmValidator]);
+					isValidForm = validatorErrorArray.length == 0;
+					if (isValidForm) {
+						if(passwordInput.text == confirmInput.text){
+							//turn on the spinner / block UI
+							uie = new UIEvent(UIEvent.SPINNER_ON);
+							dispatchEvent(uie);
+							//make the request
+							re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+							requestObj = new Object();
+							requestObj.operation = 'user.signup';
+							requestObj.name = nameInput.text;
+							requestObj.email = emailInput.text;
+							requestObj.password = MD5.hash(passwordInput.text);
+							re.requestJson = JSON.stringify(requestObj);
+							trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+							trace(re.requestJson);
+							dispatchEvent(re);
+						}else{
+							Alert.show("Please make sure your passwords match", "Password");
+						}
+					}else{
 						Alert.show("The form is not valid!", "Somethings up");
 					}
 				}
 				
 			}
 			
-			// FORGOT button
-			protected function forgotButton_rollOverHandler(event:MouseEvent):void
-			{
-				//forgotButton.setStyle("color", "#00a2ce");
-				
-			}
-			
-			protected function forgotButton_rollOutHandler(event:MouseEvent):void
-			{
-				//forgotButton.setStyle("color", "#333333");
-				
-			}
-			
-			protected function forgotButton_clickHandler(event:MouseEvent):void
-			{
-				currentState ="forgotState";
-				
+			protected function enter_pressHandler(event:FlexEvent):void{
+				goButton_clickHandler(new MouseEvent(MouseEvent.CLICK) );
 			}
 			
 			
+			public function userLoggedIn(event:UIEvent):void{
+				TweenLite.delayedCall(40, clearFields, [], true); //wait for dash to reveal
+				stage.focus = null;
+			}
+			public function loginFail(event:UIEvent):void{
+				currentState = "loginState";
+			}
+			
+			
+//--------  MODE buttons
+			protected function modeButton_rollOverHandler(event:MouseEvent):void{ event.target.setStyle("color", "#00a2ce");	}
+			protected function modeButton_rollOutHandler(event:MouseEvent):void{ event.target.setStyle("color", "#333333");	}
 			// LOG IN button
-			protected function loginButton_rollOverHandler(event:MouseEvent):void
-			{
-				loginButton.setStyle("color", "#00a2ce");
-				
-			}
-			
-			protected function loginButton_rollOutHandler(event:MouseEvent):void
-			{
-				loginButton.setStyle("color", "#333333");
-				
-			}
-			
-			protected function loginButton_clickHandler(event:MouseEvent):void
-			{
+			protected function loginButton_clickHandler(event:MouseEvent):void{ 
 				currentState ="loginState";
-				
+				clearValidators();
+			}
+			// FORGOT button
+			protected function forgotButton_clickHandler(event:MouseEvent):void{ 
+				currentState ="forgotState";
+				clearValidators();
+			}
+			// SIGNUP button
+			protected function signupButton_clickHandler(event:MouseEvent):void{ 
+				currentState ="signupState";
+				clearValidators();
+			}
+			protected function clearValidators():void{
+				emailInput.errorString = '';
+				passwordInput.errorString = '';
+				try{
+					confirmInput.errorString = '';
+					nameInput.errorString = '';
+				}catch(e:Error){
+					
+				}
+			}
+			
+			
+			
+			
+			private function clearFields():void{
+				//emailInput.text = '';
+				passwordInput.text = '';
+				passwordInput.errorString = ''; //resets validation.
 			}
 			
 			
@@ -126,6 +195,19 @@
 				dispatchEvent(re);
 			}
 			
+			protected function btbHandler(event:MouseEvent):void
+			{
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'token.createToken';
+				requestObj.email = "ben.tilly@gmail.com";
+				requestObj.password = MD5.hash("bt");
+				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
+				dispatchEvent(re);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -133,39 +215,53 @@
 	<fx:Declarations>
 		<mx:EmailValidator id="emailValidator" source="{emailInput}" property="text" required="true"/>
 		<mx:StringValidator id="pwValidator" source="{passwordInput}" property="text" required="true"/>
+		<mx:StringValidator id="confirmValidator" source="{confirmInput}" property="text" required="true"/>
 	</fx:Declarations>
 	
 	<s:states>
 		<s:State name="loginState"/>
 		<s:State name="forgotState"/>
+		<s:State name="signupState"/>
 	</s:states>
 	
 	
 	<s:VGroup gap="0">
 		<s:Group>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="LOGIN" paddingBottom="-6" paddingLeft="5" includeIn="loginState"/>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="FORGOT" paddingBottom="-6" paddingLeft="5" includeIn="forgotState"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" paddingBottom="-6" paddingLeft="5"
+					 text.loginState="LOGIN" text.forgotState="FORGOT" text.signupState="SIGNUP"
+					 />
 		</s:Group>
 		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="4">
 			<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
+				<s:Label text="name:" styleName="smallLight" includeIn="signupState"/>
+				<s:TextInput id="nameInput" styleName="textFieldBold" width="300" includeIn="signupState"/>
 				<s:Label text="email:" styleName="smallLight"/>
 				<s:TextInput id="emailInput" styleName="textFieldBold" width="300"/>
 				<s:Label text="password:" styleName="smallLight" excludeFrom="forgotState" paddingTop="8"/>
-				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState"/>
+				<s:TextInput id="passwordInput" styleName="textFieldBold" displayAsPassword="true" width="300" excludeFrom="forgotState" enter.loginState="enter_pressHandler(event)"/>
+				<s:Label text="password confirm:" styleName="smallLight" paddingTop="8" includeIn="signupState"/>
+				<s:TextInput id="confirmInput" styleName="textFieldBold" displayAsPassword="true" width="300" includeIn="signupState"/>
 				<s:HGroup gap="15">
-					<!--<s:Label id="forgotButton" text="Forgot?" styleName="smallLight" paddingTop="15"
-							 useHandCursor="true" buttonMode="true"
-							 rollOver="forgotButton_rollOverHandler(event)"
-							 rollOut="forgotButton_rollOutHandler(event)"
-							 click="forgotButton_clickHandler(event)"
-							 excludeFrom="forgotState"
-							 />-->
 					<s:Label id="loginButton" text="Log in" styleName="smallLight" paddingTop="15"
 							 useHandCursor="true" buttonMode="true"
-							 rollOver="loginButton_rollOverHandler(event)"
-							 rollOut="loginButton_rollOutHandler(event)"
+							 rollOver="modeButton_rollOverHandler(event)"
+							 rollOut="modeButton_rollOutHandler(event)"
 							 click="loginButton_clickHandler(event)"
 							 excludeFrom="loginState"
+							 />
+					<s:Label id="forgotButton" text="Forgot" styleName="smallLight" paddingTop="15"
+							 useHandCursor="true" buttonMode="true"
+							 rollOver="modeButton_rollOverHandler(event)"
+							 rollOut="modeButton_rollOutHandler(event)"
+							 click="forgotButton_clickHandler(event)"
+							 excludeFrom="forgotState"
+							 />
+					<s:Label id="signupButton" text="Signup" styleName="smallLight" paddingTop="15"
+							 useHandCursor="true" buttonMode="true"
+							 rollOver="modeButton_rollOverHandler(event)"
+							 rollOut="modeButton_rollOutHandler(event)"
+							 click="signupButton_clickHandler(event)"
+							 excludeFrom="signupState"
 							 />
 				</s:HGroup>
 			</s:VGroup>
@@ -182,6 +278,7 @@
 			
 		</s:Group>
 		<!--<s:Label text="go b@b" click="batbHandler(event)" />-->
+		<!--<s:Label text="go bt" click="btbHandler(event)" />-->
 	</s:VGroup>
 	
 </s:Group>

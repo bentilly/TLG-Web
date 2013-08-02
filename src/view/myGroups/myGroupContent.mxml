@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 
+		 width="100%" 
+		 height="100%" xmlns:fxg="assets.fxg.*"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.PopUpEvent;
+			
+			import business.utils;
+			import business.dataObjects.raw.TLGGroup;
+			
+			import events.UIEvent;
+			
+			import view.popups.addTagPopup;
+			import view.popups.groupInvitePopup;
+			
+			/*** IMPORT ***/
+			[Bindable] public var token:String;
+			[Bindable] public var currentGroup:TLGGroup;
+			[Bindable] public var leaderboard_collection:ArrayCollection; //used to build group leaderboard.
+			[Bindable] public var leaderboardStartDate:Date;
+			[Bindable] public var leaderboardEndDate:Date;
+			
+			/*** INTERNAL ***/
+			[Bindable] private var days:ArrayCollection = new ArrayCollection( ['SUN','MON','TUE','WED','THU','FRI','SAT'] );
+			[Bindable] private var months:ArrayCollection = new ArrayCollection( ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'] );
+			private var lbPreset:String = 'thisMonth'; //tracks the users last view of the leaderboard (except custom...)
+			
+			private var utils:business.utils = new business.utils;
+			
+			public function groupReady(event:UIEvent):void{
+				presetClick(lbPreset);
+			}
+			
+			protected function addActivityLabel_clickHandler(event:MouseEvent):void
+			{
+				var addTagPU:addTagPopup = new addTagPopup();
+				addTagPU.token = token;
+				addTagPU.groupKey = currentGroup._key;
+				addTagPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(addTagPU);
+			}
+			
+			protected function dateLabel_rollOverHandler(event:MouseEvent):void
+			{
+				event.target.alpha = 1;
+				
+			}
+			protected function dateLabel_rollOutHandler(event:MouseEvent):void
+			{
+				event.target.alpha = .7;
+				
+			}
+
+			
+			protected function startDateLabel_clickHandler(event:MouseEvent):void
+			{
+				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
+				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				dateChoosePU.addEventListener('close', updateStartDate);
+				PopUpManager.centerPopUp(dateChoosePU);
+				
+				dateChoosePU.popupTitle.text = "START DATE";
+				//dateChoosePU.workoutDateChooser.selectedDate = lbStartDate;
+				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date+1) } ];
+			}
+			
+			protected function endDateLabel_clickHandler(event:MouseEvent):void
+			{
+				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
+				dateChoosePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				dateChoosePU.addEventListener('close', updateEndDate);
+				PopUpManager.centerPopUp(dateChoosePU);
+				
+				dateChoosePU.popupTitle.text = "END DATE";
+				//dateChoosePU.workoutDateChooser.selectedDate = lbEndDate;
+				
+				var d:Date = new Date();
+				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(lbStartDate.fullYear, lbStartDate.month, lbStartDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
+			}
+			
+			private function updateStartDate(event:PopUpEvent):void{
+				// If commit is false, no data is returned.
+				if (!event.commit)
+					return;
+				
+				//lbStartDate = event.data as Date;
+				updateLeaderboardRange();
+			}
+			private function updateEndDate(event:PopUpEvent):void{
+				// If commit is false, no data is returned.
+				if (!event.commit)
+					return;
+				
+				//lbEndDate = event.data as Date;
+				updateLeaderboardRange();
+			}
+			
+			private function updateLeaderboardRange():void{
+				//start date text
+				/*if( utils.compareDates(new Date(), lbStartDate) ){
+					startDateLabel.text = 'TODAY '+lbStartDate.date+' '+months[lbStartDate.month];
+				}else{
+					startDateLabel.text = days[lbStartDate.day]+' '+lbStartDate.date+' '+months[lbStartDate.month];
+				}*/
+				//end date text
+				/*if( utils.compareDates(new Date(), lbEndDate) ){
+					endDateLabel.text = 'TODAY '+lbEndDate.date+' '+months[lbEndDate.month];
+				}else{
+					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
+				}*/
+				//rebuild
+				//currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
+				//sort leaderboard members
+				//utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
+			}
+
+			
+			
+			protected function inviteMemberLabel_clickHandler(event:MouseEvent):void
+			{
+				var invitePU:groupInvitePopup = new groupInvitePopup();
+				invitePU.token = token;
+				invitePU.groupKey = currentGroup._key;
+				
+				invitePU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(invitePU);
+			}
+			
+			
+			/*Presets*/
+			private function presetRollover(event:MouseEvent):void{
+				event.target.alpha = 1;
+			}
+			private function presetRollout(event:MouseEvent):void{
+				event.target.alpha = .5;
+			}
+			private function presetClick(range:String):void{
+				var today:Date;
+				lbPreset = range;
+				var lbStartDate:Date;
+				var lbEndDate:Date;
+				switch(range){
+					case "thisMonth":
+						lbEndDate = new Date();//end on today
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, 1); //start on first of month
+						break;
+					case "lastMonth":
+						today = new Date();
+						lbEndDate = new Date(today.fullYear, today.month, 0); //end on '0' day of this month (= last day of previus month)
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, 1); //start on first day of end month
+						break;
+					case "thisWeek":
+						lbEndDate = new Date();//end on today
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date - lbEndDate.day); //start on today minus the number of week days
+						break;
+					case "lastWeek":
+						today = new Date();
+						lbEndDate = new Date(today.fullYear, today.month, today.date - today.day - 1); //end on today minus the number of week days and back another day
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-6); //start on end minus a week
+						break;
+					case "last30":
+						lbEndDate = new Date();//end on today
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date-30) //start on today - 30 days
+						break;
+					default: //this month
+						lbEndDate = new Date();//end on today
+						lbStartDate = new Date(lbEndDate.fullYear, lbEndDate.month, 1); //start on first of month
+						break;
+				}
+				
+				//updateLeaderboardRange();
+				
+				var uie:UIEvent = new UIEvent(UIEvent.UPDATE_LEADERBOARD_RANGE);
+				uie.lbEndDate = lbEndDate;
+				uie.lbStartDate = lbStartDate;
+				dispatchEvent(uie);
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<fx:Component className="dateChooserPopup">
+			<s:SkinnablePopUpContainer>
+				<fx:Script>
+					<![CDATA[
+						import mx.events.CalendarLayoutChangeEvent;
+						
+						protected function workoutDateChooser_changeHandler(event:CalendarLayoutChangeEvent):void
+						{
+							close(true, workoutDateChooser.selectedDate);
+						}
+						
+					]]>
+				</fx:Script>
+				<s:VGroup gap="0">
+					<s:Group>
+						<s:Label id="popupTitle" fontFamily="OS-condBold" color="white" fontSize="30" text="DATE" paddingBottom="-6" paddingLeft="2"/>
+					</s:Group>
+					<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
+						<s:VGroup paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+							<mx:DateChooser id="workoutDateChooser" change="workoutDateChooser_changeHandler(event)"/>
+						</s:VGroup>
+					</s:BorderContainer>
+				</s:VGroup>
+			</s:SkinnablePopUpContainer>
+		</fx:Component>
+	</fx:Declarations>
+	
+	<s:BorderContainer backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
+		<s:VGroup width="100%" height="100%">
+			<s:HGroup paddingTop="40" paddingLeft="15" gap="15">
+				<fxg:gibbon width="56" height="56"/>
+				<s:Label text="{currentGroup._name}" styleName="h1_white" color="#123456" fontSize="40" paddingTop="10"/>
+			</s:HGroup>
+			
+			<s:Scroller width="100%" height="100%">
+				<s:HGroup paddingRight="20" paddingLeft="20" paddingTop="20">
+					
+					<s:VGroup id="leaderboard" paddingRight="50" paddingBottom="50">
+						<s:Label text="LEADER BOARD" styleName="leaderboardTitle"/>
+						
+						<s:HGroup paddingBottom="0" paddingTop="-5">
+							<s:Label id="startDateLabel" text="{days.getItemAt( leaderboardStartDate.getDay() )+' '+leaderboardStartDate.getDate()+' '+months.getItemAt( leaderboardStartDate.getMonth() )}" 
+									 styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+									 buttonMode="true" useHandCursor="true"
+									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="startDateLabel_clickHandler(event)"
+									 />
+							<fxg:smallArrow alpha=".6" scaleX=".8" scaleY=".8"/>
+							<s:Label id="endDateLabel" text="{days.getItemAt( leaderboardEndDate.getDay() )+' '+leaderboardEndDate.getDate()+' '+months.getItemAt( leaderboardEndDate.getMonth() )}" styleName="leaderboardTitle"  fontSize="15"  alpha=".7"
+									 buttonMode="true" useHandCursor="true"
+									 rollOver="dateLabel_rollOverHandler(event)" rollOut="dateLabel_rollOutHandler(event)" click="endDateLabel_clickHandler(event)"
+									 />
+							
+						</s:HGroup>
+							
+						<!--Presets-->
+						<s:HGroup gap="20" paddingBottom="15" paddingTop="0">
+							<s:Label text="This month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisMonth')"/>
+							<s:Label text="Last month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastMonth')"/>
+							<s:Label text="This week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisWeek')"/>
+							<s:Label text="Last week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastWeek')"/>
+							<s:Label text="Last 30 days" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('last30')"/>
+						</s:HGroup>
+						
+						<s:VGroup paddingBottom="20">
+							<s:DataGroup dataProvider="{leaderboard_collection}" itemRenderer="view.skinsAndRenderers.groupLeaderboard_memberRenderer" contentBackgroundAlpha="0" rollOverColor="#ffffff">
+								<s:layout>
+									<s:VerticalLayout/>
+								</s:layout>
+							</s:DataGroup>
+						</s:VGroup>
+						
+						<s:Line width="100%">
+							<s:stroke>
+								<s:SolidColorStroke color="#CCCCCC" weight="1"/>
+							</s:stroke>
+						</s:Line>
+						
+						<s:Label text="GROUP INVITES" styleName="leaderboardTitle" paddingTop="20" paddingBottom="10"/>
+						
+						<s:DataGroup dataProvider="{currentGroup._invites}" itemRenderer="view.skinsAndRenderers.groupInvite_renderer" contentBackgroundAlpha="0" rollOverColor="#ffffff" >
+							<s:layout>
+								<s:VerticalLayout/>
+							</s:layout>
+						</s:DataGroup>
+						
+						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" click="inviteMemberLabel_clickHandler(event)" paddingTop="20"/>
+					</s:VGroup>
+					
+					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>
+					
+					<s:VGroup paddingLeft="10">
+						<s:Label text="GROUP ACTIVITIES" styleName="leaderboardTitle" paddingBottom="10"/>
+						<s:DataGroup id="activitiesList" itemRenderer="view.skinsAndRenderers.plainBlue_activityRenderer" dataProvider="{currentGroup._activities}" >
+							<s:layout>
+								<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1" gap="3"/>
+							</s:layout>
+						</s:DataGroup>
+						<s:Label id="addActivityLabel" text="+ add activity" styleName="durationlabel" click="addActivityLabel_clickHandler(event)" visible="{currentGroup._admin}"
+								 paddingTop="20"/>
+					</s:VGroup>
+					
+				</s:HGroup>
+			</s:Scroller>
+			
+		</s:VGroup>
+	</s:BorderContainer>
+	
+	
+</s:Group>

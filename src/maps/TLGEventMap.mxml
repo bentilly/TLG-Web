@@ -25,20 +25,26 @@
 			import view.addBar.workoutTimeEntry;
 			import view.dashboard.myGroups_dash;
 			import view.dashboard.myTraining_dash;
+			import view.login.loginUI;
+			import view.myGroups.myGroupContent;
 			import view.myWorkouts.calendarChartDay;
+			import view.myWorkouts.monthBreakdown;
 			import view.myWorkouts.myWorkoutsContent;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
+			import view.skinsAndRenderers.groupInvite_renderer;
 			
 			
-			[Bindable] private var services:Services = new Services();
-			
+			//[Bindable] private var services:Services = new Services();
+			[Bindable] public var services:Services;
 			
 		]]>
 	</fx:Script>
 	
 	
 	<fx:Declarations>
+		
+		<Debugger level="{Debugger.ALL}" />
 		
 		<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
 		<!--Initializes event dispatchers in Managers so they can send events-->
@@ -47,8 +53,8 @@
 		</EventHandlers>
 		
 		<!--Main API request-->
-		<EventHandlers type="{RequestEvent.TLG_API_REQUEST}" debug="true">
-			<HTTPServiceInvoker instance="{services.tlgApiRequest}" debug="true">
+		<EventHandlers type="{RequestEvent.TLG_API_REQUEST}" debug="false">
+			<HTTPServiceInvoker instance="{services.tlgApiRequest}" debug="false">
 				<Request data="{event.requestJson}"/>
 				<resultHandlers>
 					<MethodInvoker generator="{ResponseManager}" method="handleResponse" arguments="{[event, resultObject]}"/>
@@ -63,30 +69,50 @@
 			<MethodInvoker generator="{ResponseManager}" method="logout"/>
 		</EventHandlers>
 		
+		<EventHandlers type="{UIEvent.GO_GROUP}">
+			<MethodInvoker generator="{ResponseManager}" method="goGroup" arguments="{event}"/>
+		</EventHandlers>
+		
+		<EventHandlers type="{UIEvent.SET_WORKOUT_MONTH}">
+			<MethodInvoker generator="{ResponseManager}" method="setWorkoutMonth" arguments="{event}"/>
+		</EventHandlers>
+		
+		<EventHandlers type="{UIEvent.UPDATE_LEADERBOARD_RANGE}">
+			<MethodInvoker generator="{ResponseManager}" method="updateLeaderboardRange" arguments="{event}"/>
+		</EventHandlers>
+		
 		
 		<Injectors target="{tlgContent}">
 			<!--Events-->
 			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
 			<ListenerInjector eventType="{UIEvent.GOT_GROUPS}" method="gotGroups"/>
 			<ListenerInjector eventType="{UIEvent.GO_HOME}" method="goHome"/>
+			<ListenerInjector eventType="{UIEvent.GO_GROUP}" method="goGroup"/>
+			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="gotAllWorkouts"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
+			<ListenerInjector eventType="{UIEvent.SPINNER_ON}" method="spinnerOn"/>
+			<ListenerInjector eventType="{UIEvent.SPINNER_OFF}" method="spinnerOff"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups" targetKey="myGroups"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
 		</Injectors>
 		
 		<Injectors target="{addBar}">
 			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.GO_GROUP}" method="goGroup"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="currentGroup" targetKey="currentGroup"/>
 		</Injectors>
 		
 		<Injectors target="{myTraining_dash}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="userName" targetKey="userName"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
 		</Injectors>
 		
 		<Injectors target="{myGroups_dash}">
-			<PropertyInjector source="{ResponseManager}" sourceKey="myGroups" targetKey="myGroups"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
 		</Injectors>
 		
 		<Injectors target="{workoutActivities}">
@@ -94,10 +120,15 @@
 			<ListenerInjector eventType="{UIEvent.GOT_MY_ACTIVITES}" method="buildMyActivities"/>
 			<ListenerInjector eventType="{UIEvent.ACTIVITIES_UPDATED}" method="updateMyActivities"/>
 			<!--Properties-->
-			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities" targetKey="myActivities"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
 		</Injectors>
 		
 		<Injectors target="{addWorkout}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+		</Injectors>
+		
+		<Injectors target="{editTagPopup}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 		</Injectors>
 		
@@ -111,11 +142,12 @@
 		
 		<Injectors target="{activityGroup}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
-			<PropertyInjector source="{ResponseManager}" sourceKey="myActivities_collection" targetKey="myActivities_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="userEmail" targetKey="userEmail"/>
 		</Injectors>
 		
 		<Injectors target="{calendarChartDay}">
 			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_DELETED}" method="workoutDeleted"/>
 			<ListenerInjector eventType="{UIEvent.WORKOUT_DATE_CHANGED}" method="workoutDateChanged"/>
 			<ListenerInjector eventType="{UIEvent.GOT_ALL_WORKOUTS}" method="buildWorkouts"/>
 		</Injectors>
@@ -128,19 +160,35 @@
 		
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<!--<PropertyInjector source="{ResponseManager}" sourceKey="myWorkouts" targetKey="myWorkouts"/>-->
-			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDaysByMonth_collection" targetKey="workoutDaysByMonth_collection"/>
-			<ListenerInjector eventType="{UIEvent.GO_MYWORKOUTS}" method="goMyWorkouts"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDay_collection" targetKey="workoutDay_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workoutMonth_collection" targetKey="workoutMonth_collection"/>
+			<ListenerInjector eventType="{UIEvent.BUILD_MYWORKOUTS}" method="buildMyWorkouts"/>
+			<ListenerInjector eventType="{UIEvent.WORKOUT_ADDED}" method="workoutAdded"/>
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 		</Injectors>
 		
-		<!--This stops them being removed from memory. Need to find other ways of passing this info in-->
-		<Injectors target="{editTagPopup}">
+		<Injectors target="{myGroupContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
-			<ListenerInjector eventType="{UIEvent.ACTIVITY_UPDATED}" method="activityUpdated"/>
-			<ListenerInjector eventType="{UIEvent.ACTIVITY_UPDATE_FAIL}" method="activityUpdateFail"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="currentGroup" targetKey="currentGroup"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboard_collection" targetKey="leaderboard_collection"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboardStartDate" targetKey="leaderboardStartDate"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="leaderboardEndDate" targetKey="leaderboardEndDate"/>
+			<ListenerInjector eventType="{UIEvent.GROUP_READY}" method="groupReady"/>
 		</Injectors>
-	
+		
+		<Injectors target="{loginUI}">
+			<ListenerInjector eventType="{UIEvent.USER_LOGGED_IN}" method="userLoggedIn"/>
+			<ListenerInjector eventType="{UIEvent.LOGIN_FAIL}" method="loginFail"/>
+		</Injectors>
+		
+		<Injectors target="{groupInvite_renderer}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+		</Injectors>
+		
+		<Injectors target="{monthBreakdown}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="selectedMonth" targetKey="selectedMonth"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="monthBreakdownData" targetKey="monthBreakdownData"/>
+		</Injectors>
 		
 		
 	</fx:Declarations>

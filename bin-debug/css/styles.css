@@ -36,6 +36,13 @@ global{
 	color: #ffffff;
 }
 /* TopAddBar */
+.backButton{
+	fontFamily: "OS-condBold";
+	color: #CCC;
+	fontSize: 13px;
+}
+
+
 .tlgBrand{
 	fontFamily: "OS-condBold";
 	fontSize: 13px;
@@ -176,5 +183,49 @@ global{
 	fontSize: 13px;
 	color: #2a8796;
 }
+
+
+/* GROUP */
+.leaderboardTitle{
+	fontFamily: "OS-condBold";
+	fontSize: 25px;
+	color: #2A8796;
+}
+.leaderboardName{
+	fontFamily: "OS-condBold";
+	fontSize: 20px;
+	color: #0D7F12;
+	textAlign:right;
+}
+.leaderboardTotal{
+	fontFamily: "OS-condBold";
+	fontSize: 13;
+	color: #0D7F12;
+}
+.newGroupMessage{
+	fontFamily: "OS-condLight";
+	fontSize: 18px;
+	color: #003300;
+}
+
+
+
+/* stats */
+.statTitle{
+	fontFamily: "OS-condLight";
+	fontSize: 13px;
+	color: #ffffff;
+}
+.statBigNumber{
+	fontFamily: "OS-condLight";
+	fontSize: 50;
+	color: #FFFFFF;
+}
+
+
+
+
+
+
 
 

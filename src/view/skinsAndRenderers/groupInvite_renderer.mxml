@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true"
+				
+				width="300"
+				
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.greensock.TweenLite;
+			
+			import events.RequestEvent;
+			
+			
+			[Bindable] public var token:String;
+			
+			
+			protected function xLabel_rollOverHandler(event:MouseEvent):void
+			{
+				xLabel.alpha = 1;
+			}
+			
+			protected function xLabel_rollOutHandler(event:MouseEvent):void
+			{
+				xLabel.alpha = .5;
+			}
+			
+			protected function xLabel_clickHandler(event:MouseEvent):void
+			{
+				deleteContainer.alpha = 1;
+				deleteContainer.visible = true;
+				TweenLite.to(deleteContainer, 3, {alpha:0, onComplete:killDelete});
+			}
+			private function killDelete():void{
+				deleteContainer.visible = false;
+			}			
+			protected function deleteLabel_clickHandler(event:MouseEvent):void
+			{
+				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
+				var requestObj:Object = new Object();
+				requestObj.operation = 'group.deleteInvite';
+				requestObj.token = token;
+				requestObj.key = data._key;
+				re.requestJson = JSON.stringify(requestObj);
+				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
+				trace(re.requestJson);
+				dispatchEvent(re);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+		<s:Label text="{data._email}" maxDisplayedLines="1" styleName="leaderboardName" textAlign="left" width="200"/>
+		<s:BorderContainer id="deleteContainer" borderVisible="false" backgroundColor="red" right="15" cornerRadius="3" minHeight="0" height="17" visible="false">
+			<s:Label id="deleteLabel" text="DELETE" styleName="h2_white" fontSize="12" color="#FFFFFF" paddingTop="4" paddingLeft="5" paddingRight="3"
+					 buttonMode="true" useHandCursor="true" click="deleteLabel_clickHandler(event)"/>
+		</s:BorderContainer>
+		<s:Label id="xLabel" text="x" styleName="leaderboardName" color="#555555" alpha=".5" right="0" buttonMode="true" useHandCursor="true"
+				 rollOver="xLabel_rollOverHandler(event)" rollOut="xLabel_rollOutHandler(event)" click="xLabel_clickHandler(event)"/>
+	
+	
+</s:ItemRenderer>
