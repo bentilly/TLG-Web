@@ -8,6 +8,7 @@ package business{
 	import spark.collections.Sort;
 	import spark.collections.SortField;
 	
+	import business.dataObjects.MonthBreakdownData;
 	import business.dataObjects.raw.Activity;
 	import business.dataObjects.raw.ActivitySummary;
 	import business.dataObjects.raw.GroupInvite;
@@ -54,11 +55,14 @@ package business{
 		[Bindable] public var userEmail:String;
 		[Bindable] public var currentGroup:TLGGroup = null; //the current group (if looking at a group).
 		private var nowDate:Date = new Date();
-		[Bindable] private var selectedMonth:Date = new Date(nowDate.fullYear, nowDate.month);
+		[Bindable] public var selectedMonth:Date = new Date(nowDate.fullYear, nowDate.month);
 		
 		//leaderboard date range
 		[Bindable] public var leaderboardStartDate:Date;
 		[Bindable] public var leaderboardEndDate:Date;
+		
+		//Stats
+		[Bindable] public var monthBreakdownData:MonthBreakdownData;
 		
 		
 		public function ResponseManager(dispatcher:IEventDispatcher){
@@ -241,6 +245,17 @@ package business{
 			//reset leaderboard date range
 			leaderboardEndDate = new Date();
 			leaderboardStartDate = new Date(leaderboardEndDate.fullYear, leaderboardEndDate.month, 1); //defaults to 'this month'
+			
+			//reset Stats data
+			monthBreakdownData = new MonthBreakdownData();
+			
+		}
+		
+		//Triggered when user changes month on MyWorkouts
+		public function setWorkoutMonth(event:UIEvent):void{
+			selectedMonth = event.date;
+			workoutDay_collection.refresh();
+			build_month_stats();
 		}
 		
 		
@@ -405,6 +420,7 @@ package business{
 				
 			}
 			build_workoutDay_collection(); //update my workouts lists for display
+			build_month_stats();  //calculate this first months stats
 			
 			//Changes screen in UI
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_ALL_WORKOUTS);
@@ -453,6 +469,7 @@ package business{
 			var w:Workout = new Workout(wo, mdActivities);
 			workout_collection.addItem( w );
 			build_workoutDay_collection(); //update my workouts lists
+			build_month_stats();  //calculate this months stats
 			
 			uie = new UIEvent(UIEvent.WORKOUT_ADDED); //updates the calendar. Could do this better
 			uie.workout = w;
@@ -463,7 +480,6 @@ package business{
 
 /** UPDATE WORKOUT **/
 		private function workout_updateWorkout_handler(result:Object, request:Object):void{
-			trace("---w");
 			//Master data update
 			//workout to update
 			var workout:Workout = getWorkoutObjectByKey(result.key);
@@ -512,6 +528,7 @@ package business{
 			}
 			
 			updateLeaderboard();
+			build_month_stats();  //calculate this first months stats
 			
 		}
 
@@ -527,6 +544,7 @@ package business{
 			
 			//rebuild list
 			build_workoutDay_collection();
+			build_month_stats();  //calculate this first months stats
 			
 			//update any group data
 			updateLeaderboard();
@@ -692,7 +710,40 @@ package business{
 			dispatcher.dispatchEvent(uie);
 		}
 		
-		
+
+/** -----------------
+ * 
+ * Stats
+ * 
+ * -----------------**/		
+		private function build_month_stats():void{
+			//reset counters
+			monthBreakdownData._totalDuration = 0;
+			monthBreakdownData._avgPerDay = 0;
+			
+			//iterate baby!
+			var dayCursor:IViewCursor = workoutDay_collection.createCursor();
+			while(!dayCursor.afterLast){ //each day
+				var day:WorkoutDay = dayCursor.current as WorkoutDay;
+				var woCursor:IViewCursor = day._workouts.createCursor();
+				while(!woCursor.afterLast){ //each workout
+					var wo:Workout = woCursor.current as Workout;
+					monthBreakdownData._totalDuration = monthBreakdownData._totalDuration + wo._duration;
+					woCursor.moveNext();
+				}
+				dayCursor.moveNext();
+			}
+			monthBreakdownData._totalDuration_display = utils.formatDurationForDisplay(monthBreakdownData._totalDuration);
+			
+			//average per day
+			var lastDayOfSelecetedMonth:Date = new Date(selectedMonth.fullYear, selectedMonth.month+1, 0);
+			var daysThisMonth:Number = lastDayOfSelecetedMonth.date;
+			monthBreakdownData._avgPerDay = Math.round(monthBreakdownData._totalDuration / daysThisMonth);
+			monthBreakdownData._avgPerDay_display = utils.formatDurationForDisplay(monthBreakdownData._avgPerDay);
+			
+			
+		}
+
 		
 /** -----------------
  * 
@@ -905,10 +956,7 @@ package business{
 			}
 			return false;
 		}
-		public function setWorkoutMonth(event:UIEvent):void{
-			selectedMonth = event.date;
-			workoutDay_collection.refresh();
-		}
+		
 		private function getTLGUserByEmail(email:String):TLGUser{
 			for each(var user:TLGUser in user_collection){
 				if(user._email == email){

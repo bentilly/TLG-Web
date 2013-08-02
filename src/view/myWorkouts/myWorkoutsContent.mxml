@@ -99,35 +99,7 @@
 					resizeMonths();
 					calBuilt = true;
 				}
-				
-				
-				/* -------- LIST --------*/
-				
-				//clear list
-				//workoutsListComponent.dataProvider = null;
-				//Find this WorkoutMonth and set as dataprovider
-				/*for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
-					if( utils.compareMonths(month._date, selectedMonth) ){
-						workoutsListComponent.dataProvider = month._workoutDays_collection;
-						break;
-					}
-				}*/
 			}
-			
-			/*public function workoutAdded(event:UIEvent):void{
-				//If this month has no workouts, the list will have no dataprovider. On workoutAdded see if there now is data for this month
-				if(!workoutsListComponent.dataProvider){
-					for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
-						if( utils.compareMonths(month._date, selectedMonth) ){
-							workoutsListComponent.dataProvider = month._workoutDays_collection;
-							break;
-						}
-					}
-				}
-			}*/
-			
-			
-			
 			
 			
 			protected function resizeHandler(event:ResizeEvent):void
@@ -199,20 +171,6 @@
 				//add event listeners
 				TweenLite.delayedCall(.1, addMonthEventListeners);
 				
-				
-			/* -------- LIST --------*/
-				
-				//clear list
-				/*workoutsListComponent.dataProvider = null;
-				//Find this WorkoutMonth and set as dataprovider
-				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
-				for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
-					if( utils.compareMonths(month._date, cm.myMonth) ){
-						workoutsListComponent.dataProvider = month._workoutDays_collection;
-						break;
-					}
-				}*/
-				
 				//broadcast current month
 				var uie:UIEvent = new UIEvent(UIEvent.SET_WORKOUT_MONTH);
 				uie.date = new Date(selectedMonth.fullYear, selectedMonth.month-1);
@@ -245,8 +203,6 @@
 					}else{
 						TweenLite.to(m, 1, {x:nowX-monthWidth});
 					}
-					
-					
 					i++;
 				}
 				TweenLite.delayedCall(1, finishGoNextMonth);
@@ -263,8 +219,6 @@
 				//set selected month and title
 				selectedMonth = calMonthsArray[2].myMonth; //<<<
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month+2);
-				//pass in workouts
-				//newMonth.myMonthData = getMonthData(newMonth.myMonth);
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.push(newMonth);
@@ -272,32 +226,16 @@
 
 				//add event listeners
 				TweenLite.delayedCall(.1, addMonthEventListeners);
-				
-				
-				/* -------- LIST --------*/
-				
-				//clear list
-				//workoutsListComponent.dataProvider = null;
-				//Find this WorkoutMonth and set as dataprovider
+
 				var cm:calendarChartMonth = calMonthsArray[2] as calendarChartMonth;
-				/*for each(var month:WorkoutMonth in workoutDaysByMonth_collection){
-					if( utils.compareMonths(month._date, cm.myMonth) ){
-						workoutsListComponent.dataProvider = month._workoutDays_collection;
-						break;
-					}
-				}*/
-				
-				
+
 				//broadcast current month
 				var uie:UIEvent = new UIEvent(UIEvent.SET_WORKOUT_MONTH);
 				uie.date = selectedMonth;
 				dispatchEvent(uie);
 				
 			}
-			
-			
-			
-			
+
 			private function addMonthEventListeners():void{
 				calMonthsArray[1].addEventListener(MouseEvent.CLICK, goPrevMonth);
 				calMonthsArray[3].addEventListener(MouseEvent.CLICK, goNextMonth);
@@ -339,19 +277,19 @@
 			</s:BorderContainer>
 		</s:Group>
 		<s:Group width="100%" height="100%">
-			<s:HGroup width="100%" height="100%">
-				<!--Stats and activities go here
-				<s:BorderContainer height="100%" width="400"/>
-				-->
-				<s:Scroller horizontalScrollPolicy="off" width="100%" height="100%">
+			<s:Scroller horizontalScrollPolicy="off" width="100%" height="100%">
+				<s:HGroup width="100%" height="100%">
+					
 					<s:DataGroup id="workoutsList" width="100%" height="100%" itemRenderer="view.skinsAndRenderers.workoutList_dayRenderer" dataProvider="{workoutDay_collection}">
 						<s:layout>
 							<s:VerticalLayout/>
 						</s:layout>
 					</s:DataGroup>
-				</s:Scroller>
+					
+					<myWorkouts:monthBreakdown/>
 				
-			</s:HGroup>
+				</s:HGroup>
+			</s:Scroller>
 		</s:Group>
 	</s:VGroup>
 	

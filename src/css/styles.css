@@ -210,9 +210,17 @@ global{
 
 
 
-
-
-
+/* stats */
+.statTitle{
+	fontFamily: "OS-condLight";
+	fontSize: 13px;
+	color: #ffffff;
+}
+.statBigNumber{
+	fontFamily: "OS-condLight";
+	fontSize: 50;
+	color: #FFFFFF;
+}
 
 
 

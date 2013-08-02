@@ -95,7 +95,16 @@ package business
 			ar.refresh();
 		}
 		
-		
+		public function formatDurationForDisplay(duration:Number):String{
+			var totalString:String = String(Math.floor(duration/60));
+			totalString = totalString + ':';
+			var mins:String = String(duration - (Math.floor(duration/60) * 60));
+			if(mins.length < 2){
+				mins = '0' + mins;
+			}
+			totalString = totalString + mins;
+			return totalString;
+		}
 		
 		
 		

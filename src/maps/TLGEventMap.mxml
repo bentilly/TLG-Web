@@ -28,6 +28,7 @@
 			import view.login.loginUI;
 			import view.myGroups.myGroupContent;
 			import view.myWorkouts.calendarChartDay;
+			import view.myWorkouts.monthBreakdown;
 			import view.myWorkouts.myWorkoutsContent;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
@@ -182,6 +183,11 @@
 		
 		<Injectors target="{groupInvite_renderer}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+		</Injectors>
+		
+		<Injectors target="{monthBreakdown}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="selectedMonth" targetKey="selectedMonth"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="monthBreakdownData" targetKey="monthBreakdownData"/>
 		</Injectors>
 		
 		
