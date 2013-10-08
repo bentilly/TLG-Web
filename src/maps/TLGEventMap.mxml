@@ -160,6 +160,7 @@
 		
 		<Injectors target="{myWorkoutsContent}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="workout_collection" targetKey="workout_collection"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="workoutDay_collection" targetKey="workoutDay_collection"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="workoutMonth_collection" targetKey="workoutMonth_collection"/>
 			<ListenerInjector eventType="{UIEvent.BUILD_MYWORKOUTS}" method="buildMyWorkouts"/>
