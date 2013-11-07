@@ -18,8 +18,7 @@ package business.dataObjects.raw
 		public var firstActivityName:String;
 		
 		//Grouping like dates
-		[Bindable] public var _first:Boolean = false;
-		[Bindable] public var _last:int = 0;
+		[Bindable] public var _first:Boolean;
 		
 		
 		private var utils:business.utils = new business.utils();
