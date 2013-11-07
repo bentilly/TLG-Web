@@ -15,16 +15,9 @@
 	
 	
 	
-	<s:Line width="100%" visible="{data._first}" top="0">
-		<s:stroke>
-			<s:SolidColorStroke color="0x123456" weight="1" alpha=".2"/>
-		</s:stroke>
-	</s:Line>
-	
 	<s:HGroup>
 		
-		
-		<s:HGroup width="60" horizontalAlign="right" paddingTop="12" visible="{data._first}">
+		<s:HGroup width="60" horizontalAlign="right" paddingTop="12">
 			<s:Label id="dayTitle" text="{ days.getItemAt(data._date.getDay()) }" styleName="smallDateText" color="0x0D7F12" fontSize="16"/>
 			<s:Label id="dateTitle" text="{ data._date.getDate() }" styleName="smallDateText" paddingBottom="0" color="0x0D7F12" fontSize="16"/>
 		</s:HGroup>

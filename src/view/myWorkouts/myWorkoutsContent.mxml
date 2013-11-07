@@ -32,10 +32,10 @@
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
-			[Bindable] public var workoutDay_collection:ArrayCollection;
-			[Bindable] public var workoutMonth_collection:ArrayCollection;
+			[Bindable] public var workoutDay_collection:ArrayCollection; //workouts by day : used for list
+			[Bindable] public var workoutMonth_collection:ArrayCollection; //workout days by month : used for calendar
 			
-			[Bindable] public var workout_collection:ArrayCollection; //all workouts, filtered to show current month
+			[Bindable] public var workout_collection:ArrayCollection; //all workouts
 			
 			
 			
@@ -170,7 +170,7 @@
 				selectedMonth = calMonthsArray[2].myMonth; //<<<< is not actual month (wtf?)
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month-3);
 				//pass in workouts
-				newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				//newMonth.myMonthData = getMonthData(newMonth.myMonth);
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.unshift(newMonth);
@@ -226,8 +226,6 @@
 				//set selected month and title
 				selectedMonth = calMonthsArray[2].myMonth; //<<<
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month+2);
-				//pass in workouts
-				newMonth.myMonthData = getMonthData(newMonth.myMonth);
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.push(newMonth);

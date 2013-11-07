@@ -38,7 +38,7 @@ package business{
 		//Master collections of DB objects
 		private var user_collection:ArrayCollection;
 		private var activity_collection:ArrayCollection;
-		[Bindable] public var workout_collection:ArrayCollection; // all the workouts, filtered to show only one month
+		[Bindable] public var workout_collection:ArrayCollection; // all the workouts
 		[Bindable] public var group_collection:ArrayCollection;
 		private var groupMember_collection:ArrayCollection;
 		private var groupMemberActivityDay_collection:ArrayCollection;
@@ -257,8 +257,10 @@ package business{
 			selectedMonth = event.date;
 			workoutDay_collection.refresh();
 			build_month_stats();
-			workout_collection.refresh(); //refresh to filter this month
-			format_workout_collection(); //add flags for formatting
+			
+			
+			workout_collection.refresh();
+			
 		}
 		
 		
@@ -435,7 +437,6 @@ package business{
 			
 			workout_collection.filterFunction = workoutsByMonth_filter;
 			workout_collection.refresh();
-			format_workout_collection();
 		}
 		
 		
@@ -985,7 +986,7 @@ package business{
 		
 		
 		
-// Filtering, sorting, formating
+// Filtering and sorting
 			
 		private function sortWorkouts():void{
 			var dateSort:SortField = new SortField();
@@ -1034,33 +1035,6 @@ package business{
 			}
 			return false;
 		}
-		private function format_workout_collection():void{
-			var currentItem:Workout;
-			var currentDate:Date;
-			if(workout_collection.length > 0){
-				var cursor:IViewCursor = workout_collection.createCursor();
-				currentItem = cursor.current as Workout;
-				currentItem._first = true;
-				currentDate = currentItem._date;
-				cursor.moveNext();
-				while(!cursor.afterLast){
-					currentItem = cursor.current as Workout;
-					if(currentItem._date.getTime() != currentDate.getTime()){
-						currentItem._first = true;
-						currentDate = currentItem._date;
-					}else{
-						currentItem._first = false;
-					}
-					cursor.moveNext();
-				}
-			}
-		}
-		
-		
-		
-		
-		
-		
 	}
 }
 
