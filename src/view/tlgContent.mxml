@@ -37,7 +37,7 @@
 			/*** INTERNAL ***/
 			private var myTrainingSize:Number;
 			//First three = app.yaml version. Last = UI iteration
-			[Bindable] private var versionNumber:String = '0-0-35-0';
+			[Bindable] private var versionNumber:String = '0-0-37-0';
 			
 			//Flags
 			private var uiState:int = 0; //0 = login, 1 = dashboard, 2 = Workouts, 3 = Groups
@@ -86,7 +86,15 @@
 				dispatchEvent(re);
 				
 			}
+			
 			public function gotGroups(event:UIEvent):void{
+				setDashboardSizes();
+				preloadData();
+			}
+			public function groupAdded(event:UIEvent):void{
+				setDashboardSizes();
+			}
+			private function setDashboardSizes():void{
 				switch(group_collection.length){
 					case 0:
 						myTrainingSize = 0.6666;
@@ -101,8 +109,8 @@
 						trace("1+ groups");
 						break;
 				}
-				preloadData();
 			}
+			
 			private function preloadData():void{
 				//myActivities
 				var re:RequestEvent = new RequestEvent(RequestEvent.TLG_API_REQUEST);
@@ -217,6 +225,7 @@
 				}
 			}
 			private function revealDash():void{
+				sizeDashGroup();
 				uiState = 1;
 				dispatchEvent( new UIEvent(UIEvent.CLEAR_GROUP) ); //clears the currentGroup if on a group page
 				TweenLite.to(myTrainingDash, 15, {x:0, useFrames:true});

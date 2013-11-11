@@ -9,12 +9,14 @@ package events{
 
 		public static const USER_LOGGED_IN:String = "userLoggedIn_event";
 		public static const GOT_GROUPS:String = "gotGroups_event";
-		
 		public static const GOT_MY_ACTIVITES:String = "gotMyActivities_event";
+		
+		//Activity
 		public static const ACTIVITIES_UPDATED:String = "activitiesUpdated_event";
 		public static const ACTIVITY_UPDATED:String = "activityUpdated_event";
 		public static const ACTIVITY_UPDATE_FAIL:String = "activityUpdateFail_event";
 		
+		//Workout
 		public static const WORKOUT_ADDED:String = "workoutAdded_event";
 		public static const WORKOUT_DATE_CHANGED:String = "workoutDateChanged_event";
 		public static const WORKOUT_DELETED:String = "workoutDeleted_event";
@@ -22,7 +24,10 @@ package events{
 		public static const BUILD_MYWORKOUTS:String = "buildMyWorkouts_event";
 		public static const SET_WORKOUT_MONTH:String = "setWorkoutMonth_event";
 		
+		//Group
+		public static const GROUP_ADDED:String = "groupAdded_event";
 		
+		//Interaction
 		public static const GO_HOME:String = "goHome_event";
 		public static const GO_MYWORKOUTS:String = "goMyWorkouts_event";
 		public static const GO_GROUP:String = "goGroup_event";

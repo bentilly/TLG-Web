@@ -170,7 +170,7 @@ global{
 }
 .durationNumbers{
 	fontFamily: "OS-condBold";
-	fontSize: 32px;
+	fontSize: 28px;
 	color: #2A8796;
 }
 .durationlabel{

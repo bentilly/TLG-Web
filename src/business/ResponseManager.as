@@ -38,7 +38,7 @@ package business{
 		//Master collections of DB objects
 		private var user_collection:ArrayCollection;
 		private var activity_collection:ArrayCollection;
-		private var workout_collection:ArrayCollection;
+		[Bindable] public var workout_collection:ArrayCollection; // all the workouts
 		[Bindable] public var group_collection:ArrayCollection;
 		private var groupMember_collection:ArrayCollection;
 		private var groupMemberActivityDay_collection:ArrayCollection;
@@ -136,6 +136,12 @@ package business{
 						workout_deleteWorkout_handler(result, request);
 						break;
 				//GROUP
+					case "group.addGroup":
+						group_addGroup_handler(result, request);
+						break;
+					case "group.editGroup":
+						group_editGroup_handler(result, request);
+						break;
 					case "group.getMemberWorkouts":
 						group_getMemberWorkouts_handler(result, request);
 						break;
@@ -226,21 +232,23 @@ package business{
 			activity_collection = new ArrayCollection([]);
 			myActivities_collection = new ArrayCollection([]);
 			workout_collection = new ArrayCollection([]);
-			workoutDay_collection = new ArrayCollection([])
+			workoutDay_collection = new ArrayCollection([]);
 			group_collection = new ArrayCollection([]);
 			groupMember_collection = new ArrayCollection([]);
 			groupMemberActivityDay_collection = new ArrayCollection([]);
 			leaderboard_collection = new ArrayCollection( [] );
 			
-			//set the sort order for workouts, leaderboard, group member workouts
+			//set the sort orders
 			utils.sortArrayCollection(workout_collection, '_date', true, "DESC");
+			utils.sortArrayCollection(group_collection, '_name');
 			utils.sortArrayCollection(myActivities_collection, '_name');
 			utils.sortArrayCollection(leaderboard_collection, "_total", true, "DESC");
 			utils.sortGroupMemberActivityDayCollection(groupMemberActivityDay_collection);
-			//sort
 			
-			//assign filter for groupMemberActivityDays
+			//assign filters
+			//workout_collection.filterFunction = workoutsByMonth_filter;
 			groupMemberActivityDay_collection.filterFunction = leaderboard_filter;
+			
 			
 			//reset leaderboard date range
 			leaderboardEndDate = new Date();
@@ -256,6 +264,10 @@ package business{
 			selectedMonth = event.date;
 			workoutDay_collection.refresh();
 			build_month_stats();
+			
+			
+			workout_collection.refresh();
+			
 		}
 		
 		
@@ -364,7 +376,6 @@ package business{
 
 /** GET ACTIVITIES **/
 		private function user_getActivities_handler(result:Object):void{
-			//master data storage
 			//my activities
 			for each(var ao:Object in result.activities){
 				var act:Activity = new Activity();
@@ -390,7 +401,6 @@ package business{
 					tlggroup._activities.addItem(gact);
 				}
 			}
-			//END master data
 					
 			var uie:UIEvent = new UIEvent(UIEvent.GOT_MY_ACTIVITES);
 			dispatcher.dispatchEvent(uie);
@@ -419,6 +429,8 @@ package business{
 				workout_collection.addItem( new Workout(o, mdActivities) );
 				
 			}
+			
+			
 			build_workoutDay_collection(); //update my workouts lists for display
 			build_month_stats();  //calculate this first months stats
 			
@@ -429,6 +441,9 @@ package business{
 			//turn off spinner
 			uie = new UIEvent(UIEvent.SPINNER_OFF);
 			dispatcher.dispatchEvent(uie);
+			
+			workout_collection.filterFunction = workoutsByMonth_filter;
+			workout_collection.refresh();
 		}
 		
 		
@@ -552,14 +567,31 @@ package business{
 		
 		
 //-----GROUP-----//
+/** ADD / EDIT Groups **/
+		private function group_addGroup_handler(result:Object, request:Object):void{
+			//Add new group to array
+			var tlggroup:TLGGroup = new TLGGroup();
+			tlggroup._key = result.key;
+			tlggroup._name = request.name;
+			tlggroup._admin = true; //if USER adds a group they must be admin
+			group_collection.addItem(tlggroup);
+			group_collection.refresh();
+			
+			// Add group image to UI / Dashboard
+			var uie:UIEvent = new UIEvent(UIEvent.GROUP_ADDED);
+			dispatcher.dispatchEvent(uie);
+			
+		}
+		private function group_editGroup_handler(result:Object, request:Object):void{
+			currentGroup._name = request.name;
+			group_collection.refresh();
+		}
+		
 		
 /** GET MEMBER WORKOUTS **/
 		private function group_getMemberWorkouts_handler(result:Object, request:Object):void{
 			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
-			var m:Object;
-			
-			//if(!groupObject._loaded){ // should not request if loaded
-				
+			var m:Object;				
 				
 			//show all...
 			groupMemberActivityDay_collection.filterFunction = null;
@@ -769,6 +801,7 @@ package business{
 //BUILDERS ---------------------
 
 		private function build_workoutDay_collection():void{
+			
 			if(workout_collection.length < 1){ return; }; //kick out of function if no workouts
 			//empty collection
 			workoutDay_collection = new ArrayCollection([]);
@@ -804,6 +837,7 @@ package business{
 			
 			workoutDay_collection.filterFunction = workoutByMonth_filter;
 			workoutDay_collection.refresh();
+			
 		}
 		
 		private function build_workoutMonth_collection():void{
@@ -995,8 +1029,29 @@ package business{
 			workout_collection.refresh();
 			
 		}
+		/*private function sortGroups():void{
+			var groupSortField:SortField = new SortField();
+			groupSortField.name = 'name';
+			
+			var groupSort:Sort = new Sort();
+			groupSort.fields = [groupSortField];
+			group_collection.sort = groupSort;
+			group_collection.refresh();
+
+		}*/
 		
 		//Filter functions
+		private function workoutsByMonth_filter(w:Workout):Boolean{
+			if(w._date.time >= selectedMonth.time){
+				var endDate:Date = new Date(selectedMonth.fullYear, selectedMonth.month+1);
+				if(w._date.time < endDate.time){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		
 		private function workoutByMonth_filter(w:WorkoutDay):Boolean{
 			if(w._date.time >= selectedMonth.time){
 				var endDate:Date = new Date(selectedMonth.fullYear, selectedMonth.month+1);

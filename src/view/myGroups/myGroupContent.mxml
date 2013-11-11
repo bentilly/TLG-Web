@@ -20,7 +20,9 @@
 			
 			import events.UIEvent;
 			
+			import view.popups.addGroupPopup;
 			import view.popups.addTagPopup;
+			import view.popups.editGroupPopup;
 			import view.popups.groupInvitePopup;
 			
 			/*** IMPORT ***/
@@ -53,15 +55,13 @@
 			protected function dateLabel_rollOverHandler(event:MouseEvent):void
 			{
 				event.target.alpha = 1;
-				
 			}
+			
 			protected function dateLabel_rollOutHandler(event:MouseEvent):void
 			{
 				event.target.alpha = .7;
-				
 			}
 
-			
 			protected function startDateLabel_clickHandler(event:MouseEvent):void
 			{
 				var dateChoosePU:dateChooserPopup = new dateChooserPopup();
@@ -70,8 +70,8 @@
 				PopUpManager.centerPopUp(dateChoosePU);
 				
 				dateChoosePU.popupTitle.text = "START DATE";
-				//dateChoosePU.workoutDateChooser.selectedDate = lbStartDate;
-				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(lbEndDate.fullYear, lbEndDate.month, lbEndDate.date+1) } ];
+				dateChoosePU.workoutDateChooser.selectedDate = leaderboardStartDate;
+				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeStart : new Date(leaderboardEndDate.fullYear, leaderboardEndDate.month, leaderboardEndDate.date+1) } ];
 			}
 			
 			protected function endDateLabel_clickHandler(event:MouseEvent):void
@@ -82,10 +82,10 @@
 				PopUpManager.centerPopUp(dateChoosePU);
 				
 				dateChoosePU.popupTitle.text = "END DATE";
-				//dateChoosePU.workoutDateChooser.selectedDate = lbEndDate;
+				dateChoosePU.workoutDateChooser.selectedDate = leaderboardEndDate;
 				
 				var d:Date = new Date();
-				//dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(lbStartDate.fullYear, lbStartDate.month, lbStartDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
+				dateChoosePU.workoutDateChooser.disabledRanges = [ {rangeEnd : new Date(leaderboardStartDate.fullYear, leaderboardEndDate.month, leaderboardEndDate.date-1) }, {rangeStart : new Date(d.fullYear, d.month, d.date+1)} ];
 			}
 			
 			private function updateStartDate(event:PopUpEvent):void{
@@ -93,38 +93,21 @@
 				if (!event.commit)
 					return;
 				
-				//lbStartDate = event.data as Date;
-				updateLeaderboardRange();
+				var uie:UIEvent = new UIEvent(UIEvent.UPDATE_LEADERBOARD_RANGE);
+				uie.lbEndDate = leaderboardEndDate;
+				uie.lbStartDate = event.data as Date;
+				dispatchEvent(uie);
 			}
 			private function updateEndDate(event:PopUpEvent):void{
 				// If commit is false, no data is returned.
 				if (!event.commit)
 					return;
 				
-				//lbEndDate = event.data as Date;
-				updateLeaderboardRange();
+				var uie:UIEvent = new UIEvent(UIEvent.UPDATE_LEADERBOARD_RANGE);
+				uie.lbEndDate = event.data as Date;
+				uie.lbStartDate = leaderboardStartDate;
+				dispatchEvent(uie);
 			}
-			
-			private function updateLeaderboardRange():void{
-				//start date text
-				/*if( utils.compareDates(new Date(), lbStartDate) ){
-					startDateLabel.text = 'TODAY '+lbStartDate.date+' '+months[lbStartDate.month];
-				}else{
-					startDateLabel.text = days[lbStartDate.day]+' '+lbStartDate.date+' '+months[lbStartDate.month];
-				}*/
-				//end date text
-				/*if( utils.compareDates(new Date(), lbEndDate) ){
-					endDateLabel.text = 'TODAY '+lbEndDate.date+' '+months[lbEndDate.month];
-				}else{
-					endDateLabel.text = days[lbEndDate.day]+' '+lbEndDate.date+' '+months[lbEndDate.month];
-				}*/
-				//rebuild
-				//currentGroup.rebuildLeaderboardData(lbStartDate, lbEndDate);
-				//sort leaderboard members
-				//utils.sortArrayCollection(currentGroup._members_collection, '_totalDuration', true, 'DESC');
-			}
-
-			
 			
 			protected function inviteMemberLabel_clickHandler(event:MouseEvent):void
 			{
@@ -178,15 +161,30 @@
 						break;
 				}
 				
-				//updateLeaderboardRange();
-				
 				var uie:UIEvent = new UIEvent(UIEvent.UPDATE_LEADERBOARD_RANGE);
 				uie.lbEndDate = lbEndDate;
 				uie.lbStartDate = lbStartDate;
 				dispatchEvent(uie);
+			}
+			
+			
+			protected function groupHeaderGroup_rollOverHandler(event:MouseEvent):void
+			{
+				groupHeaderEditLabel.visible = true;
+			}
+			
+			protected function groupHeaderGroup_rollOutHandler(event:MouseEvent):void
+			{
+				groupHeaderEditLabel.visible = false;
 				
 			}
 			
+			protected function groupHeaderGroup_clickHandler(event:MouseEvent):void
+			{
+				var editGroupPU:editGroupPopup = new editGroupPopup();
+				editGroupPU.open(FlexGlobals.topLevelApplication as DisplayObjectContainer, true);
+				PopUpManager.centerPopUp(editGroupPU);
+			}
 			
 		]]>
 	</fx:Script>
@@ -221,9 +219,13 @@
 	
 	<s:BorderContainer backgroundColor="#ffffff" width="100%" height="100%" borderVisible="false">
 		<s:VGroup width="100%" height="100%">
-			<s:HGroup paddingTop="40" paddingLeft="15" gap="15">
+			<s:HGroup id="groupHeaderGroup" paddingTop="40" paddingLeft="15" gap="15"
+					  rollOver="groupHeaderGroup_rollOverHandler(event)" rollOut="groupHeaderGroup_rollOutHandler(event)" click="groupHeaderGroup_clickHandler(event)"
+					  buttonMode="true" useHandCursor="true"
+					  >
 				<fxg:gibbon width="56" height="56"/>
 				<s:Label text="{currentGroup._name}" styleName="h1_white" color="#123456" fontSize="40" paddingTop="10"/>
+				<s:Label id="groupHeaderEditLabel" text="edit" styleName="tagEdit" visible="false" paddingTop="33"/>
 			</s:HGroup>
 			
 			<s:Scroller width="100%" height="100%">
@@ -248,11 +250,11 @@
 							
 						<!--Presets-->
 						<s:HGroup gap="20" paddingBottom="15" paddingTop="0">
-							<s:Label text="This month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisMonth')"/>
-							<s:Label text="Last month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastMonth')"/>
-							<s:Label text="This week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisWeek')"/>
-							<s:Label text="Last week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastWeek')"/>
-							<s:Label text="Last 30 days" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('last30')"/>
+							<s:Label text="This month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisMonth')" buttonMode="true" useHandCursor="true"/>
+							<s:Label text="Last month" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastMonth')" buttonMode="true" useHandCursor="true"/>
+							<s:Label text="This week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('thisWeek')" buttonMode="true" useHandCursor="true"/>
+							<s:Label text="Last week" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('lastWeek')" buttonMode="true" useHandCursor="true"/>
+							<s:Label text="Last 30 days" styleName="leaderboardTitle"  fontSize="13"  alpha=".5" rollOver="presetRollover(event)" rollOut="presetRollout(event)" click="presetClick('last30')" buttonMode="true" useHandCursor="true"/>
 						</s:HGroup>
 						
 						<s:VGroup paddingBottom="20">
@@ -277,7 +279,7 @@
 							</s:layout>
 						</s:DataGroup>
 						
-						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" click="inviteMemberLabel_clickHandler(event)" paddingTop="20"/>
+						<s:Label id="inviteMemberLabel" text="+ invite" styleName="durationlabel" visible="{currentGroup._admin}" click="inviteMemberLabel_clickHandler(event)" paddingTop="20" buttonMode="true" useHandCursor="true"/>
 					</s:VGroup>
 					
 					<s:Line height="100%" alpha=".3"><s:stroke><s:SolidColorStroke color="#000000"/></s:stroke></s:Line>
@@ -290,7 +292,7 @@
 							</s:layout>
 						</s:DataGroup>
 						<s:Label id="addActivityLabel" text="+ add activity" styleName="durationlabel" click="addActivityLabel_clickHandler(event)" visible="{currentGroup._admin}"
-								 paddingTop="20"/>
+								 paddingTop="20" buttonMode="true" useHandCursor="true"/>
 					</s:VGroup>
 					
 				</s:HGroup>

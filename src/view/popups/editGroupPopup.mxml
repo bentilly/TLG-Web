@@ -15,11 +15,14 @@
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
+			import business.dataObjects.raw.TLGGroup;
+			
 			import events.RequestEvent;
 			import events.UIEvent;
 			
 			/*** IMPORTED ***/
 			[Bindable] public var token:String;
+			[Bindable] public var currentGroup:TLGGroup;
 			
 			
 			
@@ -61,15 +64,16 @@
 			
 			protected function goButton_clickHandler():void
 			{
-				var re:RequestEvent
+				var re:RequestEvent;
 				var requestObj:Object
 				var uie:UIEvent;
 				
 				//make the request
 				re = new RequestEvent(RequestEvent.TLG_API_REQUEST);
 				requestObj = new Object();
-				requestObj.operation = 'group.addGroup';
+				requestObj.operation = 'group.editGroup';
 				requestObj.token = token;
+				requestObj.key = currentGroup._key;
 				requestObj.name = nameInput.text;
 				re.requestJson = JSON.stringify(requestObj);
 				trace("\n\n>>--------API REQUEST--------- : request = "+requestObj.operation);
@@ -93,13 +97,13 @@
 	
 	<s:VGroup gap="0">
 		<s:Group>
-			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="CREATE A GROUP" paddingBottom="-6" paddingLeft="2"/>
+			<s:Label fontFamily="OS-condBold" color="white" fontSize="30" text="EDIT GROUP" paddingBottom="-6" paddingLeft="2"/>
 		</s:Group>
 		<s:BorderContainer backgroundColor="white" borderVisible="false" cornerRadius="6">
 			
 			<s:VGroup paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="18">
 				<s:Label text="group name:" styleName="smallLight"/>
-				<s:TextInput id="nameInput" styleName="textFieldBold" width="300" enter="goButton_clickHandler()"/>
+				<s:TextInput id="nameInput" styleName="textFieldBold" width="300" enter="goButton_clickHandler()" text="{currentGroup._name}"/>
 			</s:VGroup>
 			
 		</s:BorderContainer>

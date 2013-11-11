@@ -33,6 +33,8 @@
 			/*** IMPORTED ***/
 			[Bindable] public var userEmail:String;
 			
+			
+			
 			//Flags
 			public var editWorkoutMode:Boolean = false; //activityGroup used by addBar and editWorkoutPopup. Need to use appropriate activityTag UI Element.
 			
@@ -149,7 +151,7 @@
 		<s:HGroup id="groupHeader" click="groupHeader_clickHandler(event)" buttonMode="true" useHandCursor="true">
 			<fxg:gibbon id="gibbonIcon" width="50" height="50"/>
 			<s:Image id="gravatarImage" visible="false"/>
-			<s:Label text="{groupName}" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
+			<s:Label text="{tlgGroup._name}" styleName="h2_white" width="150" height="50" paddingTop="6" lineHeight="100%"/>
 		</s:HGroup>
 		
 		<s:List id="activitiesList" dataProvider="{activities_collection}" itemRenderer="view.skinsAndRenderers.editWorkout_activityRenderer"

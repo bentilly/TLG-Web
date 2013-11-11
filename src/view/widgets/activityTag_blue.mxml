@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:fxg="assets.fxg.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import business.dataObjects.raw.Activity;
+			
+			[Bindable] public var data:Activity; 
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:HGroup gap="-1" mouseChildren="false" mouseEnabled="false">
+		<fxg:tagHead_blue/>
+		<s:Label text="{data._name}" height="18" styleName="tagBlueText" maxWidth="150" maxDisplayedLines="1"/>
+		<s:Rect width="10" height="18" topRightRadiusX="5" topRightRadiusY="5" bottomRightRadiusX="5" bottomRightRadiusY="5">
+			<s:fill><s:SolidColor color="{data._colour}" /></s:fill>
+		</s:Rect>
+	</s:HGroup>
+	
+</s:Group>
