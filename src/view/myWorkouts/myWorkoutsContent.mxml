@@ -169,8 +169,10 @@
 				//set selected month and title
 				selectedMonth = calMonthsArray[2].myMonth; //<<<< is not actual month (wtf?)
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month-3);
+				
 				//pass in workouts
-				//newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.unshift(newMonth);
@@ -223,9 +225,14 @@
 				newMonth.alpha = .3;
 				newMonth.monthLabel.scaleX = newMonth.monthLabel.scaleY = .7;
 				newMonth.monthLabel.y = 7;
+				
 				//set selected month and title
 				selectedMonth = calMonthsArray[2].myMonth; //<<<
 				newMonth.myMonth = new Date(selectedMonth.fullYear, selectedMonth.month+2);
+				
+				//pass in workouts
+				newMonth.myMonthData = getMonthData(newMonth.myMonth);
+				
 				//build and add
 				newMonth.buildMonth();
 				calMonthsArray.push(newMonth);

@@ -151,7 +151,7 @@
 				woDetails.setWOComment(workout._comment);
 				
 				//find select activities
-				woActivitiesSelector.selectWorkoutActivites(workout)
+				woActivitiesSelector.selectWorkoutActivites(workout);
 				
 				
 			}

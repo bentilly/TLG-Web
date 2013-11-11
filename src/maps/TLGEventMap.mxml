@@ -23,6 +23,7 @@
 			import view.addBar.workoutActivities;
 			import view.addBar.workoutDetails;
 			import view.addBar.workoutTimeEntry;
+			import view.dashboard.group_dash;
 			import view.dashboard.myGroups_dash;
 			import view.dashboard.myTraining_dash;
 			import view.login.loginUI;
@@ -30,6 +31,8 @@
 			import view.myWorkouts.calendarChartDay;
 			import view.myWorkouts.monthBreakdown;
 			import view.myWorkouts.myWorkoutsContent;
+			import view.popups.addGroupPopup;
+			import view.popups.editGroupPopup;
 			import view.popups.editTagPopup;
 			import view.popups.editWorkoutPopup;
 			import view.skinsAndRenderers.groupInvite_renderer;
@@ -93,6 +96,8 @@
 			<ListenerInjector eventType="{UIEvent.LOGOUT}" method="logout"/>
 			<ListenerInjector eventType="{UIEvent.SPINNER_ON}" method="spinnerOn"/>
 			<ListenerInjector eventType="{UIEvent.SPINNER_OFF}" method="spinnerOff"/>
+			
+			<ListenerInjector eventType="{UIEvent.GROUP_ADDED}" method="groupAdded"/>
 			<!--Properties-->
 			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="group_collection" targetKey="group_collection"/>
@@ -189,6 +194,19 @@
 		<Injectors target="{monthBreakdown}">
 			<PropertyInjector source="{ResponseManager}" sourceKey="selectedMonth" targetKey="selectedMonth"/>
 			<PropertyInjector source="{ResponseManager}" sourceKey="monthBreakdownData" targetKey="monthBreakdownData"/>
+		</Injectors>
+		
+		<Injectors target="{addGroupPopup}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+		</Injectors>
+		
+		<Injectors target="{editGroupPopup}">
+			<PropertyInjector source="{ResponseManager}" sourceKey="token" targetKey="token"/>
+			<PropertyInjector source="{ResponseManager}" sourceKey="currentGroup" targetKey="currentGroup"/>
+		</Injectors>
+		
+		<Injectors target="{myGroups_dash}">
+			<ListenerInjector eventType="{UIEvent.GROUP_ADDED}" method="addGroup"/>
 		</Injectors>
 		
 		

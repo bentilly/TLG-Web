@@ -16,6 +16,8 @@
 			
 			import business.dataObjects.raw.TLGGroup;
 			
+			import events.UIEvent;
+			
 			/*** IMPORTED ***/
 			[Bindable] public var group_collection:ArrayCollection;
 			public var myTrainingSize:Number;
@@ -26,18 +28,25 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
-				
+				drawGroups();
+			}
+			
+			private function drawGroups():void{
 				for each(var g:TLGGroup in group_collection){
 					var gd:group_dash = new group_dash();
 					gd.tlgGroup = g;
 					groupList.addElement(gd);
 				}
-				var ag:addGroup = new addGroup();
+				var ag:addGroupButton = new addGroupButton();
 				groupList.addElement(ag);
 				
 				numGroups = group_collection.length + 1;
-
-				
+			}
+			
+			
+			public function addGroup(event:UIEvent):void{
+				groupList.removeAllElements();
+				drawGroups();
 			}
 			
 		]]>

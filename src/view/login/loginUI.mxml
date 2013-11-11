@@ -277,7 +277,7 @@
 				</s:Group>
 			
 		</s:Group>
-		<s:Label text="go b@b" click="batbHandler(event)" />
+		<!--<s:Label text="go b@b" click="batbHandler(event)" />-->
 		<!--<s:Label text="go bt" click="btbHandler(event)" />-->
 	</s:VGroup>
 	

@@ -136,6 +136,12 @@ package business{
 						workout_deleteWorkout_handler(result, request);
 						break;
 				//GROUP
+					case "group.addGroup":
+						group_addGroup_handler(result, request);
+						break;
+					case "group.editGroup":
+						group_editGroup_handler(result, request);
+						break;
 					case "group.getMemberWorkouts":
 						group_getMemberWorkouts_handler(result, request);
 						break;
@@ -234,6 +240,7 @@ package business{
 			
 			//set the sort orders
 			utils.sortArrayCollection(workout_collection, '_date', true, "DESC");
+			utils.sortArrayCollection(group_collection, '_name');
 			utils.sortArrayCollection(myActivities_collection, '_name');
 			utils.sortArrayCollection(leaderboard_collection, "_total", true, "DESC");
 			utils.sortGroupMemberActivityDayCollection(groupMemberActivityDay_collection);
@@ -560,14 +567,31 @@ package business{
 		
 		
 //-----GROUP-----//
+/** ADD / EDIT Groups **/
+		private function group_addGroup_handler(result:Object, request:Object):void{
+			//Add new group to array
+			var tlggroup:TLGGroup = new TLGGroup();
+			tlggroup._key = result.key;
+			tlggroup._name = request.name;
+			tlggroup._admin = true; //if USER adds a group they must be admin
+			group_collection.addItem(tlggroup);
+			group_collection.refresh();
+			
+			// Add group image to UI / Dashboard
+			var uie:UIEvent = new UIEvent(UIEvent.GROUP_ADDED);
+			dispatcher.dispatchEvent(uie);
+			
+		}
+		private function group_editGroup_handler(result:Object, request:Object):void{
+			currentGroup._name = request.name;
+			group_collection.refresh();
+		}
+		
 		
 /** GET MEMBER WORKOUTS **/
 		private function group_getMemberWorkouts_handler(result:Object, request:Object):void{
 			var groupObject:TLGGroup = getGroupObjectByKey(request.group);
-			var m:Object;
-			
-			//if(!groupObject._loaded){ // should not request if loaded
-				
+			var m:Object;				
 				
 			//show all...
 			groupMemberActivityDay_collection.filterFunction = null;
@@ -1005,6 +1029,16 @@ package business{
 			workout_collection.refresh();
 			
 		}
+		/*private function sortGroups():void{
+			var groupSortField:SortField = new SortField();
+			groupSortField.name = 'name';
+			
+			var groupSort:Sort = new Sort();
+			groupSort.fields = [groupSortField];
+			group_collection.sort = groupSort;
+			group_collection.refresh();
+
+		}*/
 		
 		//Filter functions
 		private function workoutsByMonth_filter(w:Workout):Boolean{

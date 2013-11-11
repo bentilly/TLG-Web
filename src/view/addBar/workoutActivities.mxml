@@ -53,7 +53,7 @@
 					if(tlgGroup._member){
 						var ag:activityGroup = new activityGroup();
 						ag.activities_collection = tlgGroup._activities;
-						ag.groupName = tlgGroup._name;
+						//ag.groupName = tlgGroup._name;
 						ag.tlgGroup = tlgGroup;
 						allActivities.addElement(ag);
 						activityLists.push(ag);
